@@ -2,6 +2,10 @@
 
 Every department MUST return this exact JSON envelope. No exceptions.
 
+## Relationship with Agent Teams Lite
+
+This contract extends the ATL output contract (`status`, `executive_summary`, `detailed_report`, `artifacts`, `next_recommended`, `risks`) with domain-specific fields for idea validation (`department`, `score`, `score_reasoning`, `data`, `evidence`). The ATL `risks` field is mapped to `flags` in our contract since our `flags` serve as operational alerts to the orchestrator rather than risk descriptions (risk analysis is a dedicated department).
+
 ## Envelope Schema
 
 ```json
@@ -9,6 +13,7 @@ Every department MUST return this exact JSON envelope. No exceptions.
   "status": "ok | warning | blocked | failed",
   "department": "problem | market | competitive | bizmodel | risk | synthesis",
   "executive_summary": "1-2 oraciones decision-grade para el orquestador",
+  "detailed_report": "optional — análisis extendido cuando detail_level es deep",
   "score": 0,
   "score_reasoning": "justificación explícita del score asignado",
   "data": {},
@@ -41,6 +46,10 @@ Exact string identifying which department produced this output. One of:
 
 Bad: "Se analizó el mercado."
 Good: "Mercado de $5B con 12% crecimiento anual. SOM estimado en $50M con early adopters claros en el segmento tech freelancer."
+
+### `detailed_report`
+
+**Optional.** Extended analysis for `detail_level: "deep"`. Can be arbitrarily long. The orchestrator does NOT show this by default — only when the user requests more detail on a specific department. If omitted, the orchestrator uses `executive_summary` + `data` for presentation.
 
 ### `score`
 
@@ -100,6 +109,8 @@ Array of strings alerting the orchestrator to issues that need attention:
 
 Flags don't halt the pipeline (use `status: "blocked"` for that) but they ARE shown to the user.
 
+**Note:** This maps to ATL's `risks` field but serves a different purpose — our flags are operational alerts, not risk descriptions. Risk analysis is handled by the dedicated `hc-risk` department.
+
 ### `next_recommended`
 
 Array of department names that should run next according to the DAG:
@@ -120,3 +131,4 @@ The orchestrator uses this as a hint but always validates against the DAG defini
 6. `evidence` SHOULD have at least 3 entries for `status: "ok"`
 7. If `status` is `blocked`, `flags` MUST explain why
 8. `data` schema is validated by each department's own contract (see SKILL.md)
+9. `detailed_report` is OPTIONAL — omit entirely if `detail_level` is not `deep`

@@ -1,5 +1,9 @@
 # Persistence Contract (shared across all HC departments)
 
+## Relationship with Agent Teams Lite
+
+ATL defines 4 modes: `engram`, `openspec`, `hybrid`, `none`. Idea Validation uses 3 modes: `engram`, `file`, `none`. Our `file` mode is a simplified version of ATL's `openspec` — we write JSON envelopes to `output/` instead of specs/proposals to `openspec/changes/`. We don't implement `hybrid` since validation artifacts are either in Engram or local files, not both.
+
 ## Mode Resolution
 
 The orchestrator passes `persistence_mode` with one of: `engram | file | none`.
@@ -12,18 +16,21 @@ Default resolution (when not explicitly set):
 
 ## Behavior Per Mode
 
-| Mode | Read from | Write to | Project files |
-|------|-----------|----------|---------------|
-| `engram` | Engram (see `engram-convention.md`) | Engram | Never |
-| `file` | JSON files in `output/` directory | JSON files in `output/` directory | Yes |
-| `none` | Orchestrator prompt context | Nowhere (inline only) | Never |
+| Mode | Read from | Write to | Project files | Cross-session |
+|------|-----------|----------|---------------|---------------|
+| `engram` | Engram (see `engram-convention.md`) | Engram | Never | Yes |
+| `file` | JSON files in `output/` directory | JSON files in `output/` directory | Yes | No |
+| `none` | Orchestrator prompt context | Nowhere (inline only) | Never | No |
 
 ### `engram` Mode (default)
 
 - Persist every department output to Engram using the naming in `engram-convention.md`
+- Use valid Engram `type` enums (see Type Mapping in `engram-convention.md`)
+- Do NOT use `tags` parameter (it does not exist in Engram's API)
 - Read previous department outputs from Engram using the 2-step recovery protocol
 - **Never** write project files
 - Cross-session recovery is automatic (Engram persists to SQLite)
+- Orchestrator MUST manage session lifecycle: `mem_session_start` → work → `mem_session_summary` → `mem_session_end` (see `engram-convention.md`)
 
 ### `file` Mode (fallback)
 
@@ -46,6 +53,7 @@ Each JSON file contains the full output envelope (see `output-contract.md`).
 - Write files ONLY to the `output/` directory at project root
 - Read previous department outputs by loading the JSON files
 - No cross-session intelligence (no search, no timeline, no progressive disclosure)
+- No session lifecycle management (Engram-only feature)
 
 ### `none` Mode
 
@@ -53,12 +61,13 @@ Each JSON file contains the full output envelope (see `output-contract.md`).
 - **No** persistence of any kind
 - The orchestrator passes previous outputs in the prompt context for each subsequent department
 - **Warning**: Context window fills up quickly. Only use for quick single-run validations.
+- No session lifecycle management
 
 ## State Persistence (Orchestrator)
 
 | Mode | Persist State | Recover State |
 |------|--------------|---------------|
-| `engram` | `mem_save(topic_key: "validation/{slug}/state")` | `mem_search("validation/{slug}/state")` → `mem_get_observation(id)` |
+| `engram` | `mem_save(topic_key: "validation/{slug}/state", type: "config")` | `mem_search("validation/{slug}/state")` → `mem_get_observation(id)` |
 | `file` | Write `output/{slug}/state.yaml` | Read `output/{slug}/state.yaml` |
 | `none` | Not possible — state lives only in context | Not possible — warn user |
 
@@ -79,10 +88,10 @@ A department detects Engram by checking if `mem_search` is available as an MCP t
 
 The orchestrator may pass `detail_level`: `concise | standard | deep`.
 
-| Level | `executive_summary` | `data` | `evidence` |
-|-------|---------------------|--------|------------|
-| `concise` | 1 sentence | Key metrics only | Top 3 sources |
-| `standard` | 1-2 sentences | Full analysis | All sources |
-| `deep` | 2-3 sentences | Full analysis + methodology notes | All sources + reliability assessment |
+| Level | `executive_summary` | `detailed_report` | `data` | `evidence` |
+|-------|---------------------|--------------------|--------|------------|
+| `concise` | 1 sentence | Omitted | Key metrics only | Top 3 sources |
+| `standard` | 1-2 sentences | Omitted | Full analysis | All sources |
+| `deep` | 2-3 sentences | Included | Full analysis + methodology notes | All sources + reliability assessment |
 
 Detail level controls output verbosity but does NOT affect what gets persisted — always persist the full artifact regardless.

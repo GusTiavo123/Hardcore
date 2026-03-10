@@ -1,16 +1,29 @@
 # Engram Artifact Convention (shared across all HC departments)
 
+## Compatibility Note
+
+This convention adapts Engram's API to the Idea Validation domain (a module of Hardcore).
+Key constraints from Engram that inform our design:
+
+- **`type`** is an enum: `decision`, `architecture`, `bugfix`, `pattern`, `config`, `discovery`, `learning`. Custom values are NOT accepted.
+- **`tags`** does NOT exist as a `mem_save` parameter. Use keywords in `title` and `content` for FTS5 searchability.
+- **`topic_key`** accepts any string. Engram's convention is `family/segment` (e.g., `decision/state-management`). We use `validation/{slug}/{department}` which is compatible.
+- **Content format**: Engram recommends `**What** / **Why** / **Where** / **Learned**`. We adapt this to our domain (see Content Format section).
+- **Session lifecycle**: Engram expects `mem_session_start` → work → `mem_session_summary` → `mem_session_end`. The orchestrator MUST follow this.
+
 ## Naming Rules
 
-ALL Hardcore Validation artifacts persisted to Engram MUST follow this deterministic naming:
+ALL Idea Validation artifacts persisted to Engram MUST follow this deterministic naming:
 
 ```
-title:     validation/{idea-slug}/{department}
-topic_key: validation/{idea-slug}/{department}
-type:      validation-{department}
-project:   hardcore
-scope:     project
+title:     "Validation: {idea-slug} — {department} ({score}/100)"
+topic_key: "validation/{idea-slug}/{department}"
+type:      <mapped to valid Engram enum — see table below>
+project:   "hardcore"
+scope:     "project"
 ```
+
+`project` is `"hardcore"` (the parent ecosystem). The `validation/` prefix in `topic_key` namespaces this module. Future modules (discovery, research, etc.) will use their own prefixes under the same project.
 
 ### Idea Slug
 
@@ -24,34 +37,55 @@ Examples:
 - `ai-resume-builder`
 - `saas-inventory-management`
 
-### Department Types (exact strings)
+### Type Mapping (Engram enum compliance)
 
-| Department | Type Value | Produced By |
-|------------|-----------|-------------|
-| `problem` | `validation-problem` | hc-problem |
-| `market` | `validation-market` | hc-market |
-| `competitive` | `validation-competitive` | hc-competitive |
-| `bizmodel` | `validation-bizmodel` | hc-bizmodel |
-| `risk` | `validation-risk` | hc-risk |
-| `synthesis` | `validation-synthesis` | hc-synthesis |
-| `report` | `validation-report` | hc-synthesis (final) |
-| `state` | `validation-state` | hc-orchestrator |
+Engram only accepts 7 type values. Our departments map as follows:
+
+| Department | Engram `type` | Rationale |
+|------------|---------------|-----------|
+| `problem` | `discovery` | Investigating whether a problem exists |
+| `market` | `discovery` | Investigating market size and dynamics |
+| `competitive` | `discovery` | Investigating competitive landscape |
+| `bizmodel` | `discovery` | Investigating unit economics viability |
+| `risk` | `discovery` | Investigating risk factors |
+| `synthesis` | `decision` | Final verdict is a decision |
+| `report` | `decision` | Consolidated decision report |
+| `state` | `config` | Pipeline configuration and recovery state |
+
+### Content Format
+
+Engram recommends `**What** / **Why** / **Where** / **Learned**` for coding observations.
+We adapt this structure to the validation domain while keeping FTS5 searchability:
+
+```markdown
+**What**: {executive_summary} [validation] [{department}] [{industry-keyword}]
+
+**Why**: Score {score}/100 — {score_reasoning}
+
+**Where**: validation/{slug}/{department}
+
+**Data**:
+{JSON stringified department-specific data}
+```
+
+The `[validation]` and `[{department}]` keywords in the `**What**` section replace `tags` — they make the content findable via `mem_search` FTS5 queries.
 
 ## Writing Artifacts
 
-### Standard Write (new artifact)
+### Standard Write (new or upsert)
 
 ```
 mem_save(
-  title: "validation/{slug}/{department}",
+  title: "Validation: {slug} — {department} ({score}/100)",
   topic_key: "validation/{slug}/{department}",
-  type: "validation-{department}",
+  type: "discovery",
   project: "hardcore",
   scope: "project",
-  content: "## Summary\n{executive_summary}\n\n## Score: {score}/100\n{score_reasoning}\n\n## Data\n{JSON stringified data}",
-  tags: ["validation", "{department}", "{industry}"]
+  content: "**What**: {executive_summary} [validation] [{department}] [{industry}]\n\n**Why**: Score {score}/100 — {score_reasoning}\n\n**Where**: validation/{slug}/{department}\n\n**Data**:\n{JSON stringified data}"
 )
 ```
+
+If the same `topic_key` already exists (same `project` + `scope`), Engram upserts: it updates the existing observation and increments `revision_count`. This enables re-validation without duplicating.
 
 ### Update Existing Artifact
 
@@ -64,7 +98,8 @@ mem_update(
 )
 ```
 
-Use `mem_update` when you have the exact observation ID. Use `mem_save` with the same `topic_key` for upserts (Engram deduplicates by `project + scope + topic_key`).
+Use `mem_update` when you have the exact observation ID and want to update specific fields.
+Use `mem_save` with the same `topic_key` for upserts when you don't have the ID.
 
 ## Recovery Protocol (2 steps — MANDATORY)
 
@@ -100,21 +135,58 @@ mem_search(query: "validation/{slug}/", project: "hardcore")
 → Returns all department outputs for that idea
 ```
 
+## Session Lifecycle (Orchestrator — MANDATORY)
+
+The orchestrator MUST manage session lifecycle for every validation run:
+
+### Start of validation
+
+```
+mem_session_start(
+  id: "validation-{slug}-{YYYY-MM-DD}",
+  project: "hardcore"
+)
+```
+
+### End of validation (after Synthesis or on abort)
+
+```
+mem_session_summary(
+  session_id: "validation-{slug}-{YYYY-MM-DD}",
+  goal: "Validate idea: {original idea text}",
+  accomplished: ["Problem: {score}", "Market: {score}", ...],
+  discoveries: ["key finding 1", "key finding 2"],
+  next_steps: ["validation experiment 1", "next action"]
+)
+
+mem_session_end(
+  session_id: "validation-{slug}-{YYYY-MM-DD}"
+)
+```
+
+### On context compaction (mid-validation recovery)
+
+```
+mem_context(project: "hardcore")
+→ Retrieves recent sessions, observations, and prompts for state recovery
+```
+
 ## State Persistence (Orchestrator)
 
 The orchestrator persists DAG state after each phase to enable recovery:
 
 ```
 mem_save(
-  title: "validation/{slug}/state",
+  title: "Validation: {slug} — state",
   topic_key: "validation/{slug}/state",
-  type: "validation-state",
+  type: "config",
   project: "hardcore",
-  content: "slug: {slug}\nphase: {last-completed-department}\nmode: {fast|normal}\ncompleted:\n  problem: true\n  market: true\n  competitive: false\n  bizmodel: false\n  risk: false\n  synthesis: false\nlast_updated: {ISO date}"
+  scope: "project",
+  content: "**What**: Pipeline state for {slug} [validation] [state]\n\n**Where**: validation/{slug}/state\n\n**Data**:\nslug: {slug}\nphase: {last-completed-department}\nmode: {fast|normal}\ncompleted:\n  problem: true\n  market: true\n  competitive: false\n  bizmodel: false\n  risk: false\n  synthesis: false\nlast_updated: {ISO date}"
 )
 ```
 
-Recovery: `mem_search("validation/{slug}/state")` → `mem_get_observation(id)` → parse YAML → restore state.
+Recovery: `mem_search("validation/{slug}/state")` → `mem_get_observation(id)` → parse YAML from Data section → restore state.
 
 ## Final Report
 
@@ -124,26 +196,31 @@ After synthesis, persist a consolidated report:
 mem_save(
   title: "VALIDATION REPORT: {slug} — {VERDICT} ({weighted_score}/100)",
   topic_key: "validation/{slug}/report",
-  type: "validation-report",
+  type: "decision",
   project: "hardcore",
-  content: "{full report with all scores, evidence, and verdict}",
-  tags: ["validation", "report", "{verdict}", "{industry}"]
+  scope: "project",
+  content: "**What**: {verdict} for {slug} — {executive_summary} [validation] [report] [{verdict}] [{industry}]\n\n**Why**: Weighted score {weighted_score}/100 — {score breakdown}\n\n**Where**: validation/{slug}/report\n\n**Data**:\n{full report with all scores, evidence, and verdict}"
 )
 ```
 
 ## Cross-Validation Queries (enabled by design)
 
-The consistent naming enables future queries:
+The consistent naming and embedded keywords enable future queries:
 ```
-mem_search("validation-report GO")       → all ideas that received GO
-mem_search("validation-report fintech")  → all fintech validations
-mem_search("validation/*/problem")       → all problem analyses
+mem_search("validation report GO", project: "hardcore")      → all ideas that received GO
+mem_search("validation report fintech", project: "hardcore")  → all fintech validations
+mem_search("validation problem", project: "hardcore")         → all problem analyses
 ```
+
+These work because `[validation]`, `[report]`, `[GO]`, `[fintech]` etc. are embedded as keywords in the content's `**What**` section, making them FTS5-searchable.
 
 ## Why This Convention Exists
 
 - **Deterministic titles** → recovery works by exact match, not fuzzy search
 - **`topic_key`** → enables upserts (re-validate without duplicating)
-- **`validation/` prefix** → namespaces all validation artifacts away from other Engram data
+- **`validation/` prefix** → namespaces this module within the `hardcore` project
 - **Two-step recovery** → `mem_search` previews are truncated; `mem_get_observation` gets full content
-- **`project: "hardcore"`** → scopes all data to this system
+- **`project: "hardcore"`** → shared project for all Hardcore modules, differentiated by topic_key prefix
+- **Valid `type` enums** → compliant with Engram's API (no custom types)
+- **Keywords in content** → replace `tags` (which don't exist in Engram) for FTS5 search
+- **Session lifecycle** → enables cross-session recovery and context restoration

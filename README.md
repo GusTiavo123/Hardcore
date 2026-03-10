@@ -1,8 +1,8 @@
-# HARDCORE — Idea Validation Agent Team
+# Idea Validation — Hardcore Agent Team
 
 Un equipo de 6 agentes AI especializados que toman una idea de startup en texto libre y producen un veredicto claro (**GO** / **NO-GO** / **PIVOT**) con datos reales, razonamiento explícito y próximos pasos accionables.
 
-Basado en la arquitectura de [Agent Teams Lite](https://github.com/Gentleman-Programming/agent-teams-lite) (orquestación multi-agente) y [Engram](https://github.com/Gentleman-Programming/engram) (memoria persistente entre agentes y sesiones).
+Módulo del ecosistema **Hardcore** (Founder Operating System). Basado en la arquitectura de [Agent Teams Lite](https://github.com/Gentleman-Programming/agent-teams-lite) (orquestación multi-agente) y [Engram](https://github.com/Gentleman-Programming/engram) (memoria persistente entre agentes y sesiones).
 
 ## Cómo Funciona
 
@@ -10,16 +10,24 @@ Basado en la arquitectura de [Agent Teams Lite](https://github.com/Gentleman-Pro
 TU IDEA → Problem Validation → Market Sizing ∥ Competitive Intel → Business Model → Risk → GO/NO-GO
 ```
 
-Un orquestador delegate-only coordina 6 departamentos especializados. Cada uno analiza un aspecto de la idea y retorna un score 0-100 con evidencia. Al final, un weighted score produce el veredicto.
+Un orquestador delegate-only coordina 6 departamentos especializados. Cada uno calcula un score 0-100 basado en **sub-dimensiones medibles** (no juicio subjetivo). Al final, un weighted score con reglas de knockout produce el veredicto.
 
-| Departamento | Qué analiza | Peso |
-|---|---|---|
-| **Problem** | ¿El problema existe y duele? | 25% |
-| **Market** | ¿Cuánto vale la oportunidad? | 20% |
-| **Competitive** | ¿Quién más lo resuelve? ¿Hay gaps? | 20% |
-| **Business Model** | ¿Los números cierran? | 20% |
-| **Risk** | ¿Qué puede matar esto? | 15% |
-| **Synthesis** | Veredicto final + próximos pasos | — |
+| Departamento | Qué analiza | Peso | Sub-dimensiones |
+|---|---|---|---|
+| **Problem** | ¿El problema existe y duele? | 30% | Volumen de quejas, recencia, intensidad, workarounds, alternativas pagas |
+| **Market** | ¿Cuánto vale la oportunidad? | 25% | Calidad de data, SOM, CAGR, early adopters |
+| **Competitive** | ¿Quién más lo resuelve? ¿Hay gaps? | 15% | Validación de mercado, debilidad incumbente, gaps, pricing, failures |
+| **Business Model** | ¿Los números cierran? | 20% | LTV/CAC, modelo validado, payback, pricing power |
+| **Risk** | ¿Qué puede matar esto? | 10% | Ejecución, regulatorio, timing, dependencias |
+| **Synthesis** | Veredicto final + próximos pasos | — | Weighted score + knockouts |
+
+### Reglas de Decisión
+
+- **GO**: weighted ≥ 70, Problem ≥ 60, todos los demás ≥ 45
+- **NO-GO automático**: Problem < 40, Market < 40, Risk < 30, o dos+ scores < 45
+- **PIVOT**: todo lo demás → incluye pivot suggestions
+
+Los pesos y knockouts fueron validados con simulación de 13 escenarios (84.6% accuracy vs 61.5% con pesos uniformes).
 
 ## Requisitos
 
@@ -31,18 +39,16 @@ Un orquestador delegate-only coordina 6 departamentos especializados. Cada uno a
 ### 1. Clonar el repo
 
 ```bash
-git clone https://github.com/tu-usuario/multi-agente.git
-cd multi-agente
+git clone https://github.com/tu-usuario/idea-validation.git
+cd idea-validation
 ```
 
 ### 2. Instalar Engram
 
 **Windows:**
 ```powershell
-# Descargar desde GitHub Releases
 Invoke-WebRequest -Uri "https://github.com/Gentleman-Programming/engram/releases/latest" -OutFile engram.zip
 Expand-Archive engram.zip -DestinationPath "$env:USERPROFILE\bin"
-# Agregar al PATH
 [Environment]::SetEnvironmentVariable("Path", "$env:USERPROFILE\bin;" + [Environment]::GetEnvironmentVariable("Path", "User"), "User")
 ```
 
@@ -67,8 +73,8 @@ brew install gentleman-programming/tap/engram
 skills/
 ├── _shared/                      # Convenciones compartidas
 │   ├── output-contract.md        # JSON envelope de cada departamento
-│   ├── scoring-convention.md     # Rubrics, pesos, reglas GO/NO-GO
-│   ├── engram-convention.md      # Naming determinístico para Engram
+│   ├── scoring-convention.md     # Sub-dimensiones, pesos, knockouts
+│   ├── engram-convention.md      # Naming, type mapping, session lifecycle
 │   └── persistence-contract.md   # Modos: engram / file / none
 ├── hc-orchestrator/SKILL.md      # Orquestador delegate-only
 ├── hc-problem/SKILL.md           # Dept 1: Problem Validation
@@ -81,20 +87,28 @@ examples/
 └── opencode/                     # Config para OpenCode
 ```
 
+## Compatibilidad
+
+### Con Agent Teams Lite
+Usamos el patrón delegate-only, output contracts, skills como Markdown puro, y `_shared/` para convenciones DRY. Lo que cambia es el dominio — la mecánica es la misma.
+
+### Con Engram
+Todos los `mem_save` usan `type` enums válidos de Engram (`discovery`, `decision`, `config`). No usamos `tags` (no existe en la API). Content format adaptado a `**What**/**Why**/**Where**/**Data**`. Session lifecycle completo (`mem_session_start` → `mem_session_summary` → `mem_session_end`).
+
 ## Plan Completo
 
-Ver [hardcore-validation-plan.md](./hardcore-validation-plan.md) para la especificación detallada de cada departamento, output contracts, DAG de dependencias, y plan de implementación por fases.
+Ver [hardcore-validation-plan.md](./hardcore-validation-plan.md) para la especificación detallada de cada departamento, sub-scoring rubrics, DAG de dependencias, y plan de implementación por fases.
 
 ## Estado Actual
 
-- [x] **Phase 0: Foundation** — Estructura, convenciones, Engram
+- [x] **Phase 0: Foundation** — Estructura, convenciones, scoring con sub-dimensiones, orchestrator
 - [ ] **Phase 1: Departamentos** — Implementar los 6 skills
 - [ ] **Phase 2: Orquestación** — Pipeline end-to-end
 - [ ] **Phase 3: Hardening** — Testing con 10 ideas, calibración
 
 ## Contexto
 
-Este agent team es el **Módulo 2** de un ecosistema más amplio llamado **Hardcore** (Founder Operating System). Eventualmente se conectará con otros módulos a través de Engram como bus de memoria compartida.
+Este agent team es un módulo del ecosistema **Hardcore** (Founder Operating System). Usa `project: "hardcore"` en Engram y el prefijo `validation/` en topic_key para namespacing. Eventualmente se conectará con otros módulos (Idea Discovery, Deep Research, Product Definition) a través de Engram como bus de memoria compartida.
 
 ## Licencia
 

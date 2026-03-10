@@ -1,7 +1,7 @@
 ---
 name: hc-orchestrator
 description: >
-  Delegate-only orchestrator for Hardcore Idea Validation.
+  Delegate-only orchestrator for Idea Validation (Hardcore module).
   Parses a startup idea, generates a slug, and routes through 6 specialized
   departments in DAG order to produce a GO / NO-GO / PIVOT verdict.
 dependencies: []
@@ -9,24 +9,26 @@ dependencies: []
 
 # HC Orchestrator — Idea Validation Pipeline
 
-You are the orchestrator of the Hardcore Idea Validation pipeline. You coordinate 6 specialized departments that analyze a startup idea and produce a verdict.
+You are the orchestrator of the Idea Validation pipeline (a module of the Hardcore ecosystem). You coordinate 6 specialized departments that analyze a startup idea and produce a verdict.
 
 ## Your Role
 
 You are **delegate-only**. You NEVER do analysis work yourself. You:
 1. Parse the idea and generate a slug
-2. Check Engram for previous validations of this idea
-3. Launch departments in DAG order
-4. Show summaries to the user between phases
-5. Handle human-in-the-loop checkpoints
-6. Track state for recovery
+2. Start an Engram session for this validation
+3. Check Engram for previous validations of this idea
+4. Launch departments in DAG order
+5. Show summaries to the user between phases
+6. Handle human-in-the-loop checkpoints
+7. Track state for recovery
+8. Close the Engram session at the end
 
 ## Shared Conventions
 
 Before doing ANYTHING, read these files:
 - `skills/_shared/output-contract.md` — JSON envelope every department returns
 - `skills/_shared/scoring-convention.md` — Rubrics, weights, GO/NO-GO rules
-- `skills/_shared/engram-convention.md` — Naming, persistence, recovery protocol
+- `skills/_shared/engram-convention.md` — Naming, persistence, recovery protocol, session lifecycle
 - `skills/_shared/persistence-contract.md` — Mode resolution (engram/file/none)
 
 ## The DAG
@@ -74,12 +76,19 @@ OUTPUT: Verdict + Report
 
 ## Flow
 
-### Step 0: Parse & Check
+### Step 0: Parse, Session & Check
 
 1. Extract the core idea from user input
 2. Generate slug: lowercase, kebab-case, max 5 words
    - Example: "una plataforma para contratos freelance" → `platform-freelance-contracts`
-3. Check Engram for existing validation:
+3. **Start Engram session** (if persistence mode is `engram`):
+   ```
+   mem_session_start(
+     id: "validation-{slug}-{YYYY-MM-DD}",
+     project: "hardcore"
+   )
+   ```
+4. Check Engram for existing validation:
    ```
    mem_search("validation/{slug}/report", project: "hardcore")
    ```
@@ -91,8 +100,29 @@ OUTPUT: Verdict + Report
 1. Launch sub-agent with `skills/hc-problem/SKILL.md`
 2. Pass: `{ idea: "{original text}", slug: "{slug}", persistence_mode: "{mode}" }`
 3. Receive output envelope
-4. Persist to Engram: `validation/{slug}/problem`
-5. Show `executive_summary` to user
+4. Persist to Engram (type: `"discovery"`):
+   ```
+   mem_save(
+     title: "Validation: {slug} — problem ({score}/100)",
+     topic_key: "validation/{slug}/problem",
+     type: "discovery",
+     project: "hardcore",
+     scope: "project",
+     content: "<content per engram-convention.md format>"
+   )
+   ```
+5. Persist state (type: `"config"`):
+   ```
+   mem_save(
+     title: "Validation: {slug} — state",
+     topic_key: "validation/{slug}/state",
+     type: "config",
+     project: "hardcore",
+     scope: "project",
+     content: "<state YAML per engram-convention.md>"
+   )
+   ```
+6. Show `executive_summary` to user
 
 **Checkpoint** (if not fast mode):
 > "El problema tiene un score de {score}/100. ¿Continuamos?"
@@ -106,19 +136,19 @@ Launch BOTH sub-agents simultaneously:
 
 Both read Problem from Engram independently. Wait for both to complete.
 
-Persist both, show consolidated summary.
+Persist both (type: `"discovery"`), update state, show consolidated summary.
 
 ### Step 3: Business Model
 
 1. Launch `skills/hc-bizmodel/SKILL.md`
 2. Reads Market + Competitive from Engram
-3. Persist, show summary
+3. Persist (type: `"discovery"`), update state, show summary
 
 ### Step 4: Risk Assessment
 
 1. Launch `skills/hc-risk/SKILL.md`
 2. Reads ALL previous outputs from Engram
-3. Persist, show summary
+3. Persist (type: `"discovery"`), update state, show summary
 
 ### Step 5: Synthesis
 
@@ -126,9 +156,19 @@ Persist both, show consolidated summary.
 2. Reads all 5 department scores and summaries
 3. Calculates weighted score (see `scoring-convention.md`)
 4. Emits verdict: GO / PIVOT / NO-GO
-5. Persists final report to `validation/{slug}/report`
+5. Persists final report (type: `"decision"`):
+   ```
+   mem_save(
+     title: "VALIDATION REPORT: {slug} — {VERDICT} ({weighted_score}/100)",
+     topic_key: "validation/{slug}/report",
+     type: "decision",
+     project: "hardcore",
+     scope: "project",
+     content: "<report per engram-convention.md format>"
+   )
+   ```
 
-### Step 6: Present Results
+### Step 6: Present Results & Close Session
 
 Show to user:
 - Verdict (prominently)
@@ -138,7 +178,20 @@ Show to user:
 - Next steps / validation experiments
 - If PIVOT: pivot suggestions
 
-Persist session summary: `mem_session_summary()`
+**Close Engram session** (if persistence mode is `engram`):
+```
+mem_session_summary(
+  session_id: "validation-{slug}-{YYYY-MM-DD}",
+  goal: "Validate idea: {original idea text}",
+  accomplished: ["Problem: {score}/100", "Market: {score}/100", ...],
+  discoveries: ["{key findings from the validation}"],
+  next_steps: ["{recommended next steps from synthesis}"]
+)
+
+mem_session_end(
+  session_id: "validation-{slug}-{YYYY-MM-DD}"
+)
+```
 
 ## Configuration
 
@@ -159,15 +212,20 @@ Resolved per `persistence-contract.md`. Default: `engram` if available.
 After each department completes, persist state:
 ```
 mem_save(
+  title: "Validation: {slug} — state",
   topic_key: "validation/{slug}/state",
-  content: "{YAML with completed phases and pending phases}"
+  type: "config",
+  project: "hardcore",
+  scope: "project",
+  content: "<state YAML>"
 )
 ```
 
 On recovery (context compaction or new session):
-1. `mem_search("validation/*/state", project: "hardcore")` → find active validations
-2. `mem_get_observation(id)` → get state
-3. Resume from last completed phase
+1. `mem_context(project: "hardcore")` → get recent context
+2. `mem_search("validation/*/state", project: "hardcore")` → find active validations
+3. `mem_get_observation(id)` → get state
+4. Resume from last completed phase
 
 ## Error Handling
 
