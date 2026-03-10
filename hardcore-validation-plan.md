@@ -672,7 +672,7 @@ mem_search("validation problem", project: "hardcore")         → todos los prob
 
 ## PLAN DE IMPLEMENTACIÓN
 
-### Phase 0: Foundation ✅
+### Phase 0: Foundation ✅ DONE
 
 **Objetivo**: Infraestructura base lista.
 
@@ -684,7 +684,7 @@ mem_search("validation problem", project: "hardcore")         → todos los prob
 - `_shared/persistence-contract.md` — 3 modos (engram/file/none) con degradación graceful
 - `hc-orchestrator/SKILL.md` — DAG completo, session lifecycle, state recovery
 
-### Phase 1: Departamentos uno a uno
+### Phase 1: Departamentos uno a uno ✅ DONE
 
 **Objetivo**: Cada departamento funciona standalone y produce output con sub-scores correctos.
 

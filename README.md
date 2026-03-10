@@ -102,7 +102,7 @@ Ver [hardcore-validation-plan.md](./hardcore-validation-plan.md) para la especif
 ## Estado Actual
 
 - [x] **Phase 0: Foundation** — Estructura, convenciones, scoring con sub-dimensiones, orchestrator
-- [ ] **Phase 1: Departamentos** — Implementar los 6 skills
+- [x] **Phase 1: Departamentos** — 6 skills implementados con proceso, queries, sub-scoring, persistencia
 - [ ] **Phase 2: Orquestación** — Pipeline end-to-end
 - [ ] **Phase 3: Hardening** — Testing con 10 ideas, calibración
 
