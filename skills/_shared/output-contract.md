@@ -119,7 +119,7 @@ Array of department names that should run next according to the DAG:
 ["market", "competitive"]
 ```
 
-The orchestrator uses this as a hint but always validates against the DAG definition.
+**Note**: This field is **informational only**. The orchestrator uses its own DAG definition to determine execution order and always validates against it. Departments MUST still set `next_recommended` to their hardcoded downstream value (for documentation and potential future use by external tools), but the orchestrator NEVER relies on this field for routing decisions. If `next_recommended` conflicts with the DAG, the DAG wins.
 
 ## Validation Rules
 

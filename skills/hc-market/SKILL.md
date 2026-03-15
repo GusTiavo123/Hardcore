@@ -32,6 +32,8 @@ You receive from the orchestrator:
 }
 ```
 
+If `idea` or `slug` are missing, return `status: "blocked"` with `flags: ["invalid-input"]`.
+
 ## Step 0: Recover Problem Validation Context
 
 You MUST read the Problem Validation output before starting your analysis. It provides the refined problem statement, pain intensity, current solutions, and industry context.
@@ -49,11 +51,16 @@ You MUST read the Problem Validation output before starting your analysis. It pr
 
 **If `persistence_mode` is `none`:** The orchestrator passes the Problem output in your prompt context.
 
+**If recovery fails** (mem_search returns no results, file doesn't exist, or context is missing): return `status: "blocked"` with `flags: ["missing-dependency"]` and `executive_summary` explaining that Problem Validation output could not be found. Do NOT proceed without it.
+
 Extract from Problem output:
 - `problem_statement` — what specific problem are we sizing
+- `target_user` — who suffers this problem (informs early adopter search)
+- `industry` — industry/domain keyword for search queries. If this field is missing (legacy output), infer from `problem_statement` and `current_solutions`.
 - `pain_intensity` — informs willingness to pay
 - `current_solutions` — existing market signals
-- `industry` keyword — for search queries
+
+**If Problem score is below 40** (knockout threshold): note this context in your analysis, but proceed normally. The orchestrator decides pipeline continuation — your job is to produce the best market analysis regardless of upstream scores.
 
 ## Process
 
@@ -66,7 +73,11 @@ From the problem statement and idea, determine:
 
 ### Step 2: Search for Market Data
 
-Execute **5-8 search queries** targeting institutional sources:
+Execute **5-8 search queries** targeting institutional sources.
+
+**Language strategy**: Market reports are overwhelmingly in English. Formulate all queries in English. If the idea targets a region-specific market (e.g., Latin America, Japan), add **1-2 queries in the local language** targeting regional reports.
+
+**If your search tool does not support `site:` operators**, reformulate without them (e.g., `"freelance invoicing" market size statista 2025`).
 
 **TAM/SAM reports:**
 - `"{industry}" market size 2024 2025 2026`
@@ -81,9 +92,33 @@ Execute **5-8 search queries** targeting institutional sources:
 - `"{target segment}" community OR forum OR conference OR subreddit`
 - `"{target segment}" spending OR budget OR "willingness to pay"`
 
+**Search depth**: Review the top **10 results per query**. If a query returns mostly irrelevant results, stop at 5 and move on.
+
+**As you search, build an evidence log** — record each useful source as an evidence item:
+```json
+{
+  "source": "https://grandviewresearch.com/...",
+  "quote": "The global freelance management market was valued at $X.XB in 2024",
+  "reliability": "high | medium | low"
+}
+```
+
+Reliability levels:
+- `high`: Institutional reports (Gartner, Statista, Grand View Research, Fortune BI), government/census data, public company filings
+- `medium`: VC/analyst posts with cited numbers, industry association reports, reputable news
+- `low`: Blog posts without citations, press releases, LLM knowledge without URL
+
+Record the search queries you actually executed in `search_queries_used`.
+
 ### Step 3: Build TAM → SAM → SOM
 
-For each level, document the source and methodology:
+For each level, document the source and methodology.
+
+For the `methodology` field, use one of these labels:
+- `top-down-institutional` — TAM from institutional report, SAM filtered by segment/geo, SOM as % of SAM
+- `top-down-estimated` — TAM estimated from adjacent market data or non-institutional sources
+- `bottom-up` — calculated from unit economics × addressable users (preferred when data exists)
+- `analog` — based on comparable market in adjacent industry
 
 **TAM (Total Addressable Market):**
 - The broadest market that includes the problem space
@@ -97,9 +132,11 @@ For each level, document the source and methodology:
 
 **SOM (Serviceable Obtainable Market):**
 - Realistic first-3-years capture
-- If only TAM available: estimate SOM at 1% (broad market) to 5% (niche market)
-- If competitive data available: estimate based on smallest viable competitor's ARR
+- If only TAM available: estimate SOM using the TAM-size scale from `scoring-convention.md` (TAM > $10B → 1%, $1B-$10B → 2-3%, < $1B → 5%)
+- If you found competitor-like companies during your own market searches: use their visible traction (reviews, social following, job postings) as a loose sizing signal
+- Note: Competitive Intelligence runs in PARALLEL with you — you do NOT have access to its output. Use only what you find in your own searches.
 - Always use the most conservative credible estimate
+- If no market sizing data is found at all, set `value: 0`, `source: "No data found"`, `methodology: "N/A"`. The 0 value and Data Availability sub-score of 0-6 will properly reflect this in scoring.
 
 ### Step 4: Find Growth Trajectory
 
@@ -107,6 +144,11 @@ For each level, document the source and methodology:
 - If multiple CAGRs found, use the **median**
 - If no CAGR but year-over-year figures exist, calculate the implied growth rate
 - Note the time range and source for every figure
+
+Format the `growth_rate` field as:
+- `"X% CAGR (YYYY-YYYY)"` when sourced directly from a report
+- `"~X% implied growth (YYYY-YYYY)"` when calculated from YoY figures
+- `"N/A — no growth data found"` when no data exists (this maps to 0-6 points in scoring)
 
 ### Step 5: Identify Early Adopter Segments
 
@@ -117,6 +159,8 @@ A segment counts as identifiable ONLY if ALL THREE criteria are observable:
 3. **At least one concrete channel** to reach them with measurable membership (subreddit + member count, Slack community, conference + attendance, newsletter + subscriber count)
 
 List every qualifying segment with its channels and evidence.
+
+**Only include segments in the `early_adopters` array that meet ALL THREE criteria.** Segments that partially qualify (e.g., identifiable group but no reachable channel) may be mentioned in `detailed_report` but MUST NOT appear in the array. The array count directly drives the Early Adopter Identifiability sub-score.
 
 ### Step 6: Determine Market Stage
 
@@ -131,21 +175,43 @@ List every qualifying segment with its channels and evidence.
 
 Apply the rubrics from `scoring-convention.md` section **"Market Sizing — hc-market"**. Your 4 sub-dimensions, each worth 0-25 points:
 
-| Sub-dimension | What to evaluate | Max |
-|---|---|---|
-| Data Availability & Source Quality | Count and quality of market sizing sources | 25 |
-| Market Scale (SOM) | Serviceable Obtainable Market value | 25 |
-| Growth Trajectory | CAGR of relevant market | 25 |
-| Early Adopter Identifiability | Segments meeting all 3 criteria | 25 |
+| Sub-dimension | What to evaluate | Sub-score key | Max |
+|---|---|---|---|
+| Data Availability & Source Quality | Count and quality of market sizing sources | `data_availability` | 25 |
+| Market Scale (SOM) | Serviceable Obtainable Market value | `market_scale` | 25 |
+| Growth Trajectory | CAGR of relevant market | `growth_trajectory` | 25 |
+| Early Adopter Identifiability | Segments meeting all 3 criteria | `early_adopter_identifiability` | 25 |
 
 For each sub-dimension:
 1. State the **observable evidence** (counts, figures, sources)
 2. Map to the rubric tier
-3. Assign points within the tier
+3. Assign points **within the tier**: bottom of range if the count barely qualifies, middle if solidly in range, top if near the next tier's threshold
 
-**Total score** = sum of all 4 sub-dimensions.
+**Total score** = sum of all 4 sub-dimensions. Verify the arithmetic before proceeding.
 
-### Step 8: Persist (if applicable)
+### Step 8: Determine Status and Flags
+
+**Flags** — set all that apply:
+- `"no-reliable-market-data"` — no institutional sources found; sizing is speculative
+- `"market-data-stale"` — best available data is 3+ years old
+- `"som-is-estimate"` — SOM was derived from % of TAM, not bottom-up analysis
+- `"no-early-adopters-identified"` — could not find segments meeting all 3 criteria
+- `"score-below-threshold"` — score < 40 (knockout threshold for Market)
+- `"no-search-results"` — web search failed for most queries (>50% returned 0 relevant results)
+- `"missing-dependency"` — could not recover Problem Validation output
+
+**Status** — based on your analysis:
+
+| Status | Condition |
+|---|---|
+| `ok` | Problem context recovered AND search returned usable results AND you scored all 4 sub-dimensions |
+| `warning` | Analysis completed BUT any flag is set |
+| `blocked` | Input missing/invalid OR Problem Validation output could not be recovered |
+| `failed` | Search tool entirely unavailable or returned errors on all queries |
+
+### Step 9: Persist (if applicable)
+
+**You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.
 
 Based on `persistence_mode`:
 
@@ -157,17 +223,39 @@ mem_save(
   type: "discovery",
   project: "hardcore",
   scope: "project",
-  content: "**What**: {executive_summary} [validation] [market] [{industry}]\n\n**Why**: Score {score}/100 — {score_reasoning}\n\n**Where**: validation/{slug}/market\n\n**Data**:\n{JSON.stringify(data)}"
+  content: "**What**: {executive_summary} [validation] [market] [{industry}]\n\n**Why**: Score {score}/100 — {score_reasoning}\n\n**Where**: validation/{slug}/market\n\n**Data**:\n{full data object as JSON string}"
 )
 ```
 
-**If `file`:** Write to `output/{slug}/market.json`
+**If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/market.json`.
 
 **If `none`:** Return inline only.
+
+After persisting (or in `none` mode), record the artifact reference:
+```json
+{
+  "name": "market-analysis",
+  "store": "{persistence_mode}",
+  "ref": "validation/{slug}/market"
+}
+```
 
 ## Output
 
 Return the output contract envelope exactly as specified in `output-contract.md`.
+
+**Score consistency rule**: The `data.market_score` field MUST equal the envelope's top-level `score` field. Both represent the same value — the total of your 4 sub-dimensions. This redundancy exists so `data` can be parsed independently from the envelope.
+
+### Detail Level Adjustments
+
+| Field | `concise` | `standard` | `deep` |
+|---|---|---|---|
+| `executive_summary` | 1 sentence | 1-2 sentences | 2-3 sentences |
+| `detailed_report` | Omit | Omit | Include: full methodology, all sources reviewed, TAM/SAM derivation logic, rejected segments |
+| `data` | Only: tam, sam, som (values only), growth_rate, market_score, sub_scores | Full schema | Full schema + methodology notes |
+| `evidence` | Top 3 highest-reliability sources | All sources | All sources with reliability justification per item |
+
+**Always persist the full artifact** regardless of detail_level. Detail level only affects the returned output envelope.
 
 ### `data` Schema
 
@@ -204,6 +292,9 @@ Return the output contract envelope exactly as specified in `output-contract.md`
       ]
     }
   ],
+  "search_queries_used": [
+    "actual query string executed"
+  ],
   "sub_scores": {
     "data_availability": 0,
     "market_scale": 0,
@@ -227,17 +318,7 @@ Total: {a} + {b} + {c} + {d} = {total}
 
 ### `next_recommended`
 
-Always return `["bizmodel"]` — Business Model is the next department that depends on your output.
-
-## Flags
-
-Set these flags when appropriate:
-- `"no-reliable-market-data"` — no institutional sources found; sizing is speculative
-- `"market-data-stale"` — best available data is 3+ years old
-- `"som-is-estimate"` — SOM was derived from % of TAM, not bottom-up analysis
-- `"no-early-adopters-identified"` — could not find segments meeting all 3 criteria
-- `"score-below-threshold"` — score < 40 (knockout threshold for Market)
-- `"no-search-results"` — web search failed for most queries
+Always return `["bizmodel"]` — Business Model depends on your output (and on Competitive Intelligence, which runs in parallel with you). The orchestrator waits for BOTH to complete before launching BizModel.
 
 ## Critical Rules
 
@@ -245,5 +326,6 @@ Set these flags when appropriate:
 2. **Always cite the source and year** for every market figure. Stale data (>3 years) gets flagged.
 3. **SOM must be conservative.** When estimating, use the lower bound. Optimistic SOM projections are the #1 source of bad validation calls.
 4. **Early adopters must be reachable.** "SMBs" is not a segment. "Freelance developers earning >$100k who are active on r/freelance (250k members)" is a segment.
-5. **If web search fails**, use your knowledge but flag every item with `reliability: "low"` and set the `"no-search-results"` flag.
+5. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (7-12 points).
 6. **Distinguish between TAM you found vs TAM you estimated.** Be transparent in methodology.
+7. **Arithmetic must be exact.** `market_score` MUST equal the sum of the 4 sub_scores values. Verify before returning.

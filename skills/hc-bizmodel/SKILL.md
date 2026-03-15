@@ -5,6 +5,7 @@ description: >
   Evaluates whether the unit economics work: LTV/CAC ratio, revenue model
   validation, payback period, pricing power, and sensitivity analysis.
 dependencies:
+  - hc-problem
   - hc-market
   - hc-competitive
 ---
@@ -33,24 +34,42 @@ You receive from the orchestrator:
 }
 ```
 
+If `idea` or `slug` are missing, return `status: "blocked"` with `flags: ["invalid-input"]`.
+
 ## Step 0: Recover Upstream Context
 
-You depend on **Market Sizing** and **Competitive Intelligence**. You MUST read both before starting.
+You depend on three upstream departments:
+- **Competitive Intelligence** — HARD dependency. Pricing benchmark is essential for unit economics. Without it you cannot calculate.
+- **Market Sizing** — soft dependency. Provides scale context (SOM, growth, early adopters). Unit economics can be calculated without it.
+- **Problem Validation** — soft dependency. Provides `pain_intensity` which calibrates pricing. Can default to mid-range without it.
 
 **If `persistence_mode` is `engram`:**
 ```
-1. mem_search(query: "validation/{slug}/market", project: "hardcore") → get ID
-2. mem_search(query: "validation/{slug}/competitive", project: "hardcore") → get ID
-3. mem_get_observation(id) for EACH → full content
+1. mem_search(query: "validation/{slug}/competitive", project: "hardcore") → get ID
+2. mem_search(query: "validation/{slug}/market", project: "hardcore") → get ID
+3. mem_search(query: "validation/{slug}/problem", project: "hardcore") → get ID
+4. mem_get_observation(id) for EACH → full content (NEVER use mem_search results directly)
 ```
 
-**If `persistence_mode` is `file`:** Read `output/{slug}/market.json` and `output/{slug}/competitive.json`
+**If `persistence_mode` is `file`:** Read `output/{slug}/competitive.json`, `output/{slug}/market.json`, and `output/{slug}/problem.json`
 
-**If `persistence_mode` is `none`:** Both outputs are in your prompt context.
+**If `persistence_mode` is `none`:** All outputs are in your prompt context.
 
-Extract from upstream:
-- **From Market**: SOM, market stage, early adopter segments, growth rate
-- **From Competitive**: pricing benchmark (low/mid/high), pricing model, competitor strengths/weaknesses, free alternatives
+**Recovery failure handling:**
+
+| Dependency | If recovery fails |
+|---|---|
+| Competitive | Return `status: "blocked"`, `flags: ["missing-dependency"]`. Pricing benchmark is essential — you cannot calculate unit economics without it. Do NOT proceed. |
+| Market | Proceed with `flags: ["missing-upstream-data"]`. Note limitations in executive_summary. You lose scale context but can still calculate unit economics from competitive pricing alone. |
+| Problem | Proceed with `flags: ["missing-upstream-data"]`. Default to mid-range pricing (cannot calibrate by pain intensity). |
+
+**Extract from upstream:**
+
+| Source | Fields | Used for |
+|---|---|---|
+| **Problem** | `data.pain_intensity`, `data.problem_statement` | Pricing calibration, context |
+| **Market** | `data.som.value`, `data.market_stage`, `data.early_adopters`, `data.growth_rate` | Scale context, segment characteristics |
+| **Competitive** | `data.pricing_benchmark.low/mid/high`, `data.pricing_benchmark.model`, `data.pricing_benchmark.free_alternatives_exist`, `data.pricing_benchmark.competitors_with_pricing`, `data.direct_competitors` | Unit economics inputs, pricing power assessment |
 
 ## Process
 
@@ -67,98 +86,158 @@ Based on the idea, competitive pricing, and market norms, recommend the most via
 | `freemium` | Network effects, large TAM, land-and-expand strategy |
 | `hybrid` | Combination (e.g., subscription + usage overages) |
 
-Justify with competitive evidence: what model do successful competitors use?
+Justify with competitive evidence: what model do successful competitors use? Reference specific competitors from the Competitive Intelligence output (`data.direct_competitors[].pricing.model`).
 
 ### Step 2: Set Price Point
 
-Using the competitive pricing benchmark:
-- **If pain intensity is `critical`/`high`**: price at mid-to-high range
-- **If pain intensity is `medium`/`low`**: price at low-to-mid range
-- **If no pricing data**: use industry benchmarks for the model type
+Using the competitive pricing benchmark (`data.pricing_benchmark.low`, `.mid`, `.high` from Competitive):
+
+- **If `pain_intensity` is `critical` or `high`** (from Problem): price at mid-to-high of the competitive range (high pain justifies higher willingness to pay)
+- **If `pain_intensity` is `medium` or `low`**: price at low-to-mid range (need to compete on price)
+- **If `pain_intensity` is unknown** (Problem recovery failed): use mid-range as default
+- **If no competitive pricing data** (should not happen — Competitive is a hard dependency, but if `pricing_benchmark.competitors_with_pricing` is 0): use industry benchmarks for the model type and flag `"pricing-data-incomplete"`
 
 Document the justification linking price to competitive positioning and pain intensity.
 
-### Step 3: Calculate Unit Economics
+### Step 3: Search for Industry Benchmarks
+
+Execute **3-5 search queries** to find published benchmarks for your unit economics inputs:
+
+- `"{industry}" SaaS churn rate benchmark {year}`
+- `"{industry}" customer acquisition cost benchmark`
+- `"{revenue model}" gross margin benchmark`
+- `"{industry}" "{customer segment}" CAC LTV benchmark site:profitwell.com OR site:openviewpartners.com`
+
+**If your search tool does not support `site:` operators**, reformulate without them (e.g., `"SaaS SMB" churn benchmark profitwell 2025`).
+
+**Search depth**: Review the top **10 results per query**. If a query returns mostly irrelevant results, stop at 5 and move on.
+
+**As you search, build an evidence log** — record each useful source:
+```json
+{
+  "source": "https://profitwell.com/blog/...",
+  "quote": "Median SaaS SMB monthly churn is 4.7%",
+  "reliability": "high | medium | low"
+}
+```
+
+Reliability levels:
+- `high`: Published benchmark reports (ProfitWell, KeyBanc, OpenView, Bessemer), public company data
+- `medium`: VC/analyst blog posts with cited methodology, industry surveys
+- `low`: Uncited blog posts, single company anecdotes, LLM knowledge without URL
+
+If search yields no specific benchmarks, fall back to these defaults (flag each with `source: "industry-default"`, `reliability: "low"`):
+- SaaS SMB: 3-7% monthly churn, $100-$300 CAC (content/paid), 70-85% gross margin
+- SaaS Mid-market: 1-3% monthly churn, $300-$1000 CAC, 70-85% gross margin
+- SaaS Enterprise: <1% monthly churn, $1000-$5000 CAC, 75-90% gross margin
+- Marketplace: 5-15% monthly churn, varies by model, 20-40% gross margin
+
+Record the search queries you actually executed in `search_queries_used`.
+
+### Step 4: Calculate Unit Economics
 
 **ARPU (Average Revenue Per User):**
-- Derived from the price point × expected billing frequency
+- Derived from the price point (Step 2) × expected billing frequency
 - Adjust for expected tier mix if freemium (e.g., 5% conversion to paid)
 
 **Churn rate:**
-- Use published benchmarks for the business model and segment:
-  - SaaS SMB: 3-7% monthly churn (source: ProfitWell, KeyBanc)
-  - SaaS Mid-market: 1-3% monthly churn
-  - SaaS Enterprise: <1% monthly churn
-  - Marketplace: varies widely (5-15% monthly)
-- Cite the specific benchmark source
+- Use the best benchmark found in Step 3
+- Cite the specific source
 
 **LTV (Lifetime Value):**
-- `LTV = ARPU × Gross Margin % × (1 / monthly_churn_rate)`
-- Gross margin benchmarks: SaaS 70-85%, Marketplace 20-40%, Hardware 30-50%
-- Cite margin benchmark source
+- `LTV = ARPU_monthly × Gross_Margin_% × (1 / monthly_churn_rate)`
+- Cite the margin benchmark source
 
 **CAC (Customer Acquisition Cost):**
-- Use industry benchmarks: ProfitWell, OpenView, KeyBanc SaaS surveys
+- Use the best benchmark found in Step 3
 - Adjust for primary acquisition channel:
   - Content marketing / SEO: lower CAC, longer payback
   - Paid search / social: higher CAC, faster acquisition
   - Outbound sales: highest CAC, enterprise focus
-- If competitive data includes competitor marketing spend, factor that in
 
 **LTV/CAC Ratio:**
 - `LTV / CAC`
 - Healthy: >3.0x. Excellent: >5.0x. Concerning: <2.0x. Unviable: <1.0x
 
 **Payback Period:**
-- `CAC / (monthly ARPU × gross margin %)`
+- `CAC / (ARPU_monthly × Gross_Margin_%)`
 - Healthy: <12 months. Excellent: <6 months. Concerning: >18 months.
 
-### Step 4: Run Sensitivity Analysis
+**Show your math.** Every calculation must be traceable: state the inputs, the formula, and the result.
 
-Test three scenarios against the base case:
+### Step 5: Run Sensitivity Analysis
+
+Test three scenarios against the base case. Report **all three metrics** for each scenario to enable uniform downstream comparison:
 
 **Scenario 1: CAC +20%**
-- Recalculate LTV/CAC and payback
-- State whether the model remains viable
+- LTV unchanged. Recalculate LTV/CAC ratio and payback months.
+- One-sentence viability assessment
 
 **Scenario 2: Churn +20%**
-- Recalculate LTV and LTV/CAC
-- State whether the model remains viable
+- Recalculate LTV and LTV/CAC ratio. Payback unchanged (churn affects lifetime, not monthly margin). Report `payback_months` as base case value.
+- One-sentence viability assessment
 
 **Scenario 3: Price -20%**
-- Recalculate ARPU, LTV, payback
-- State whether the model remains viable
+- ARPU drops 20%. Recalculate LTV, LTV/CAC ratio, and payback months.
+- One-sentence viability assessment
 
-For each scenario, give a one-sentence viability assessment.
+For each scenario, determine `viable`: true if LTV/CAC remains > 2.0 AND payback < 18 months.
 
-### Step 5: Search for Revenue Model Validation
+### Step 6: Search for Revenue Model Validation
 
 Look for evidence that this specific revenue model works for similar customer segments:
 
 - `"{revenue model}" "{customer segment}" success OR case study`
 - `"{revenue model}" SaaS benchmarks {year}`
-- Find 3-6 companies using the same model for a similar segment
-- Note their funding status, profitability signals, or public metrics
 
-### Step 6: Score Each Sub-Dimension
+**Search depth**: Review the top **10 results per query**.
+
+Find 3-6 companies using the same model for a similar segment. Note their funding status, profitability signals, or public metrics. Continue building your evidence log from Step 3.
+
+### Step 7: Score Each Sub-Dimension
 
 Apply the rubrics from `scoring-convention.md` section **"Business Model — hc-bizmodel"**. Your 4 sub-dimensions, each worth 0-25 points:
 
-| Sub-dimension | What to evaluate | Max |
-|---|---|---|
-| LTV/CAC Ratio | Calculated ratio with benchmark-derived inputs | 25 |
-| Revenue Model Validation | Successful companies using same model for similar segment | 25 |
-| Payback Period | Months to recover CAC | 25 |
-| Pricing Power | Competitive spread, premium players, free alternatives | 25 |
+| Sub-dimension | What to evaluate | Sub-score key | Max |
+|---|---|---|---|
+| LTV/CAC Ratio | Calculated ratio with benchmark-derived inputs | `ltv_cac_ratio` | 25 |
+| Revenue Model Validation | Successful companies using same model for similar segment | `revenue_model_validation` | 25 |
+| Payback Period | Months to recover CAC | `payback_period` | 25 |
+| Pricing Power | Competitive spread, premium players, free alternatives | `pricing_power` | 25 |
 
 For each sub-dimension:
 1. State the **calculation or evidence**
 2. Map to the rubric tier
-3. Assign points
+3. Assign points **within the tier**: bottom of range if barely qualifies, middle if solidly in range, top if near the next tier's threshold
 
-**Total score** = sum of all 4 sub-dimensions.
+**Total score** = sum of all 4 sub-dimensions. Verify the arithmetic before proceeding.
 
-### Step 7: Persist (if applicable)
+### Step 8: Determine Status and Flags
+
+**Flags** — set all that apply:
+- `"unit-economics-speculative"` — 2+ unit economics inputs are assumptions rather than found benchmarks
+- `"ltv-cac-below-2"` — LTV/CAC ratio < 2.0 (concerning)
+- `"no-model-precedents"` — couldn't find companies using this model for similar segment
+- `"sensitivity-fails"` — one or more sensitivity scenarios have `viable: false`
+- `"pricing-data-incomplete"` — competitive pricing benchmark had 0 competitors with pricing
+- `"missing-dependency"` — Competitive Intelligence output could not be recovered (should have blocked)
+- `"missing-upstream-data"` — Market or Problem output could not be recovered (proceeded with limitations)
+- `"no-search-results"` — web search failed for most queries (>50% returned 0 relevant results)
+- `"evidence-mostly-unverified"` — more than half of evidence items have `reliability: "low"`
+- `"score-below-threshold"` — score < 45 (contributes to multi-weakness knockout)
+
+**Status** — based on your analysis:
+
+| Status | Condition |
+|---|---|
+| `ok` | Competitive data recovered AND unit economics calculated with at least some benchmark-derived inputs AND all 4 sub-dimensions scored |
+| `warning` | Analysis completed BUT any flag is set |
+| `blocked` | Input missing/invalid OR Competitive Intelligence output could not be recovered |
+| `failed` | Search tool entirely unavailable or returned errors on all queries |
+
+### Step 9: Persist (if applicable)
+
+**You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.
 
 Based on `persistence_mode`:
 
@@ -170,17 +249,39 @@ mem_save(
   type: "discovery",
   project: "hardcore",
   scope: "project",
-  content: "**What**: {executive_summary} [validation] [bizmodel] [{industry}]\n\n**Why**: Score {score}/100 — {score_reasoning}\n\n**Where**: validation/{slug}/bizmodel\n\n**Data**:\n{JSON.stringify(data)}"
+  content: "**What**: {executive_summary} [validation] [bizmodel] [{industry}]\n\n**Why**: Score {score}/100 — {score_reasoning}\n\n**Where**: validation/{slug}/bizmodel\n\n**Data**:\n{full data object as JSON string}"
 )
 ```
 
-**If `file`:** Write to `output/{slug}/bizmodel.json`
+**If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/bizmodel.json`.
 
 **If `none`:** Return inline only.
+
+After persisting (or in `none` mode), record the artifact reference:
+```json
+{
+  "name": "bizmodel-analysis",
+  "store": "{persistence_mode}",
+  "ref": "validation/{slug}/bizmodel"
+}
+```
 
 ## Output
 
 Return the output contract envelope exactly as specified in `output-contract.md`.
+
+**Score consistency rule**: The `data.model_score` field MUST equal the envelope's top-level `score` field. Both represent the same value — the total of your 4 sub-dimensions. This redundancy exists so `data` can be parsed independently from the envelope.
+
+### Detail Level Adjustments
+
+| Field | `concise` | `standard` | `deep` |
+|---|---|---|---|
+| `executive_summary` | 1 sentence | 1-2 sentences | 2-3 sentences |
+| `detailed_report` | Omit | Omit | Include: full calculation derivation, all benchmarks reviewed, sensitivity methodology, rejected model alternatives |
+| `data` | Only: recommended_model, pricing_suggestion (price_point + billing), unit_economics (ratios only), model_score, sub_scores | Full schema | Full schema + extended assumption justifications |
+| `evidence` | Top 3 highest-reliability sources | All sources | All sources with reliability justification per item |
+
+**Always persist the full artifact** regardless of detail_level. Detail level only affects the returned output envelope.
 
 ### `data` Schema
 
@@ -210,16 +311,19 @@ Return the output contract envelope exactly as specified in `output-contract.md`
     "cac_plus_20": {
       "ltv_cac_ratio": 0.0,
       "payback_months": 0.0,
+      "viable": true,
       "assessment": "One-sentence viability assessment"
     },
     "churn_plus_20": {
-      "ltv": 0,
       "ltv_cac_ratio": 0.0,
+      "payback_months": 0.0,
+      "viable": true,
       "assessment": "One-sentence viability assessment"
     },
     "price_minus_20": {
-      "ltv": 0,
+      "ltv_cac_ratio": 0.0,
       "payback_months": 0.0,
+      "viable": true,
       "assessment": "One-sentence viability assessment"
     }
   },
@@ -234,6 +338,9 @@ Return the output contract envelope exactly as specified in `output-contract.md`
   ],
   "assumptions": [
     "Each assumption stated explicitly with its source or basis"
+  ],
+  "search_queries_used": [
+    "actual query string executed"
   ],
   "sub_scores": {
     "ltv_cac_ratio": 0,
@@ -260,21 +367,12 @@ Total: {a} + {b} + {c} + {d} = {total}
 
 Always return `["risk"]` — Risk Assessment is the next department in the DAG.
 
-## Flags
-
-Set these flags when appropriate:
-- `"unit-economics-speculative"` — 2+ inputs are assumptions rather than benchmarks
-- `"ltv-cac-below-2"` — LTV/CAC ratio < 2.0 (concerning)
-- `"no-model-precedents"` — couldn't find companies using this model for similar segment
-- `"sensitivity-fails"` — one or more sensitivity scenarios show unviable economics
-- `"missing-upstream-data"` — couldn't recover Market or Competitive data
-- `"no-search-results"` — web search failed for most queries
-
 ## Critical Rules
 
 1. **Show your math.** Every calculation must be traceable: state the inputs, the formula, and the result. No "LTV/CAC is about 4x" without the calculation.
-2. **Cite benchmark sources.** Churn rate, CAC, gross margin — each must reference a specific benchmark (ProfitWell, KeyBanc, OpenView, etc.). If using LLM knowledge, flag it.
+2. **Cite benchmark sources.** Churn rate, CAC, gross margin — each must reference a specific benchmark (ProfitWell, KeyBanc, OpenView, etc.) or be flagged with `source: "llm-knowledge"`, `reliability: "low"`.
 3. **Sensitivity analysis is mandatory.** It's the difference between "the numbers work" and "the numbers work even when things go wrong".
-4. **Use competitive pricing, not aspirational pricing.** The price point must be grounded in the pricing benchmark from Competitive Intelligence, not what the founder wishes they could charge.
+4. **Use competitive pricing, not aspirational pricing.** The price point must be grounded in the pricing benchmark from Competitive Intelligence (`data.pricing_benchmark`), not what the founder wishes they could charge.
 5. **State every assumption explicitly.** Each entry in `assumptions` should include what was assumed and why (benchmark, estimate, or guess).
-6. **If upstream data is missing**, set `status: "warning"` and the `"missing-upstream-data"` flag. Do your best with available information but note the limitations.
+6. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (7-12 points).
+7. **Arithmetic must be exact.** `model_score` MUST equal the sum of the 4 sub_scores values. Unit economics calculations must be verifiable (inputs × formula = stated result). Verify all before returning.

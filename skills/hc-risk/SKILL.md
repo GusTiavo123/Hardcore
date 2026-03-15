@@ -38,9 +38,11 @@ You receive from the orchestrator:
 }
 ```
 
+If `idea` or `slug` are missing, return `status: "blocked"` with `flags: ["invalid-input"]`.
+
 ## Step 0: Recover ALL Upstream Context
 
-You depend on **every previous department**. You MUST read all 4 outputs before starting.
+You depend on **every previous department**. You MUST attempt to read all 4 outputs before starting.
 
 **If `persistence_mode` is `engram`:**
 ```
@@ -48,30 +50,66 @@ You depend on **every previous department**. You MUST read all 4 outputs before 
 2. mem_search(query: "validation/{slug}/market", project: "hardcore") → get ID
 3. mem_search(query: "validation/{slug}/competitive", project: "hardcore") → get ID
 4. mem_search(query: "validation/{slug}/bizmodel", project: "hardcore") → get ID
-5. mem_get_observation(id) for EACH → full content
+5. mem_get_observation(id) for EACH → full content (NEVER use mem_search results directly — they are truncated)
 ```
 
 **If `persistence_mode` is `file`:** Read all 4 JSON files from `output/{slug}/`
 
 **If `persistence_mode` is `none`:** All outputs are in your prompt context.
 
-Extract key risk inputs from each:
-- **Problem**: pain intensity, evidence quality, whether problem was assumed
-- **Market**: market stage, growth trajectory, SOM size, data quality
-- **Competitive**: dominant incumbents, failed competitors and their reasons, market gaps
-- **BizModel**: LTV/CAC health, sensitivity analysis results, key assumptions, model precedents
+**Recovery failure handling:**
+
+| Dependency | Type | If recovery fails |
+|---|---|---|
+| Problem | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose pain intensity and evidence quality context. Default to mid-range assumptions. |
+| Market | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose market stage and growth data for timing assessment. Use your own search results instead. |
+| Competitive | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose incumbent data and failure intelligence. Conduct your own competitive search in Step 1. |
+| BizModel | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose sensitivity analysis and LTV/CAC data for financial risk. Focus on non-financial risks. |
+
+Unlike other departments, Risk has **no hard dependencies** — you can always produce a risk assessment from your own research. But missing upstream data degrades your analysis quality significantly. Flag every missing dependency.
+
+**Extract key risk inputs from each (when available):**
+
+| Source | Fields to extract | Used for |
+|---|---|---|
+| **Problem** | `data.pain_intensity`, `data.evidence_summary`, `data.sub_scores` | Evidence quality assessment, problem-assumption risk |
+| **Market** | `data.market_stage`, `data.growth_rate`, `data.som.value`, `data.som.methodology`, `flags` | Market timing, scale risk, data quality |
+| **Competitive** | `data.direct_competitors[].traction`, `data.failed_competitors[]`, `data.market_gaps[]`, `flags` (especially `dominant-incumbent-found`) | Incumbent risk, failure patterns, entry barriers |
+| **BizModel** | `data.unit_economics.ltv_cac_ratio`, `data.sensitivity_analysis`, `data.assumptions[]`, `flags` (especially `sensitivity-fails`) | Financial risk, model fragility |
+
+**Extract industry/domain** from Problem's `data.industry` field — this becomes your search keyword for Steps 1-4. If the field is missing (legacy output), infer from `problem_statement` and the idea text.
 
 ## Process
 
 ### Step 1: Assess Execution Feasibility
 
-Search for evidence about technical and operational feasibility:
+Search for evidence about technical and operational feasibility.
 
-**Queries:**
+**Language strategy**: Technical queries work best in English. Formulate all queries in English. If the idea targets a specific regulatory jurisdiction, add **1-2 queries in the local language** for Step 2.
+
+**If your search tool does not support `site:` operators**, reformulate without them.
+
+**Queries (4-6):**
 - `"{core technology}" API OR SDK OR "open source"`
 - `"{core technology}" developer OR engineer job postings`
 - `"{solution type}" infrastructure cost OR hosting cost`
 - `"{solution type}" technical architecture OR "tech stack"`
+
+**Search depth**: Review the top **10 results per query**. If a query returns mostly irrelevant results, stop at 5 and move on.
+
+**As you search, build an evidence log** — record each useful source:
+```json
+{
+  "source": "https://...",
+  "quote": "AWS offers 3 competing services for this...",
+  "reliability": "high | medium | low"
+}
+```
+
+Reliability levels:
+- `high`: Official documentation, pricing pages, API registries, job boards with counts, infrastructure pricing calculators
+- `medium`: Engineering blog posts with specifics, Stack Overflow developer surveys, tech news with cited data
+- `low`: Uncited blog posts, opinion pieces, LLM knowledge without URL
 
 **Evaluate:**
 - Are all required APIs/services publicly available? How many redundant providers?
@@ -82,25 +120,29 @@ Search for evidence about technical and operational feasibility:
 
 ### Step 2: Assess Regulatory & Legal Risk
 
-Search for regulatory frameworks, enforcement actions, and pending legislation:
+Search for regulatory frameworks, enforcement actions, and pending legislation.
 
-**Queries:**
+**Queries (3-5):**
 - `"{industry}" regulation OR compliance OR legal requirements`
 - `"{industry}" enforcement action OR fine OR penalty {recent years}`
 - `"{industry}" legislation OR bill OR regulation pending OR proposed`
 - `"{data type if applicable}" privacy OR GDPR OR CCPA OR data protection`
+- `"{industry}" compliance cost OR "compliance as a service"` (to assess navigability)
+
+Add **industry-specific queries** based on the idea's domain (see `scoring-convention.md` for templates: fintech, healthtech, edtech, general SaaS).
 
 **Evaluate:**
 - How many regulatory frameworks apply?
+- For each framework: is it a **barrier** (novel, no commercial compliance path) or **navigable** (commercial tools exist, well-documented path)? Count barrier frameworks as 1.0 and navigable frameworks as 0.5 per `scoring-convention.md`.
 - Are there active enforcement actions against companies in this space?
 - Is there pending legislation that could restrict the value proposition?
-- Are compliance tools/services commercially available?
+- Are compliance tools/services commercially available? (Their existence converts a barrier framework to navigable)
 
 ### Step 3: Assess Market Timing
 
-Use signals from previous departments plus new research:
+Use signals from previous departments plus new research.
 
-**Queries:**
+**Queries (3-4):**
 - `"{industry keyword}" Google Trends` (or check trends.google.com data)
 - `"{solution category}" startup launch 2024 2025`
 - `"{industry}" investment OR funding 2024 2025`
@@ -108,13 +150,13 @@ Use signals from previous departments plus new research:
 
 **Evaluate using the rubric:**
 - Google Trends direction over 24 months (growing, flat, declining)
-- New competitors launched in last 18 months (from Competitive output)
-- Funding rounds in last 2 years (from Competitive output + new search)
+- New competitors launched in last 18 months (from Competitive output if available, plus your own search)
+- Funding rounds in last 2 years (from Competitive output if available, plus new search)
 - Major publication coverage signaling timing
 
 ### Step 4: Assess Dependency & Concentration
 
-From all previous outputs, identify single points of failure:
+From all previous outputs (when available) + your own analysis, identify single points of failure:
 
 **Categories to check:**
 - **Platform dependency**: Does the idea rely on a single platform (iOS, Shopify, Salesforce) that could restrict access?
@@ -130,7 +172,7 @@ For each dependency:
 
 ### Step 5: Build Risk Register
 
-For every risk identified across all 4 dimensions, document:
+For every risk identified across all 4 dimensions + financial risks from BizModel, document:
 
 | Field | Description |
 |---|---|
@@ -140,6 +182,11 @@ For every risk identified across all 4 dimensions, document:
 | `impact` | `critical`, `high`, `medium`, `low` — what happens if it materializes |
 | `mitigation` | Specific action that reduces probability or impact |
 | `evidence` | What data point led to this risk |
+| `source_department` | Which upstream department flagged or sourced this risk (`problem`, `market`, `competitive`, `bizmodel`, `own-research`) |
+
+**Financial risks from BizModel**: If BizModel's sensitivity analysis showed any scenario with `viable: false`, create a risk entry with `category: "financial"` referencing the specific failed scenario.
+
+Record the search queries you actually executed in `search_queries_used`.
 
 ### Step 6: Rank Top 3 Killers
 
@@ -154,23 +201,25 @@ Apply the rubrics from `scoring-convention.md` section **"Risk Assessment — hc
 
 **CRITICAL: THE SCALE IS INVERTED. 100 = lowest risk = best score.**
 
-| Sub-dimension | What to evaluate | Max |
-|---|---|---|
-| Execution Feasibility | Tech availability, talent, infrastructure costs | 25 |
-| Regulatory & Legal | Frameworks, enforcement, pending legislation | 25 |
-| Market Timing | Trends direction, new entrants, funding activity | 25 |
-| Dependency & Concentration | Platform risk, channel concentration, SPOFs | 25 |
+| Sub-dimension | What to evaluate | Sub-score key | Max |
+|---|---|---|---|
+| Execution Feasibility | Tech availability, talent, infrastructure costs | `execution_feasibility` | 25 |
+| Regulatory & Legal | Frameworks, enforcement, pending legislation | `regulatory_legal` | 25 |
+| Market Timing | Trends direction, new entrants, funding activity | `market_timing` | 25 |
+| Dependency & Concentration | Platform risk, channel concentration, SPOFs | `dependency_concentration` | 25 |
 
 **High score = LOW risk = GOOD.** A score of 20/25 in Execution means "highly feasible, low execution risk."
 
 For each sub-dimension:
 1. State the **evidence** from search and upstream data
 2. Map to the rubric tier (remember: inverted)
-3. Assign points
+3. Assign points **within the tier**: bottom of range if barely qualifies, middle if solidly in range, top if near the next tier's threshold
 
-**Total score** = sum of all 4 sub-dimensions.
+**Total score** = sum of all 4 sub-dimensions. Verify the arithmetic before proceeding.
 
-### Step 8: Determine Overall Risk Level
+### Step 8: Determine Overall Risk Level, Status, and Flags
+
+**Overall Risk Level** (stored in `data.overall_risk_level`):
 
 | Level | Criteria |
 |---|---|
@@ -179,7 +228,30 @@ For each sub-dimension:
 | `high` | Score 30-49, OR 3+ `critical` impact risks |
 | `critical` | Score < 30 — triggers knockout NO-GO |
 
+**Flags** — set all that apply:
+- `"knockout-risk"` — score < 30, will trigger automatic NO-GO
+- `"critical-unmitigated-risk"` — a `critical` impact risk with no feasible mitigation
+- `"dominant-incumbent-risk"` — from Competitive: strong incumbent could crush new entrant
+- `"regulatory-uncertainty"` — pending legislation could change the game
+- `"single-point-of-failure"` — one critical dependency with no fallback
+- `"financial-model-fragile"` — BizModel sensitivity analysis has ≥ 2 failed scenarios
+- `"missing-upstream-data"` — couldn't recover one or more upstream department outputs
+- `"no-search-results"` — web search failed for most queries (>50% returned 0 relevant results)
+- `"evidence-mostly-unverified"` — more than half of evidence items have `reliability: "low"`
+- `"score-below-threshold"` — score < 30 (knockout threshold for Risk)
+
+**Status** — based on your analysis:
+
+| Status | Condition |
+|---|---|
+| `ok` | At least some upstream data recovered AND search returned usable results AND you scored all 4 sub-dimensions AND `overall_risk_level` is `low` or `medium` |
+| `warning` | Analysis completed BUT any flag is set OR `overall_risk_level` is `high` or `critical` |
+| `blocked` | Input missing/invalid |
+| `failed` | Search tool entirely unavailable or returned errors on all queries |
+
 ### Step 9: Persist (if applicable)
+
+**You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.
 
 Based on `persistence_mode`:
 
@@ -191,17 +263,39 @@ mem_save(
   type: "discovery",
   project: "hardcore",
   scope: "project",
-  content: "**What**: {executive_summary} [validation] [risk] [{industry}]\n\n**Why**: Score {score}/100 — {score_reasoning}\n\n**Where**: validation/{slug}/risk\n\n**Data**:\n{JSON.stringify(data)}"
+  content: "**What**: {executive_summary} [validation] [risk] [{industry}]\n\n**Why**: Score {score}/100 — {score_reasoning}\n\n**Where**: validation/{slug}/risk\n\n**Data**:\n{full data object as JSON string}"
 )
 ```
 
-**If `file`:** Write to `output/{slug}/risk.json`
+**If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/risk.json`.
 
 **If `none`:** Return inline only.
+
+After persisting (or in `none` mode), record the artifact reference:
+```json
+{
+  "name": "risk-assessment",
+  "store": "{persistence_mode}",
+  "ref": "validation/{slug}/risk"
+}
+```
 
 ## Output
 
 Return the output contract envelope exactly as specified in `output-contract.md`.
+
+**Score consistency rule**: The `data.risk_score` field MUST equal the envelope's top-level `score` field. Both represent the same value — the total of your 4 sub-dimensions. This redundancy exists so `data` can be parsed independently from the envelope.
+
+### Detail Level Adjustments
+
+| Field | `concise` | `standard` | `deep` |
+|---|---|---|---|
+| `executive_summary` | 1 sentence | 1-2 sentences | 2-3 sentences |
+| `detailed_report` | Omit | Omit | Include: full risk register with all entries, dependency analysis methodology, timing signal details, regulatory framework list |
+| `data` | Only: overall_risk_level, top_3_killers, risk_score, sub_scores | Full schema | Full schema + extended mitigation strategies |
+| `evidence` | Top 3 highest-reliability sources | All sources | All sources with reliability justification per item |
+
+**Always persist the full artifact** regardless of detail_level. Detail level only affects the returned output envelope.
 
 ### `data` Schema
 
@@ -214,7 +308,8 @@ Return the output contract envelope exactly as specified in `output-contract.md`
       "probability": "high | medium | low",
       "impact": "critical | high | medium | low",
       "mitigation": "Specific action to reduce risk",
-      "evidence": "Data point or source that surfaced this risk"
+      "evidence": "Data point or source that surfaced this risk",
+      "source_department": "problem | market | competitive | bizmodel | own-research"
     }
   ],
   "dependencies": [
@@ -234,6 +329,9 @@ Return the output contract envelope exactly as specified in `output-contract.md`
       "mitigation_feasible": true,
       "early_warning_signal": "What to watch for"
     }
+  ],
+  "search_queries_used": [
+    "actual query string executed"
   ],
   "sub_scores": {
     "execution_feasibility": 0,
@@ -260,17 +358,6 @@ Total: {a} + {b} + {c} + {d} = {total}
 
 Always return `["synthesis"]` — Synthesis is the final department.
 
-## Flags
-
-Set these flags when appropriate:
-- `"knockout-risk"` — score < 30, will trigger automatic NO-GO
-- `"critical-unmitigated-risk"` — a `critical` impact risk with no feasible mitigation
-- `"dominant-incumbent-risk"` — from Competitive: strong incumbent could crush new entrant
-- `"regulatory-uncertainty"` — pending legislation could change the game
-- `"single-point-of-failure"` — one critical dependency with no fallback
-- `"missing-upstream-data"` — couldn't recover one or more upstream department outputs
-- `"no-search-results"` — web search failed for most queries
-
 ## Critical Rules
 
 1. **Score is INVERTED.** 100 = safest. 0 = most dangerous. Double-check every sub-score: high points mean LOW risk. This is the most common error in risk scoring.
@@ -279,3 +366,5 @@ Set these flags when appropriate:
 4. **Mitigations must be specific and pre-launch feasible.** "Build a better product" is not a mitigation. "Validate with 10 paid pilot customers before full build" is a mitigation.
 5. **Use upstream data.** Failed competitors from Competitive tell you about execution risk. Sensitivity failures from BizModel tell you about financial risk. Market stage from Market tells you about timing.
 6. **Don't double-count.** If Competitive already identified a dominant incumbent, assess the risk it poses here but don't re-analyze the competitor landscape. Reference the upstream data.
+7. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (7-12 points).
+8. **Arithmetic must be exact.** `risk_score` MUST equal the sum of the 4 sub_scores values. Verify before returning.

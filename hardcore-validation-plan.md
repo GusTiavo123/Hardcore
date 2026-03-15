@@ -89,12 +89,14 @@ idea-validation/
 │   └── hc-synthesis/SKILL.md            # Dept 6: GO/NO-GO Synthesis
 │
 ├── examples/
-│   ├── claude-code/CLAUDE.md            # Config para Claude Code
-│   ├── opencode/opencode.json           # Config para OpenCode
-│   └── cursor/.cursorrules              # Config para Cursor
+│   └── opencode/                        # Config para OpenCode
+│       ├── opencode.json                # Agent config + MCP servers
+│       └── commands/                    # Slash commands
+│           ├── validate-new.md          # /validate:new (con checkpoints)
+│           └── validate-fast.md         # /validate:fast (sin paradas)
 │
 └── scripts/
-    └── install.sh                       # Instalador multi-tool
+    └── README.md                        # Placeholder (install.sh pendiente)
 ```
 
 ### El DAG de Departamentos
@@ -307,15 +309,19 @@ Pesos validados con simulación de 13 escenarios: 84.6% accuracy (vs 61.5% con p
 {
   "problem_exists": true,
   "problem_statement": "descripción refinada del problema",
+  "target_user": "freelancers tech que manejan múltiples clientes",
+  "industry": "contract management",
   "pain_intensity": "critical | high | medium | low",
   "current_solutions": [
-    {"solution": "Excel/Google Sheets manual", "satisfaction": "low"}
+    {"solution": "Excel/Google Sheets manual", "type": "workaround", "satisfaction": "low"},
+    {"solution": "HoneyBook", "type": "paid", "satisfaction": "medium"}
   ],
   "evidence_summary": "X quejas encontradas en Reddit/foros, patrón: ...",
+  "search_queries_used": ["query 1", "query 2"],
   "sub_scores": {
     "complaint_volume": 12,
     "complaint_recency": 16,
-    "pain_intensity": 14,
+    "pain_signals": 14,
     "workaround_evidence": 15,
     "paid_alternatives": 15
   },
@@ -347,17 +353,21 @@ Pesos validados con simulación de 13 escenarios: 84.6% accuracy (vs 61.5% con p
 **Output `data`**:
 ```json
 {
-  "tam": {"value": 50000000000, "currency": "USD", "source": "Grand View Research 2024"},
-  "sam": {"value": 5000000000, "currency": "USD", "source": "cálculo basado en..."},
-  "som": {"value": 50000000, "currency": "USD", "source": "estimación: X% de SAM"},
-  "growth_rate": "12% anual",
+  "tam": {"value": 50000000000, "currency": "USD", "source": "Grand View Research 2024", "methodology": "top-down-institutional"},
+  "sam": {"value": 5000000000, "currency": "USD", "source": "cálculo basado en...", "methodology": "top-down-institutional"},
+  "som": {"value": 50000000, "currency": "USD", "source": "estimación: 1% de SAM (TAM > $10B)", "methodology": "top-down-estimated"},
+  "growth_rate": "12% CAGR (2024-2029)",
+  "growth_source": "Grand View Research",
   "market_stage": "growing",
-  "early_adopters": {
-    "segment": "freelancers tech con >$100k ingresos anuales",
-    "estimated_size": 500000,
-    "characteristics": ["tech-savvy", "pain-aware", "willingness to pay"],
-    "reachable_channels": [{"name": "r/freelance", "members": 250000}]
-  },
+  "early_adopters": [
+    {
+      "segment": "freelancers tech con >$100k ingresos anuales",
+      "estimated_size": 500000,
+      "evidence_of_spending": "HoneyBook, Bonsai — herramientas de gestión freelance",
+      "reachable_channels": [{"name": "r/freelance", "type": "subreddit", "members": 250000}]
+    }
+  ],
+  "search_queries_used": ["query 1", "query 2"],
   "sub_scores": {
     "data_availability": 18,
     "market_scale": 19,
@@ -396,18 +406,23 @@ Pesos validados con simulación de 13 escenarios: 84.6% accuracy (vs 61.5% con p
     {
       "name": "Competidor Real",
       "url": "https://...",
-      "pricing": {"model": "subscription", "range": "$29-99/mo"},
+      "pricing": {"model": "subscription", "range": "$29-99/mo", "detail": "Starter $29, Pro $59, Enterprise $99"},
       "strengths": ["..."],
       "weaknesses": ["..."],
+      "traction": {"funding": "$5M Series A", "employees": "50", "reviews": "340", "source": "crunchbase"},
       "estimated_size": "Series A, ~$5M ARR"
     }
   ],
   "indirect_competitors": [],
+  "adjacent_competitors": [],
   "failed_competitors": [
-    {"name": "...", "reason_failed": "...", "source": "url"}
+    {"name": "...", "url": "https://...", "year_failed": 2023, "reason_failed": "...", "source": "url"}
   ],
-  "market_gaps": ["gap 1", "gap 2"],
-  "pricing_benchmark": {"low": 19, "mid": 49, "high": 149, "currency": "USD/mo"},
+  "market_gaps": [
+    {"gap": "Sin integración con herramientas de contabilidad", "mention_count": 12, "sources": ["G2 reviews", "Reddit"], "aligns_with_idea": true}
+  ],
+  "pricing_benchmark": {"low": 19, "mid": 49, "high": 149, "currency": "USD/mo", "model": "per-seat", "free_alternatives_exist": true, "competitors_with_pricing": 5},
+  "search_queries_used": ["query 1", "query 2"],
   "sub_scores": {
     "market_validation": 14,
     "incumbent_weakness": 11,
@@ -454,9 +469,9 @@ Pesos validados con simulación de 13 escenarios: 84.6% accuracy (vs 61.5% con p
     "payback_months": 2.4
   },
   "sensitivity_analysis": {
-    "cac_plus_20": "LTV/CAC baja a 4.1x — sigue saludable",
-    "churn_plus_20": "LTV baja a $470, ratio a 3.9x — viable pero ajustado",
-    "price_minus_20": "LTV baja a $470, payback sube a 3.1 meses — viable"
+    "cac_plus_20": {"ltv_cac_ratio": 4.1, "payback_months": 2.9, "viable": true, "assessment": "LTV/CAC baja a 4.1x — sigue saludable"},
+    "churn_plus_20": {"ltv_cac_ratio": 3.9, "payback_months": 2.4, "viable": true, "assessment": "LTV baja a $470, ratio a 3.9x — viable. Payback unchanged (churn affects lifetime, not monthly margin)."},
+    "price_minus_20": {"ltv_cac_ratio": 3.9, "payback_months": 3.1, "viable": true, "assessment": "LTV baja a $470, payback sube a 3.1 meses — viable"}
   },
   "assumptions": [
     "Churn mensual: 5% (benchmark SaaS SMB)",
@@ -507,7 +522,9 @@ Pesos validados con simulación de 13 escenarios: 84.6% accuracy (vs 61.5% con p
     {"dependency": "API de tercero X", "criticality": "high", "fallback": "API alternativa Y"}
   ],
   "overall_risk_level": "medium",
-  "top_3_killers": ["riesgo 1", "riesgo 2", "riesgo 3"],
+  "top_3_killers": [
+    {"risk": "Competidor X tiene $50M funding y 80% market share", "why_killer": "Pueden igualar cualquier feature en semanas", "mitigation_feasible": true, "early_warning_signal": "Competidor lanza feature similar dentro de 3 meses del launch"}
+  ],
   "sub_scores": {
     "execution_feasibility": 18,
     "regulatory_legal": 22,
@@ -688,72 +705,45 @@ mem_search("validation problem", project: "hardcore")         → todos los prob
 
 **Objetivo**: Cada departamento funciona standalone y produce output con sub-scores correctos.
 
-```
-Semana 1:
-├── Día 1-2: hc-problem/SKILL.md
-│   └── Testear con 3 ideas distintas
-│   └── Verificar que sub-scores son reproducibles (±3-5 puntos)
-│   └── Verificar que evidence tiene URLs reales
-├── Día 3-4: hc-market/SKILL.md
-│   └── Testear que lee de Engram el output de Problem (2-step recovery)
-│   └── Verificar que TAM/SAM/SOM tienen fuentes institucionales
-│   └── Verificar que early adopters tienen canales concretos
-└── Día 5: hc-competitive/SKILL.md
-    └── Testear que competidores son reales (URLs válidas)
-    └── Verificar que Incumbent Weakness está invertido correctamente
-    └── Verificar pricing benchmark
+**Completado**:
+- `hc-problem/SKILL.md` (199 líneas) — 5 sub-dimensiones, queries de búsqueda, persistencia 3 modos, critical rules
+- `hc-market/SKILL.md` (250 líneas) — TAM/SAM/SOM, 2-step Engram recovery, early adopter criteria, 4 sub-dimensiones
+- `hc-competitive/SKILL.md` (274 líneas) — clasificación direct/indirect/adjacent, pricing benchmark, failure research, 5 sub-dimensiones
+- `hc-bizmodel/SKILL.md` (281 líneas) — unit economics calculados, sensitivity analysis (3 escenarios), model precedents, 4 sub-dimensiones
+- `hc-risk/SKILL.md` (282 líneas) — scoring invertido, 4 categorías de riesgo, risk register, top 3 killers, overall risk level
+- `hc-synthesis/SKILL.md` (330 líneas) — weighted score, knockouts, pivot suggestions, validation experiments, confidence assessment
 
-Semana 2:
-├── Día 1-2: hc-bizmodel/SKILL.md
-│   └── Testear que lee Market + Competitive de Engram
-│   └── Verificar que LTV/CAC usa benchmarks reales, no assumptions
-│   └── Verificar sensitivity analysis
-├── Día 3: hc-risk/SKILL.md
-│   └── Testear que lee todos los depts anteriores
-│   └── Verificar que scoring es invertido (100 = bajo riesgo)
-└── Día 4-5: hc-synthesis/SKILL.md
-    └── Testear weighted score con pesos 30/25/15/20/10
-    └── Verificar knockouts: Problem<40→NO-GO, Market<40→NO-GO, Risk<30→NO-GO
-    └── Verificar GO requiere Problem≥60 y todos≥45
-    └── Testear pivot suggestions
-```
+**Entregable**: 6 skills funcionales con sub-scoring reproducible. ✅
 
-**Entregable**: 6 skills funcionales con sub-scoring reproducible.
-
-**Testeo**: Ejecutar cada skill manualmente. Verificar:
-- ¿Los sub-scores son consistentes entre ejecuciones? (varianza ≤5 puntos)
-- ¿La evidence es real y verificable?
-- ¿Los competidores existen?
-- ¿Los números de unit economics son plausibles?
-- ¿El score reasoning muestra breakdown de sub-dimensiones?
-
-### Phase 2: Orquestación
+### Phase 2: Orquestación 🔄 EN PROGRESO
 
 **Objetivo**: El orquestador ejecuta el DAG completo de punta a punta.
 
+**Completado**:
+- ✅ `hc-orchestrator/SKILL.md` (250 líneas) — Session lifecycle, delegación, parallelism Market ∥ Competitive, human-in-the-loop, error handling, state recovery
+- ✅ `examples/opencode/opencode.json` — Config con agent orchestrator + MCP engram
+- ✅ `examples/opencode/commands/validate-new.md` — Slash command con checkpoints
+- ✅ `examples/opencode/commands/validate-fast.md` — Slash command sin paradas
+
+**Pendiente**:
 ```
-├── Día 1-2: Completar hc-orchestrator/SKILL.md
-│   ├── Session lifecycle (mem_session_start → mem_session_end)
-│   ├── Delegación con type mapping correcto (discovery/decision/config)
-│   ├── Manejo del paso paralelo (Market ∥ Competitive)
-│   └── Human-in-the-loop checkpoints
-│
-├── Día 3-4: Integración end-to-end
+├── Integración end-to-end
 │   ├── Ejecutar pipeline completo con 3 ideas distintas
 │   ├── Verificar 2-step recovery entre departamentos
 │   ├── Verificar que el report final consolida todo
 │   └── Medir latencia total del pipeline
 │
-├── Día 5: Error handling
+├── Error handling testing
 │   ├── ¿Qué pasa si web search no retorna nada útil?
 │   ├── ¿Qué pasa si un departamento retorna status: "blocked"?
 │   ├── ¿Qué pasa si Engram no está disponible? (fallback a none)
 │   └── ¿Qué pasa si context se compacta? (mem_context recovery)
 │
-└── Día 6-7: Escribir configs de ejemplo
-    ├── examples/claude-code/CLAUDE.md
-    ├── examples/opencode/opencode.json
-    └── examples/cursor/.cursorrules
+├── Configs de ejemplo adicionales (opcional)
+│   ├── examples/claude-code/CLAUDE.md
+│   └── examples/cursor/.cursorrules
+│
+└── scripts/install.sh — Instalador multi-tool
 ```
 
 **Entregable**: Pipeline completo. `/validate:new mi idea de...` ejecuta 6 departamentos y produce veredicto.

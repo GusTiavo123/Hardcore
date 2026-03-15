@@ -78,17 +78,26 @@ OUTPUT: Verdict + Report
 
 ### Step 0: Parse, Session & Check
 
-1. Extract the core idea from user input
-2. Generate slug: lowercase, kebab-case, max 5 words
+1. **Validate input**: If no idea text is provided, ask the user: "¿Qué idea querés validar? Describila en lenguaje natural." Do not proceed until an idea is provided.
+
+2. Extract the core idea from user input
+
+3. Generate slug: lowercase, kebab-case, max 5 words
    - Example: "una plataforma para contratos freelance" → `platform-freelance-contracts`
-3. **Start Engram session** (if persistence mode is `engram`):
+
+4. Resolve `detail_level`: `normal` mode → `"standard"`, `fast` mode → `"concise"`. User can override to `"deep"` explicitly.
+
+5. Resolve `persistence_mode`: Check if Engram is available (try `mem_search`). If yes → `"engram"`. If not → `"none"`. User can explicitly request `"file"`.
+
+6. **Start Engram session** (if persistence mode is `engram`):
    ```
    mem_session_start(
      id: "validation-{slug}-{YYYY-MM-DD}",
      project: "hardcore"
    )
    ```
-4. Check Engram for existing validation:
+
+7. Check Engram for existing validation:
    ```
    mem_search("validation/{slug}/report", project: "hardcore")
    ```
@@ -98,75 +107,53 @@ OUTPUT: Verdict + Report
 ### Step 1: Problem Validation
 
 1. Launch sub-agent with `skills/hc-problem/SKILL.md`
-2. Pass: `{ idea: "{original text}", slug: "{slug}", persistence_mode: "{mode}" }`
-3. Receive output envelope
-4. Persist to Engram (type: `"discovery"`):
-   ```
-   mem_save(
-     title: "Validation: {slug} — problem ({score}/100)",
-     topic_key: "validation/{slug}/problem",
-     type: "discovery",
-     project: "hardcore",
-     scope: "project",
-     content: "<content per engram-convention.md format>"
-   )
-   ```
-5. Persist state (type: `"config"`):
-   ```
-   mem_save(
-     title: "Validation: {slug} — state",
-     topic_key: "validation/{slug}/state",
-     type: "config",
-     project: "hardcore",
-     scope: "project",
-     content: "<state YAML per engram-convention.md>"
-   )
-   ```
-6. Show `executive_summary` to user
+2. Pass: `{ idea: "{original text}", slug: "{slug}", persistence_mode: "{mode}", detail_level: "{level}" }`
+3. Receive output envelope (the department persists its own output — see Persistence Responsibility below)
+4. Update pipeline state (see State Schema below)
+5. Show `executive_summary` to user
 
-**Checkpoint** (if not fast mode):
+**Early abort check**: If Problem score < 40 (knockout threshold):
+- **In `normal` mode**: Warn the user explicitly: "⚠️ El problema tiene score {score}/100 (< 40 = knockout). Esto resultará en NO-GO automático independientemente de los otros departamentos. ¿Querés continuar de todos modos (para contexto completo) o ir directo al veredicto?"
+  - If user says continue → proceed normally
+  - If user says skip → jump to Step 5 (Synthesis) with only Problem data
+- **In `fast` mode**: Skip directly to Step 5 (Synthesis). Synthesis will trigger the knockout automatically. This avoids 4 unnecessary department executions.
+
+**Checkpoint** (if not fast mode AND score ≥ 40):
 > "El problema tiene un score de {score}/100. ¿Continuamos?"
 
 ### Step 2: Market + Competitive (PARALLEL)
 
 Launch BOTH sub-agents simultaneously:
 
-1. `skills/hc-market/SKILL.md` — passes Problem output as context
-2. `skills/hc-competitive/SKILL.md` — passes Problem output as context
+1. `skills/hc-market/SKILL.md` — passes same input format
+2. `skills/hc-competitive/SKILL.md` — passes same input format
 
-Both read Problem from Engram independently. Wait for both to complete.
+Both read Problem from Engram independently (or receive it via context in `none` mode — see None Mode Protocol). Wait for both to complete.
 
-Persist both (type: `"discovery"`), update state, show consolidated summary.
+Both departments persist their own outputs. Update pipeline state, show consolidated summary.
+
+**Checkpoint** (if not fast mode):
+> "Market: {market_score}/100 — {market_summary}\nCompetitive: {competitive_score}/100 — {competitive_summary}\n¿Continuamos con Business Model?"
 
 ### Step 3: Business Model
 
-1. Launch `skills/hc-bizmodel/SKILL.md`
-2. Reads Market + Competitive from Engram
-3. Persist (type: `"discovery"`), update state, show summary
+1. Launch `skills/hc-bizmodel/SKILL.md` — passes same input format
+2. Reads Problem + Market + Competitive from Engram (or receives all three via context in `none` mode — see None Mode Protocol)
+3. Department persists its own output. Update pipeline state, show summary
 
 ### Step 4: Risk Assessment
 
-1. Launch `skills/hc-risk/SKILL.md`
-2. Reads ALL previous outputs from Engram
-3. Persist (type: `"discovery"`), update state, show summary
+1. Launch `skills/hc-risk/SKILL.md` — passes same input format
+2. Reads ALL previous outputs from Engram (or receives all via context in `none` mode — see None Mode Protocol)
+3. Department persists its own output. Update pipeline state, show summary
 
 ### Step 5: Synthesis
 
 1. Launch `skills/hc-synthesis/SKILL.md`
-2. Reads all 5 department scores and summaries
+2. Reads all 5 department scores and summaries (or however many completed if early abort)
 3. Calculates weighted score (see `scoring-convention.md`)
 4. Emits verdict: GO / PIVOT / NO-GO
-5. Persists final report (type: `"decision"`):
-   ```
-   mem_save(
-     title: "VALIDATION REPORT: {slug} — {VERDICT} ({weighted_score}/100)",
-     topic_key: "validation/{slug}/report",
-     type: "decision",
-     project: "hardcore",
-     scope: "project",
-     content: "<report per engram-convention.md format>"
-   )
-   ```
+5. Department persists its own output (report + verdict)
 
 ### Step 6: Present Results & Close Session
 
@@ -202,14 +189,87 @@ mem_session_end(
 | Checkpoints | After Problem, after Market+Competitive | None |
 | User confirmation | Required to proceed | Skip all |
 | Detail level | `standard` | `concise` |
+| Problem knockout | Ask user whether to continue or skip | Skip directly to Synthesis |
 
 ### Persistence Mode
 
 Resolved per `persistence-contract.md`. Default: `engram` if available.
 
-## State Recovery
+## Persistence Responsibility
 
-After each department completes, persist state:
+Each department is the **authoritative persister** of its own output. The orchestrator does NOT duplicate department persistence. This prevents double-writes to Engram (which would upsert and waste calls).
+
+| What | Who persists | Type |
+|------|-------------|------|
+| Department analysis output | The department itself (via `persistence_mode`) | `discovery` |
+| Synthesis report + verdict | The synthesis department | `decision` |
+| Pipeline state (DAG progress) | The orchestrator (after each department completes) | `config` |
+| Session lifecycle (start/summary/end) | The orchestrator | Session API |
+
+If `persistence_mode` is `none`, departments return output inline and skip persistence. The orchestrator passes previous outputs in prompt context for downstream departments (see None Mode Protocol).
+
+## None Mode Protocol
+
+When `persistence_mode` is `none`, departments cannot read from Engram or files. The orchestrator MUST pass upstream outputs in the sub-agent's prompt context.
+
+**Per-department context requirements:**
+
+| Department | Upstream outputs to pass in context |
+|---|---|
+| Problem | (none — root node) |
+| Market | Problem |
+| Competitive | Problem |
+| BizModel | Problem + Market + Competitive |
+| Risk | Problem + Market + Competitive + BizModel |
+| Synthesis | Problem + Market + Competitive + BizModel + Risk |
+
+### Early Abort in None Mode
+
+When Problem triggers a knockout (score < 40) in `fast` mode with `persistence_mode: "none"`, the orchestrator skips directly to Synthesis. In this case:
+
+1. Pass **only** the Problem output envelope in Synthesis's prompt context.
+2. Synthesis receives 1 of 5 departments and applies the Early Abort Protocol (see `hc-synthesis/SKILL.md`).
+3. The Synthesis prompt context MUST include a clear header: `## Early Abort — Only Problem data available (knockout triggered)`.
+4. Do NOT pass empty/placeholder objects for the missing departments — Synthesis handles missing data via its recovery failure table.
+
+### Mid-Pipeline Mode Switch
+
+If a department signals context truncation (e.g., BizModel or Risk cannot process all upstream outputs passed inline), switch from `none` to `file` mode mid-pipeline:
+
+1. Persist all completed department outputs to `output/{slug}/` as JSON files.
+2. Update `persistence_mode` to `"file"` for all subsequent department launches.
+3. Inform the user: "El contexto es demasiado grande para modo `none`. Cambiando a modo `file`."
+4. The current department that triggered the switch MUST be relaunched with `persistence_mode: "file"` so it can read from files instead of context.
+
+**Format**: Include the FULL output envelope JSON from each required upstream department, prefixed with the department name:
+
+```
+## Problem Validation Output:
+{full JSON envelope from hc-problem}
+
+## Market Sizing Output:
+{full JSON envelope from hc-market}
+
+## Competitive Intelligence Output:
+{full JSON envelope from hc-competitive}
+```
+
+Only include the departments listed in the table above for each launch. Do NOT pass outputs from departments that haven't completed yet.
+
+**Context growth warning**: In `none` mode, context grows with each department:
+- Problem: no inputs
+- Market/Competitive: 1 input each
+- BizModel: 3 inputs
+- Risk: 4 inputs
+- Synthesis: 5 inputs
+
+If context truncation occurs (agent signals it cannot process all inputs), consider switching to `file` mode: "El contexto es demasiado grande para modo `none`. Cambiando a modo `file` para persistir outputs localmente."
+
+## State Schema
+
+After each department completes (or on abort), persist pipeline state:
+
+**If `engram`:**
 ```
 mem_save(
   title: "Validation: {slug} — state",
@@ -217,15 +277,25 @@ mem_save(
   type: "config",
   project: "hardcore",
   scope: "project",
-  content: "<state YAML>"
+  content: "**What**: Pipeline state for {slug} [validation] [state]\n\n**Where**: validation/{slug}/state\n\n**Data**:\nslug: {slug}\nphase: {last-completed-department}\nmode: fast | normal\ndetail_level: concise | standard | deep\npersistence_mode: engram | file | none\ncompleted:\n  problem: {true|false}\n  market: {true|false}\n  competitive: {true|false}\n  bizmodel: {true|false}\n  risk: {true|false}\n  synthesis: {true|false}\nscores:\n  problem: {score|null}\n  market: {score|null}\n  competitive: {score|null}\n  bizmodel: {score|null}\n  risk: {score|null}\nlast_updated: {ISO datetime}"
 )
 ```
 
+**If `file`:** Write to `output/{slug}/state.yaml`
+
+**If `none`:** State lives only in context. Cannot be recovered across sessions.
+
+## State Recovery
+
 On recovery (context compaction or new session):
+
 1. `mem_context(project: "hardcore")` → get recent context
-2. `mem_search("validation/*/state", project: "hardcore")` → find active validations
-3. `mem_get_observation(id)` → get state
-4. Resume from last completed phase
+2. `mem_search("validation state", project: "hardcore")` → find active validations (FTS5 matches keywords `validation` + `state` in content)
+3. `mem_get_observation(id)` → get full state
+4. Parse the YAML from the Data section
+5. Resume from last completed phase — launch the next uncompleted department in DAG order
+
+**If multiple active validations found**: Show them to the user and ask which to resume.
 
 ## Error Handling
 
@@ -236,14 +306,35 @@ On recovery (context compaction or new session):
 | Department returns `status: "warning"` | Proceed, but show warning flags prominently |
 | Engram unavailable | Fall back to `none` mode, warn user about limitations |
 | Web search returns no results | Department should flag `"no-search-results"` and use LLM knowledge with `reliability: "low"` |
+| User aborts at checkpoint | See Abort Handling below |
+
+## Abort Handling
+
+If the user declines to continue at any checkpoint:
+
+1. Show what has been completed so far (departments and scores)
+2. Ask: "¿Querés guardar el progreso parcial y poder retomarlo después?"
+   - If yes: persist current state (engram or file), close session with partial summary
+   - If no: close session without summary, state is lost
+3. **Always** close the Engram session if one was started:
+   ```
+   mem_session_summary(
+     session_id: "...",
+     goal: "Validate idea: {idea} (ABORTED at {phase})",
+     accomplished: ["Problem: {score}/100", ...only completed depts...],
+     discoveries: ["{findings so far}"],
+     next_steps: ["Resume validation from {next-department}"]
+   )
+   mem_session_end(session_id: "...")
+   ```
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/validate:new <idea>` | Start full validation pipeline |
-| `/validate:fast <idea>` | Run without human checkpoints |
-| `/validate:status` | Show current pipeline state |
-| `/validate:report <slug>` | Retrieve previous validation report |
-| `/validate:compare <slug1> <slug2>` | Compare two validations side-by-side |
-| `/validate:rerun <slug> <dept>` | Re-run a specific department |
+| Command | Description | Status |
+|---------|-------------|--------|
+| `/validate:new <idea>` | Start full validation pipeline (normal mode) | ✅ Implemented |
+| `/validate:fast <idea>` | Run without human checkpoints (fast mode) | ✅ Implemented |
+| `/validate:status` | Show current pipeline state from Engram: `mem_search("validation state", project: "hardcore")` | ✅ Implemented |
+| `/validate:report <slug>` | Retrieve previous report: `mem_search("validation/{slug}/report", project: "hardcore")` → `mem_get_observation(id)` | ✅ Implemented |
+| `/validate:compare <slug1> <slug2>` | Retrieve both reports and show side-by-side score comparison table | Planned — Phase 3 |
+| `/validate:rerun <slug> <dept>` | Re-run a single department: recover state, launch only that department with `persistence_mode` to upsert | Planned — Phase 3 |

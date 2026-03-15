@@ -37,7 +37,7 @@ Count of unique complaint threads, posts, or reviews mentioning the problem acro
 
 #### 2. Complaint Recency (0-20)
 
-Percentage of complaints found in sub-dimension 1 that were posted within the last 24 months.
+Percentage of **dated** complaints found in sub-dimension 1 that were posted within the last 24 months. Complaints whose date cannot be determined (not visible in snippet and page not fetchable) are excluded from both numerator and denominator — do not guess dates.
 
 | Points | Criteria |
 |--------|----------|
@@ -96,7 +96,13 @@ Count and quality of market sizing sources found: institutional reports (Gartner
 
 #### 2. Market Scale — SOM (0-25)
 
-Serviceable Obtainable Market value from the most conservative credible estimate. If only TAM is available, SOM estimated at 1-5% of TAM (1% for broad markets, 5% for niche).
+Serviceable Obtainable Market value from the most conservative credible estimate. If only TAM is available, SOM is estimated as a percentage of TAM using this scale:
+
+| TAM Size | SOM Default % | Rationale |
+|----------|---------------|-----------|
+| > $10B | 1% of TAM | Broad market — many segments, harder to capture meaningful share |
+| $1B-$10B | 2-3% of TAM | Mid-size market — moderate competition for share |
+| < $1B | 5% of TAM | Niche market — fewer players, easier to establish foothold |
 
 | Points | Criteria |
 |--------|----------|
@@ -146,12 +152,16 @@ Total competitors found: direct (same problem, similar solution), indirect (same
 
 Observable traction of the STRONGEST competitor: Crunchbase funding, employee count, reviews, web traffic. Higher score means LESS entrenched competition = MORE opportunity.
 
+**Strongest competitor selection**: Evaluate each direct competitor's traction signals and select the single most threatening one (the one that would score lowest on this rubric). If signals conflict across tiers (e.g., low funding but high review count), use the signal that places the competitor in the **lowest** tier — one dominant signal is enough to indicate entrenchment. See `hc-competitive/SKILL.md` Step 2 for the full selection protocol.
+
 | Points | Criteria |
 |--------|----------|
 | 0-5 | Strongest competitor has >$50M funding OR 500+ employees OR 1000+ reviews OR is a public company (dominant incumbent) |
 | 6-10 | Strongest competitor has $5M-$50M funding OR 50-500 employees OR 100-1000 reviews (established but not dominant) |
 | 11-15 | Strongest competitor has <$5M funding OR 10-50 employees OR 10-100 reviews (moderate traction, no dominant player) |
 | 16-20 | Strongest competitor has no known funding, <10 employees, <10 reviews (all early stage, wide open) |
+
+**INVERSION SELF-CHECK (mandatory)**: After scoring, verify the direction: a score of 0-5 means "dominant incumbent exists, hard to compete" and MUST co-occur with the `"dominant-incumbent-found"` flag. A score of 16-20 means "no strong player" and MUST NOT co-occur with `"dominant-incumbent-found"`. If there is a contradiction, re-evaluate.
 
 #### 3. Market Gap Evidence (0-20)
 
@@ -255,11 +265,26 @@ Technical and operational feasibility: API availability, open-source components,
 
 Regulatory barriers, compliance requirements, enforcement actions, pending legislation.
 
+**Industry-aware framework counting**: Not all regulatory frameworks are equal barriers. When counting frameworks for this rubric, distinguish between **barrier frameworks** and **navigable frameworks**:
+
+| Framework type | Count as | Examples |
+|----------------|----------|----------|
+| **Barrier** | 1.0 | Novel regulation with no established compliance path, pending legislation with uncertain scope, frameworks requiring government licenses |
+| **Navigable** | 0.5 | Frameworks with commercial compliance-as-a-service tools (e.g., Stripe for PCI-DSS, Vanta for SOC 2, compliance platforms for GDPR), well-documented self-serve compliance paths |
+
+Use the **adjusted count** (sum of weighted frameworks) when mapping to tiers. This prevents penalizing industries like fintech where 3 navigable frameworks (PCI-DSS + KYC/AML + state licensing = adjusted 1.5) represent standard operating cost, not existential barriers.
+
+**Industry-specific query templates**: When the idea's industry is known, add targeted regulatory queries:
+- Fintech: `"{industry}" compliance cost OR "compliance as a service" OR "regulatory sandbox"`
+- Healthtech: `"{industry}" FDA pathway OR "510(k)" OR HIPAA compliance tools`
+- Edtech: `"{industry}" FERPA OR COPPA compliance`
+- General SaaS: `"{industry}" SOC 2 OR GDPR OR "data processing agreement"`
+
 | Points | Criteria |
 |--------|----------|
-| 0-6 | 3+ regulatory frameworks apply, OR active enforcement actions against competitors in last 2 years, OR pending legislation could restrict core value proposition |
-| 7-12 | 2 regulatory frameworks with documented compliance pathways; no active enforcement |
-| 13-18 | 0-1 frameworks with standard compliance pathways (e.g., SOC 2); commercial compliance tools available; no pending legislation |
+| 0-6 | Adjusted framework count ≥ 3, OR active enforcement actions against competitors in last 2 years, OR pending legislation could restrict core value proposition |
+| 7-12 | Adjusted framework count 1.5-2.5 with documented compliance pathways; no active enforcement |
+| 13-18 | Adjusted framework count 0-1 with standard compliance pathways; commercial compliance tools available; no pending legislation |
 | 19-25 | No specific regulatory requirements beyond standard business; no history of regulatory intervention; no pending legislation |
 
 #### 3. Market Timing (0-25)
@@ -325,6 +350,23 @@ Everything that is neither NO-GO nor GO:
 - OR weighted score ≥ 70 but Problem < 60
 - OR weighted score ≥ 70 but one score between 40-44
 - Pivot suggestions and alternative directions are generated
+
+## Within-Tier Point Assignment
+
+When a count or metric falls within a tier's range, use the **thirds rule** to assign points within that tier:
+
+| Position within tier | Points | Guideline |
+|----------------------|--------|-----------|
+| Bottom third | Tier minimum + 0-1 | Count barely qualifies for this tier (just crossed the threshold) |
+| Middle third | Tier midpoint | Count is solidly within the tier's range |
+| Top third | Tier maximum - 0-1 | Count is near the next tier's threshold |
+
+**Example** — Complaint Volume tier 6-10 (criteria: 6-20 threads):
+- 6-9 threads → 6-7 points (bottom third — barely in tier)
+- 10-14 threads → 8 points (middle third — solidly in range)
+- 15-20 threads → 9-10 points (top third — approaching next tier)
+
+**Boundary cases**: When a count falls exactly on a tier boundary, assign it to the tier it enters (e.g., exactly 6 threads = tier 6-10, assign 6 points). When evidence quality is mixed within a tier (e.g., 8 threads but 3 are borderline duplicates), round down within the tier.
 
 ## Score Reasoning Requirements
 

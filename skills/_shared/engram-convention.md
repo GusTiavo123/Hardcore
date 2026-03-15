@@ -118,6 +118,18 @@ Step 2: Get full content (REQUIRED)
 **NEVER** use `mem_search` results directly as the full artifact — they are truncated previews.
 **ALWAYS** call `mem_get_observation` to get the complete content.
 
+### Retry Protocol (on recovery failure)
+
+If `mem_search` or `mem_get_observation` fails (returns no results, errors, or empty content), follow this escalation:
+
+| Attempt | Action |
+|---------|--------|
+| 1 | Retry the exact same `mem_search` query (transient failures happen) |
+| 2 | Broaden the query: `mem_search(query: "validation {slug} {department}", project: "hardcore")` — drop the `/` separators for looser FTS5 matching |
+| 3 | Try browsing all artifacts: `mem_search(query: "validation/{slug}/", project: "hardcore")` — find any artifact for this slug and check if the target department is among them |
+
+If all 3 attempts fail, the artifact is considered unrecoverable. Follow the department's recovery failure handling (each SKILL.md defines whether this is a hard or soft dependency).
+
 ### Retrieving Multiple Artifacts
 
 When a department needs multiple inputs (e.g., hc-bizmodel needs market + competitive):

@@ -28,6 +28,7 @@ Default resolution (when not explicitly set):
 - Use valid Engram `type` enums (see Type Mapping in `engram-convention.md`)
 - Do NOT use `tags` parameter (it does not exist in Engram's API)
 - Read previous department outputs from Engram using the 2-step recovery protocol
+- On recovery failure, follow the **Retry Protocol** in `engram-convention.md` (3 attempts with progressively broader queries before declaring failure)
 - **Never** write project files
 - Cross-session recovery is automatic (Engram persists to SQLite)
 - Orchestrator MUST manage session lifecycle: `mem_session_start` → work → `mem_session_summary` → `mem_session_end` (see `engram-convention.md`)
