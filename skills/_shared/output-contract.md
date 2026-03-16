@@ -142,3 +142,19 @@ Array of department names that should run next according to the DAG:
 7. If `status` is `blocked`, `flags` MUST explain why
 8. `data` schema is validated by each department's own contract (see SKILL.md)
 9. `detailed_report` is OPTIONAL — omit entirely if `detail_level` is not `deep`
+
+## Output Assembly Protocol
+
+Every department MUST cross-reference its `data` object against the SKILL.md schema **before persisting or returning**. This is the enforcement mechanism for Schema Strictness rules 1-4 above.
+
+### The Protocol (mandatory for every department)
+
+1. **After completing all analysis steps** and **before the Persist step**, execute the Output Assembly Checklist defined in your SKILL.md (Step X.5: "Assemble Output").
+2. For each field listed in the checklist, verify it is **present** in your `data` object with the **exact key name** from the schema.
+3. Verify **nesting is correct** — fields defined at the top level of `data` MUST be at the top level, not nested inside another object. Fields defined inside a sub-object MUST be inside that sub-object.
+4. Verify **no field is silently dropped** — information that exists in your analysis (score_reasoning, executive_summary, evidence) but is missing from `data` is invisible to downstream departments.
+5. If any field cannot be populated (e.g., no data found), use the schema's default value or an explicit empty value (`[]` for arrays, `0` for numbers, `""` for strings) — never omit the field entirely.
+
+### Why This Exists
+
+Sub-agents reliably produce correct analysis in prose (`score_reasoning`, `executive_summary`) but historically strip structured `data` fields when assembling the output envelope. The Output Assembly Checklist forces an explicit mapping from each analysis step to each `data` field, closing the gap between "analyzed correctly" and "reported correctly."

@@ -391,3 +391,5 @@ Score: 72/100
 - Paid Alternatives: 15/20 (4 paid alternatives, 2 with 50+ reviews on G2)
 Total: 12 + 16 + 14 + 15 + 15 = 72
 ```
+
+**Score reasoning vs `data`**: Score reasoning documents the **WHY** (justification, evidence references, tier mapping). The `data` object documents the **WHAT** (structured fields consumed by downstream departments). Both must be complete — information that exists only in `score_reasoning` but not in `data` is invisible to downstream departments. After writing your score reasoning, cross-reference the Output Assembly Checklist in your SKILL.md to ensure every finding is also captured in the corresponding `data` field.

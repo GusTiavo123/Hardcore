@@ -89,14 +89,14 @@ A department detects Engram by checking if `mem_search` is available as an MCP t
 
 The orchestrator may pass `detail_level`: `concise | standard | deep`.
 
-> **CRITICAL**: The `data` object MUST always contain the FULL schema as defined in each department's SKILL.md, regardless of `detail_level`. Detail level controls ONLY: `executive_summary` length, `detailed_report` inclusion, and `evidence` count. The `data` object is consumed by downstream departments — stripping fields breaks the pipeline.
+> **CRITICAL**: ALL fields from the department's SKILL.md `data` schema MUST be present in the `data` object regardless of `detail_level`. Detail level NEVER strips `data` fields. Detail level controls ONLY: `executive_summary` length, `detailed_report` inclusion, and `evidence` count. The `data` object is consumed by downstream departments — stripping fields breaks the pipeline.
 
-| Level | `executive_summary` | `detailed_report` | `evidence` |
-|-------|---------------------|--------------------|------------|
-| `concise` | 1 sentence | Omitted | Top 3 sources |
-| `standard` | 1-2 sentences | Omitted | All sources |
-| `deep` | 2-3 sentences | Included | All sources + reliability assessment |
+| Level | `executive_summary` | `detailed_report` | `evidence` | `data` |
+|-------|---------------------|--------------------|------------|--------|
+| `concise` | 1 sentence | Omitted | Top 3 sources | **Full schema (always)** |
+| `standard` | 1-2 sentences | Omitted | All sources | **Full schema (always)** |
+| `deep` | 2-3 sentences | Included | All sources + reliability assessment | **Full schema (always)** |
 
-**`data`**: Full schema always. Not affected by detail level.
+**`data` is never affected by detail level.** Every field defined in the department's SKILL.md data schema must be present with the exact key name and nesting structure. If a field has no value (e.g., no data found), use the schema's default or an explicit empty value (`[]`, `0`, `""`) — never omit the field.
 
 Detail level controls output verbosity but does NOT affect what gets persisted — always persist the full artifact regardless.

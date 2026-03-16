@@ -235,6 +235,36 @@ For each sub-dimension:
 | `blocked` | Input missing/invalid OR Competitive Intelligence output could not be recovered |
 | `failed` | Search tool entirely unavailable or returned errors on all queries |
 
+### Step 8.5: Assemble Output (MANDATORY)
+
+Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+
+**CRITICAL NESTING RULES**: `sensitivity_analysis` and `assumptions[]` are **TOP-LEVEL keys** in `data`, NOT nested inside `unit_economics`. Use **exact field names**: `estimated_ltv` not `ltv`, `churn_rate_monthly` not `monthly_churn_rate`, `estimated_cac` not `cac`.
+
+- [ ] `recommended_model` ← Step 1 (one of: `subscription | usage-based | marketplace | one-time | freemium | hybrid`)
+- [ ] `model_justification` ← Step 1 (why this model, based on competitive evidence)
+- [ ] `pricing_suggestion` ← Step 2 (object with `price_point`, `billing`, `currency`, `justification`)
+- [ ] `unit_economics` ← Step 4 (object — see sub-fields below)
+- [ ] `unit_economics.arpu_monthly` ← Step 4 (numeric ARPU)
+- [ ] `unit_economics.churn_rate_monthly` ← Step 4 (decimal, e.g., 0.05 — NOT `monthly_churn_rate`)
+- [ ] `unit_economics.churn_source` ← Step 3 (benchmark source and segment)
+- [ ] `unit_economics.gross_margin` ← Step 4 (decimal, e.g., 0.80)
+- [ ] `unit_economics.margin_source` ← Step 3 (benchmark source)
+- [ ] `unit_economics.estimated_ltv` ← Step 4 (numeric LTV — NOT `ltv`)
+- [ ] `unit_economics.estimated_cac` ← Step 4 (numeric CAC — NOT `cac`)
+- [ ] `unit_economics.cac_source` ← Step 3 (benchmark source and channel assumption)
+- [ ] `unit_economics.ltv_cac_ratio` ← Step 4 (decimal ratio)
+- [ ] `unit_economics.payback_months` ← Step 4 (decimal months)
+- [ ] `sensitivity_analysis` ← Step 5 (**TOP-LEVEL in `data`**, NOT inside `unit_economics`)
+- [ ] `sensitivity_analysis.cac_plus_20` ← Step 5 (object with `ltv_cac_ratio`, `payback_months`, `viable`, `assessment`)
+- [ ] `sensitivity_analysis.churn_plus_20` ← Step 5 (object with `ltv_cac_ratio`, `payback_months`, `viable`, `assessment`)
+- [ ] `sensitivity_analysis.price_minus_20` ← Step 5 (object with `ltv_cac_ratio`, `payback_months`, `viable`, `assessment`)
+- [ ] `model_precedents[]` ← Step 6 (array with `company`, `model`, `segment`, `evidence`, `source`)
+- [ ] `assumptions[]` ← Steps 3-4 (**TOP-LEVEL in `data`**, NOT inside `unit_economics`; each assumption as explicit string)
+- [ ] `search_queries_used[]` ← Step 3 (array of actual query strings executed)
+- [ ] `sub_scores` ← Step 7 (object with `ltv_cac_ratio`, `revenue_model_validation`, `payback_period`, `pricing_power`)
+- [ ] `model_score` ← Step 7 (integer sum of all 4 sub_scores — verify arithmetic)
+
 ### Step 9: Persist (if applicable)
 
 **You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.

@@ -195,6 +195,37 @@ mem_session_end(
 
 Resolved per `persistence-contract.md`. Default: `engram` if available.
 
+## Sub-Agent Launch Template
+
+When launching each department as a sub-agent, use the **Agent tool** with the following prompt template. This is the exact mechanism for delegating work to departments:
+
+```
+Read and follow these files exactly:
+- skills/_shared/output-contract.md
+- skills/_shared/scoring-convention.md
+- skills/_shared/engram-convention.md
+- skills/_shared/persistence-contract.md
+- skills/hc-{department}/SKILL.md
+
+Input:
+{
+  "idea": "{original idea text}",
+  "slug": "{slug}",
+  "persistence_mode": "{mode}",
+  "detail_level": "{level}"
+}
+
+{If persistence_mode is "none": include upstream department output envelopes here per the None Mode Protocol}
+
+CRITICAL: Your `data` object must contain EVERY field from the data schema in your SKILL.md.
+Cross-reference the Output Assembly Checklist (Step X.5) before returning.
+Missing fields break downstream departments.
+
+Execute the full process defined in the SKILL.md and return the output envelope.
+```
+
+Each department needs **web search** capabilities. The sub-agent must use WebSearch and WebFetch tools to find real evidence.
+
 ## Persistence Responsibility
 
 Each department is the **authoritative persister** of its own output. The orchestrator does NOT duplicate department persistence. This prevents double-writes to Engram (which would upsert and waste calls).

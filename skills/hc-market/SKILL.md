@@ -209,6 +209,33 @@ For each sub-dimension:
 | `blocked` | Input missing/invalid OR Problem Validation output could not be recovered |
 | `failed` | Search tool entirely unavailable or returned errors on all queries |
 
+### Step 8.5: Assemble Output (MANDATORY)
+
+Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+
+- [ ] `tam` ← Step 3 (object with `value`, `currency`, `source`, `methodology`)
+- [ ] `tam.value` ← Step 3 (numeric TAM value)
+- [ ] `tam.currency` ← Step 3 (e.g., `"USD"`)
+- [ ] `tam.source` ← Step 3 (source name and year — NOT empty)
+- [ ] `tam.methodology` ← Step 3 (one of: `top-down-institutional`, `top-down-estimated`, `bottom-up`, `analog`)
+- [ ] `sam` ← Step 3 (object with `value`, `currency`, `source`, `methodology`)
+- [ ] `sam.value` ← Step 3 (numeric SAM value)
+- [ ] `sam.currency` ← Step 3 (e.g., `"USD"`)
+- [ ] `sam.source` ← Step 3 (source or calculation basis — NOT empty)
+- [ ] `sam.methodology` ← Step 3 (what filters were applied to TAM)
+- [ ] `som` ← Step 3 (object with `value`, `currency`, `source`, `methodology`)
+- [ ] `som.value` ← Step 3 (numeric SOM value — most conservative estimate)
+- [ ] `som.currency` ← Step 3 (e.g., `"USD"`)
+- [ ] `som.source` ← Step 3 (estimation basis — NOT empty)
+- [ ] `som.methodology` ← Step 3 (how SOM was derived from SAM)
+- [ ] `growth_rate` ← Step 4 (formatted string, e.g., `"X% CAGR (YYYY-YYYY)"`)
+- [ ] `growth_source` ← Step 4 (source name — NOT empty)
+- [ ] `market_stage` ← Step 6 (one of: `emerging | growing | mature | declining`)
+- [ ] `early_adopters[]` ← Step 5 (array of segments, each with `segment`, `estimated_size`, `evidence_of_spending`, `reachable_channels[]`)
+- [ ] `search_queries_used[]` ← Step 2 (array of actual query strings executed)
+- [ ] `sub_scores` ← Step 7 (object with `data_availability`, `market_scale`, `growth_trajectory`, `early_adopter_identifiability`)
+- [ ] `market_score` ← Step 7 (integer sum of all 4 sub_scores — verify arithmetic)
+
 ### Step 9: Persist (if applicable)
 
 **You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.

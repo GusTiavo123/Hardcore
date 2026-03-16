@@ -249,6 +249,18 @@ For each sub-dimension:
 | `blocked` | Input missing/invalid |
 | `failed` | Search tool entirely unavailable or returned errors on all queries |
 
+### Step 8.5: Assemble Output (MANDATORY)
+
+Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+
+- [ ] `risks[]` ← Step 5 (array of risk objects, each with `category`, `risk`, `probability`, `impact`, `mitigation`, `evidence`, `source_department` — this is the full risk register, NOT just top killers)
+- [ ] `dependencies[]` ← Step 4 (array of dependency objects, each with `dependency`, `type`, `criticality`, `fallback`, `history`)
+- [ ] `overall_risk_level` ← Step 8 (one of: `low | medium | high | critical`)
+- [ ] `top_3_killers[]` ← Step 6 (array of exactly 3 entries, each with `risk`, `why_killer`, `mitigation_feasible`, `early_warning_signal`)
+- [ ] `search_queries_used[]` ← Steps 1-4 (array of ALL actual query strings executed across all steps)
+- [ ] `sub_scores` ← Step 7 (object with `execution_feasibility`, `regulatory_legal`, `market_timing`, `dependency_concentration`)
+- [ ] `risk_score` ← Step 7 (integer sum of all 4 sub_scores — verify arithmetic)
+
 ### Step 9: Persist (if applicable)
 
 **You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.

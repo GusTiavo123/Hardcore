@@ -206,6 +206,20 @@ For each sub-dimension:
 | `blocked` | Input missing/invalid OR Problem Validation output could not be recovered |
 | `failed` | Search tool entirely unavailable or returned errors on all queries |
 
+### Step 7.5: Assemble Output (MANDATORY)
+
+Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+
+- [ ] `direct_competitors[]` ← Step 1 + Step 2 (array of competitors, each with `name`, `url`, `pricing` {`model`, `range`, `detail`}, `strengths[]`, `weaknesses[]`, `traction` {`funding`, `employees`, `reviews`, `source`}, `estimated_size`)
+- [ ] `indirect_competitors[]` ← Step 1 (array with `name`, `url`, `approach`, `relevance`)
+- [ ] `adjacent_competitors[]` ← Step 1 (array with `name`, `url`, `current_focus`, `pivot_threat`, `evidence`)
+- [ ] `failed_competitors[]` ← Step 5 (array with `name`, `url`, `year_failed`, `reason_failed`, `source`)
+- [ ] `market_gaps[]` ← Step 3 (array with `gap`, `mention_count`, `sources[]`, `aligns_with_idea`)
+- [ ] `pricing_benchmark` ← Step 4 (object with `low`, `mid`, `high`, `currency`, `model`, `free_alternatives_exist`, `competitors_with_pricing`)
+- [ ] `search_queries_used[]` ← Step 1 (array of actual query strings executed)
+- [ ] `sub_scores` ← Step 6 (object with `market_validation`, `incumbent_weakness`, `gap_evidence`, `pricing_intelligence`, `failure_intelligence`)
+- [ ] `competitive_score` ← Step 6 (integer sum of all 5 sub_scores — verify arithmetic)
+
 ### Step 8: Persist (if applicable)
 
 **You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.

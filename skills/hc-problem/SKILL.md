@@ -170,6 +170,21 @@ Include every paid alternative found. Cap at **10 entries** — if you found mor
 | `blocked` | Input was missing or invalid |
 | `failed` | Search tool entirely unavailable or returned errors on all queries |
 
+### Step 7.5: Assemble Output (MANDATORY)
+
+Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+
+- [ ] `problem_exists` ← Step 6 (compiled from complaint count + alternatives/workarounds criteria)
+- [ ] `problem_statement` ← Step 1 (refined 1-2 sentence description of the problem)
+- [ ] `target_user` ← Step 1 (specific description of who suffers this problem)
+- [ ] `industry` ← Step 1 (industry/domain keyword)
+- [ ] `pain_intensity` ← Step 5 (classified as `critical | high | medium | low`)
+- [ ] `current_solutions[]` ← Step 6 (array of solutions with `solution`, `type`, `satisfaction`)
+- [ ] `evidence_summary` ← Step 3 (summary of complaint counts, sources, and pattern)
+- [ ] `search_queries_used[]` ← Step 3 (array of actual query strings executed)
+- [ ] `sub_scores` ← Step 4 (object with `complaint_volume`, `complaint_recency`, `pain_signals`, `workaround_evidence`, `paid_alternatives`)
+- [ ] `problem_score` ← Step 4 (integer sum of all 5 sub_scores — verify arithmetic)
+
 ### Step 8: Persist (if applicable)
 
 **You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.

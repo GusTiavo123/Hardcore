@@ -264,6 +264,24 @@ Use Market's `data.early_adopters[].reachable_channels` for specific channels in
 | `blocked` | Input missing/invalid OR no department data recovered at all |
 | `failed` | (Unlikely for Synthesis since it doesn't do external calls. Reserved for unexpected errors.) |
 
+### Step 11.5: Assemble Output (MANDATORY)
+
+Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break the final report.**
+
+- [ ] `verdict` ← Steps 2-4 (one of: `GO | NO-GO | PIVOT`)
+- [ ] `confidence` ← Step 5 (one of: `high | medium | low`)
+- [ ] `weighted_score` ← Step 1 (decimal, rounded to 1 decimal place)
+- [ ] `score_breakdown` ← Step 1 (object with `problem`, `market`, `competitive`, `bizmodel`, `risk` — each containing `score`, `weight`, `contribution`)
+- [ ] `knockouts_triggered[]` ← Step 2 (array of knockout objects with `rule`, `value`, `threshold`, `department` — empty array `[]` if none triggered)
+- [ ] `executive_summary` ← Step 6 (2-3 sentence verdict summary for the founder)
+- [ ] `key_strengths[]` ← Step 6 (array of specific strengths with evidence references)
+- [ ] `key_concerns[]` ← Step 6 (array of specific concerns with evidence references)
+- [ ] `critical_assumptions[]` ← Step 7 (array of assumptions the validation rests on — from BizModel `assumptions`, Market flags, Problem flags)
+- [ ] `pivot_suggestions[]` ← Step 8 (array with `direction`, `addresses`, `revalidation_idea` — empty `[]` if verdict is not PIVOT)
+- [ ] `next_steps[]` ← Step 9 (array with `action`, `priority`, `timeframe`, `rationale`)
+- [ ] `validation_experiments[]` ← Step 10 (array with `experiment`, `success_metric`, `effort`, `what_it_validates` — empty `[]` for NO-GO)
+- [ ] `department_flags` ← Step 11 (object with `problem`, `market`, `competitive`, `bizmodel`, `risk` — each an array of flag strings from that department)
+
 ### Step 12: Persist (if applicable)
 
 **You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.
