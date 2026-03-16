@@ -1,0 +1,84 @@
+{
+  "status": "ok",
+  "department": "bizmodel",
+  "executive_summary": "Subscription model at $29/month yields strong unit economics (LTV/CAC 5.7x, payback 2.2 months) validated by 6 model precedents including Talkspace and Terapify, though CAC and gross margin assumptions are estimated from adjacent benchmarks rather than directly observed for LATAM teen mental health — score 79/100.",
+  "score": 79,
+  "score_reasoning": "Score: 79/100\n- LTV/CAC Ratio: 21/25 (ratio 5.70 base, 4.56 worst-case; tier 19-25 for >4.0 with 2+ benchmarks; middle third because CAC $35 and gross margin 55% are estimated from adjacent benchmarks — Talkspace public GM 43-48%, WeAreFounders healthcare churn 7.5%, Usermaven pharma CAC $178 adjusted for LATAM)\n- Revenue Model Validation: 20/25 (6 companies with same/similar model: Talkspace subscription telemental health, BetterHelp D2C subscription, Terapify LATAM per-session, Sanarai LATAM bilingual therapy, Kooth B2G youth mental health, Pure Mente LATAM freemium app; tier 19-25 for 6+ in same segment, lower third as exactly 6 and 4 well-documented)\n- Payback Period: 22/25 (2.19 months base, 2.74 months worst sensitivity; tier 19-25 for <7mo with 2+ benchmarks; upper-middle third — even at $100 CAC payback would be 6.27mo still in top tier)\n- Pricing Power: 16/25 ($15-$109 range = 7.3x, 2+ premium players BetterHelp/Talkspace, BUT Kooth $680M B2G free-to-user model in exact target segment youth mental health is significant pricing headwind; tier 13-18 for 1+ free alternative in segment, middle third)\nTotal: 21 + 20 + 22 + 16 = 79",
+  "data": {
+    "recommended_model": "Freemium subscription (B2C) with B2B/B2G expansion path",
+    "pricing_suggestion": {
+      "price_point": 29,
+      "currency": "USD",
+      "billing": "monthly",
+      "premium_tier": 49,
+      "notes": "Base $29/mo includes unlimited AI triage + 1 therapist session/month; Premium $49/mo adds 2 sessions + priority access. Calibrated to LATAM mid-range ($15-30/session) with high pain intensity justifying upper range."
+    },
+    "unit_economics": {
+      "arpu_monthly": 29.00,
+      "monthly_churn_rate": 0.08,
+      "gross_margin": 0.55,
+      "ltv": 199.38,
+      "cac": 35.00,
+      "ltv_cac_ratio": 5.70,
+      "payback_months": 2.19,
+      "sensitivity": {
+        "cac_plus_20": {
+          "ltv_cac_ratio": 4.75,
+          "payback_months": 2.63,
+          "viable": true
+        },
+        "churn_plus_20": {
+          "ltv_cac_ratio": 4.75,
+          "payback_months": 2.19,
+          "viable": true
+        },
+        "price_minus_20": {
+          "ltv_cac_ratio": 4.56,
+          "payback_months": 2.74,
+          "viable": true
+        }
+      },
+      "assumptions": [
+        "A1: ARPU $29/mo based on LATAM competitive benchmark mid-to-high range (pain intensity high)",
+        "A2: Monthly churn 8% — between subscription consumer 5-10% and Headspace 13%, adjusted for therapist-involving switching cost",
+        "A3: Gross margin 55% — Talkspace at 43-48% includes full therapist compensation; AI triage model has lower therapist cost component",
+        "A4: CAC $35 — LATAM digital health estimate; between $1 mobile baseline and $178 pharma benchmark"
+      ]
+    },
+    "model_score": 79,
+    "sub_scores": {
+      "ltv_cac_ratio": 21,
+      "revenue_model_validation": 20,
+      "payback_period": 22,
+      "pricing_power": 16
+    }
+  },
+  "evidence": [
+    {
+      "source": "https://bhbusiness.com/2025/05/06/talkspace-extends-profitability-run-as-payer-strategy-fuels-growth/",
+      "quote": "Talkspace Q1 2025: revenue up 15% to $52.2M, fifth consecutive profitable quarter. Gross margin 44.6%. Insurance-covered therapy sessions increased 29%, with revenue from payer business increasing 35% to $40.5M.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.wearefounders.uk/saas-churn-rates-and-customer-acquisition-costs-by-industry-2025-data/",
+      "quote": "Healthcare SaaS monthly churn rate: 7.5%, with a 67% increase from 2024 to 2025. Healthcare SaaS CAC: SMB $500-700, Mid-Market $700-900, Enterprise $900-1100.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://usermaven.com/blog/average-customer-acquisition-cost",
+      "quote": "Pharmaceutical CAC ~$178 combined ($196 organic, $160 paid). Medical Device CAC ~$628 combined. Healthy benchmark is LTV:CAC ratio of 3:1 or 4:1.",
+      "reliability": "high"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "bizmodel-analysis",
+      "store": "file",
+      "ref": "validation/telemedicina-ia-salud-mental-latam/bizmodel"
+    }
+  ],
+  "flags": [
+    "unit-economics-speculative"
+  ],
+  "next_recommended": ["risk"]
+}

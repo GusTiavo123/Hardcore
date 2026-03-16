@@ -1,0 +1,21 @@
+slug: telemedicina-ia-salud-mental-latam
+phase: synthesis
+mode: fast
+detail_level: concise
+persistence_mode: file
+completed:
+  problem: true
+  market: true
+  competitive: true
+  bizmodel: true
+  risk: true
+  synthesis: true
+scores:
+  problem: 75
+  market: 68
+  competitive: 62
+  bizmodel: 79
+  risk: 39
+weighted_score: 68.5
+verdict: PIVOT
+last_updated: 2026-03-15T00:00:00Z

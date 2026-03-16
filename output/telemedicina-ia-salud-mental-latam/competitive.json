@@ -1,0 +1,113 @@
+{
+  "status": "warning",
+  "department": "competitive",
+  "executive_summary": "Validated market with 12+ competitors (BetterHelp, Talkspace, Brightline, Kooth globally; Terapify, Sanarai, Mindy in LATAM) but dominated by well-funded US incumbents (Teladoc/BetterHelp $950M rev, Talkspace $800M+ acquisition); major gaps in Spanish-language teen-specific AI triage and LATAM-affordable pricing ($20-30/session vs $260-436/mo US) create a defensible niche — score 62/100.",
+  "score": 62,
+  "score_reasoning": "Score: 62/100\n- Market Validation Signal: 13/20 (12 competitors found: 7 direct [BetterHelp/TeenCounseling, Talkspace, Brightline, Kooth, Terapify, Sanarai, Mindy], 2 indirect [Wysa, Woebot-deceased], 3 adjacent [Doctoralia, Go Doctor, CUX]; solidly in 6-15 tier with 7 direct + 2 indirect)\n- Incumbent Weakness: 3/20 (strongest competitor: BetterHelp/Teladoc — public company NYSE:TDOC, $2.5B parent revenue, BetterHelp segment $950M/yr, 7800+ Trustpilot reviews; runner-up: Talkspace — public company NASDAQ:TALK, being acquired for $800M+) [INVERTED: low points = dominant incumbent]\n  INVERSION CHECK: 3 points means dominant incumbent exists, hard to compete. Consistent with evidence: YES — BetterHelp is a subsidiary of a public company with >$50M funding and >1000 reviews. Flag 'dominant-incumbent-found' set.\n- Market Gap Evidence: 17/20 (7 gaps identified from reviews/research: (1) no Spanish/culturally-adapted teen content [academic papers + focus groups + user reviews], (2) US pricing prohibitive for LATAM [$260-436/mo vs $20-30/session avg], (3) generic non-personalized content for teens [focus group + app reviews], (4) no AI triage/preliminary diagnostic [gap across all platforms], (5) privacy/data concerns [FTC settlement + Trustpilot], (6) therapist matching/wait times [BBB + Trustpilot + Reddit], (7) no LATAM-specific teen platform [market gap]; 3+ thematically related to LATAM teen niche)\n- Pricing Intelligence: 16/20 (pricing found for 6+ competitors: BetterHelp/TeenCounseling $280-400/mo, Talkspace $276-436/mo, Calmerry $228-360/mo, Terapify ~$30/session, Hola Therapy $115/session, Doctoralia $25-50/session; tier detail for BetterHelp, Talkspace, Calmerry)\n- Failure Intelligence: 13/20 (3 dead competitors: Woebot [$123M raised, shut down June 2025, FDA regulatory barriers], Mindstrong [$160M raised, shut down March 2024, funding/unit economics], Yara AI [shut down Nov 2025, safety concerns]; 2 readable post-mortems [Woebot STAT article, Mindstrong press coverage]; 5+ churn signals from BetterHelp [TeenCounseling 2.4/5 Trustpilot, BBB complaints, FTC $7.8M settlement])\nTotal: 13 + 3 + 17 + 16 + 13 = 62",
+  "data": {
+    "direct_competitors": [
+      {
+        "name": "BetterHelp / Teen Counseling",
+        "url": "https://www.teencounseling.com/",
+        "pricing": {
+          "model": "subscription",
+          "range": "$280-$400/mo ($70-$100/week)"
+        }
+      },
+      {
+        "name": "Talkspace",
+        "url": "https://www.talkspace.com/",
+        "pricing": {
+          "model": "subscription",
+          "range": "$276-$436/mo ($69-$109/week); $15-30 copay with insurance"
+        }
+      },
+      {
+        "name": "Brightline",
+        "url": "https://www.hellobrightline.com/",
+        "pricing": {
+          "model": "insurance-based",
+          "range": "Covered by employer/insurance plans; no public cash-pay pricing"
+        }
+      },
+      {
+        "name": "Kooth",
+        "url": "https://www.kooth.com/",
+        "pricing": {
+          "model": "B2G (free to users)",
+          "range": "Free to end users; government contracts ($680M California deal)"
+        }
+      },
+      {
+        "name": "Terapify",
+        "url": "https://www.terapify.com/",
+        "pricing": {
+          "model": "per-session",
+          "range": "$29.99/session (50 min)"
+        }
+      },
+      {
+        "name": "Sanarai",
+        "url": "https://www.sanarai.com/",
+        "pricing": {
+          "model": "per-session",
+          "range": "~$20-30/session (affordable LATAM pricing)"
+        }
+      },
+      {
+        "name": "Mindy",
+        "url": "https://www.mindy.cl/",
+        "pricing": {
+          "model": "per-session (B2C) + subscription (B2B)",
+          "range": "~$15-30/session (Chile/Mexico)"
+        }
+      }
+    ],
+    "pricing_benchmark": {
+      "low": 15,
+      "mid": 30,
+      "high": 109,
+      "currency": "USD/session-equivalent",
+      "model": "mixed (subscription in US, per-session in LATAM)",
+      "free_alternatives_exist": true,
+      "competitors_with_pricing": 7,
+      "notes": "Massive pricing gap between US platforms ($65-109/week) and LATAM platforms ($15-30/session). LATAM mid-point ~$25-30/session is the target benchmark. Kooth and some NGO-backed services are free (B2G model)."
+    },
+    "sub_scores": {
+      "market_validation": 13,
+      "incumbent_weakness": 3,
+      "gap_evidence": 17,
+      "pricing_intelligence": 16,
+      "failure_intelligence": 13
+    },
+    "competitive_score": 62
+  },
+  "evidence": [
+    {
+      "source": "https://seekingalpha.com/news/4557798-teladoc-projects-2_47b-2_59b-revenue-in-2026-while-advancing-ai-insurance-and-international",
+      "quote": "Teladoc projects $2.47B-$2.59B revenue in 2026; BetterHelp segment revenue $950M in 2025, guided down 7% to 0.5% for 2026. Market cap $829M as of Feb 2026.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.statnews.com/2025/07/02/woebot-therapy-chatbot-shuts-down-founder-says-ai-moving-faster-than-regulators/",
+      "quote": "Woebot Health shut down its CBT-based therapy chatbot on June 30, 2025 after raising $123M. Founder cited FDA regulatory requirements as primary reason — cost and challenge of marketing authorization made it unviable.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://bhbusiness.com/2024/01/25/california-inks-680-million-deal-with-brightline-and-kooth-for-virtual-pediatric-mental-health-services/",
+      "quote": "California inks $680 million deal with Brightline and Kooth for virtual pediatric mental health services for all residents aged 25 and younger, available in English and Spanish.",
+      "reliability": "high"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "competitive-analysis",
+      "store": "file",
+      "ref": "validation/telemedicina-ia-salud-mental-latam/competitive"
+    }
+  ],
+  "flags": [
+    "dominant-incumbent-found"
+  ],
+  "next_recommended": ["bizmodel"]
+}

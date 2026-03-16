@@ -1,0 +1,46 @@
+{
+  "status": "ok",
+  "department": "problem",
+  "executive_summary": "Problem strongly validated: 16M+ adolescents in LATAM have diagnosed mental disorders with a 70%+ treatment gap, only 3.4 psychiatrists per 100K people, and multiple paid alternatives confirm willingness to pay — score 75/100 (high pain).",
+  "score": 75,
+  "score_reasoning": "Score: 75/100\n- Complaint Volume: 13/20 (30+ unique threads found across UNICEF, UNDP, PAHO, WHO, Trustpilot, Reddit, academic journals, and news outlets)\n- Complaint Recency: 18/20 (88% from last 24 months — UNICEF 2024, UNDP 2024, Frontiers 2024, NBER 2025, OECD 2025, Springer 2025, Trustpilot 2024-2026; 3 undated excluded)\n- Pain Intensity Signals: 14/20 (15+ pain markers including 5 quantified costs — $30B annual economic loss, 70% treatment gap, 3.4 psychiatrists/100K, 14K+ on waiting lists in Chile alone, $1,280 user cost on BetterHelp — and 1 borderline WTP signal from freemium conversion data)\n- Workaround Evidence: 14/20 (6 distinct workarounds — AI chatbots as pseudo-therapists, free self-help apps, self-diagnosis via search, crisis hotlines for non-crisis needs, US-based expensive platforms, free government/NGO resources with long waits; 2 involve multi-tool stacks)\n- Paid Alternatives: 16/20 (7 paid alternatives — BetterHelp/TeenCounseling $65-100/wk, Talkspace $69-109/wk, Terapify ~$20-80/session, Doctoralia $600MXN/session, Calmerry $49-90/wk, Wysa premium, Hola Therapy $115/session; BetterHelp has 7800+ Trustpilot reviews, Talkspace listed on G2/Capterra)\nTotal: 13 + 18 + 14 + 14 + 16 = 75",
+  "data": {
+    "problem_exists": true,
+    "problem_statement": "Adolescents in Latin America face a severe mental health access crisis: 16 million live with diagnosed mental disorders, yet 70%+ never receive treatment due to a critical shortage of specialists (3.4 psychiatrists per 100K vs OECD's 18), budget underinvestment (<3% of health spending), and prohibitive cost of existing telehealth alternatives designed for US/EU markets.",
+    "pain_intensity": "high",
+    "problem_score": 75,
+    "sub_scores": {
+      "complaint_volume": 13,
+      "complaint_recency": 18,
+      "pain_signals": 14,
+      "workaround_evidence": 14,
+      "paid_alternatives": 16
+    }
+  },
+  "evidence": [
+    {
+      "source": "https://www.unicef.org/lac/en/press-releases/over-us30-billion-is-lost-to-economies-in-latin-america-and-caribbean-each-year-due-youth-mental-health-disorders",
+      "quote": "15% of children and adolescents aged 10-19 in LAC — around 16 million — live with a diagnosed mental disorder. Over US$30 billion is lost to economies each year. Only 1.8% of public spending in LAC goes to mental health.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.undp.org/latin-america/blog/strong-outside-struggling-within-decline-mental-health-lac",
+      "quote": "More than 70% of people in LAC who need mental health care do not receive it. There are 3.4 psychiatrists per 100,000 people, significantly below the OECD average of over 18.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.trustpilot.com/review/teencounseling.com",
+      "quote": "Teen Counseling rated 2.4/5 on Trustpilot (86 reviews, 47% 1-star). Parent: 'Teencounselling.com has taken almost £700 from me and my child has not received one counselling session.'",
+      "reliability": "medium"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "problem-analysis",
+      "store": "file",
+      "ref": "validation/telemedicina-ia-salud-mental-latam/problem"
+    }
+  ],
+  "flags": [],
+  "next_recommended": ["market", "competitive"]
+}

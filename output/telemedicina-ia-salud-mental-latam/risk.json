@@ -1,0 +1,84 @@
+{
+  "status": "warning",
+  "department": "risk",
+  "executive_summary": "High overall risk (score 39/100) driven by severe regulatory complexity across AI + healthcare + minors + multi-jurisdiction LATAM (5/25 regulatory sub-score), with 3 failed AI mental health predecessors (Woebot $123M, Mindstrong $160M, Yara AI) confirming regulatory barriers as idea-killers, partially offset by strong market timing and established tech stack.",
+  "score": 39,
+  "score_reasoning": "Score: 39/100 (INVERTED: 100 = lowest risk)\n- Execution Feasibility: 16/25 (3+ AI API providers with healthcare BAAs — OpenAI, Anthropic Claude, Google MedGemini — all with HIPAA-ready infrastructure; telehealth tech stack well-established with WebRTC, Twilio, etc.; 100+ relevant job postings for AI/ML healthcare engineers; infra cost estimated $2-5K/mo at MVP scale using managed APIs; no SPOF in core tech. Tier 13-18, middle third.)\n- Regulatory & Legal: 5/25 (Adjusted framework count ≥ 4.5: (1) AI medical device regulation per LATAM country — ANVISA Brazil, COFEPRIS Mexico, each with distinct AI/SaMD rules = barrier 1.0; (2) minors' data protection — LGPD Art.14 Brazil, Ley 25.326 Argentina, each country-specific = barrier 1.0; (3) professional licensing for cross-border telehealth — no harmonized LATAM framework, requires per-country medical licensing = barrier 1.0; (4) general data protection laws — LGPD, Ley de Protección de Datos Argentina, Ley 1581 Colombia = navigable 0.5; (5) AI-specific mental health regulation — 8+ US state laws passed 2025, LATAM following suit = barrier 1.0. Adjusted count = 1.0 + 1.0 + 1.0 + 0.5 + 1.0 = 4.5. Additionally: active enforcement — FTC inquiry into AI chatbots harming minors Sept 2025, 7 wrongful death lawsuits against OpenAI for AI mental health harm, Woebot/Yara shutdowns from regulatory pressure. Pending legislation: COPPA expansion to teens (S.836 passed Senate March 2026), California SB 243 AI therapy requirements. Tier 0-6, near bottom — adjusted count ≥ 3 AND active enforcement AND pending legislation restricting core value prop.)\n- Market Timing: 15/25 (Google Trends: digital mental health growing — market grew from $27.8B to $33B (2024-2025), 20.25% CAGR projected to 2035; 5+ new AI mental health entrants in 18 months — Slingshot AI $30M seed Aug 2025, MindSync $250M Series D, Upheal $10M Series A, plus LATAM entrants Yana, Vitalk; 3+ funding rounds in LATAM digital health — LATAM startup funding rebounded 14.3% in 2025 to $4.1B with healthtech as #2 vertical; major publication coverage confirming timing. Tier 13-18, middle third.)\n- Dependency & Concentration: 3/25 (3+ critical dependencies identified: (1) AI LLM providers — while multiple exist (OpenAI, Anthropic, Google), all have history of policy changes restricting medical/therapeutic use cases, OpenAI faces 7 wrongful death lawsuits that could trigger policy restrictions = platform with restriction history; (2) per-country regulatory approval — viability depends entirely on current regulatory status quo which is actively changing with new AI mental health laws = regulatory dependency with no fallback; (3) licensed mental health professional supply in LATAM — 3.4 psychiatrists per 100K, platform needs human professionals for supervised AI triage = talent supply dependency. Tier 0-6, all 3 critical deps with 1+ having restriction history.)\nTotal: 16 + 5 + 15 + 3 = 39",
+  "data": {
+    "overall_risk_level": "high",
+    "top_3_killers": [
+      {
+        "risk": "Multi-jurisdiction regulatory compliance for AI-powered mental health triage targeting minors in LATAM — no harmonized framework exists, each country requires separate medical device certification, data protection compliance, and professional licensing",
+        "why_killer": "Woebot ($123M raised) and Yara AI both shut down specifically due to regulatory barriers in AI mental health. LATAM adds per-country fragmentation: ANVISA (Brazil), COFEPRIS (Mexico), and INVIMA (Colombia) each have distinct AI/SaMD pathways. Cross-border telehealth licensing has no LATAM harmonization. Compliance cost could exceed entire MVP budget.",
+        "mitigation_feasible": false,
+        "early_warning_signal": "Inability to obtain medical device classification exemption in first target country within 6 months; legal counsel advising per-country entity formation requirement"
+      },
+      {
+        "risk": "Liability exposure from AI-generated mental health triage for minors — active litigation wave against AI chatbot companies for minor self-harm and suicide",
+        "why_killer": "7 wrongful death lawsuits filed against OpenAI in California (Nov 2025) for AI chatbot-related teen suicides. FTC launched formal inquiry into AI chatbot harms to minors (Sept 2025). US Senate hearing 'Examining the Harm of AI Chatbots' with parent testimony. This platform specifically targets the highest-liability intersection: AI + mental health + minors. A single adverse incident could trigger shutdown.",
+        "mitigation_feasible": true,
+        "early_warning_signal": "Insurance carriers refusing to underwrite AI mental health liability for minor-serving platforms; new legislation requiring human-only delivery for therapeutic services to minors"
+      },
+      {
+        "risk": "AI provider policy restrictions on mental health use cases — all major LLM providers could restrict therapeutic/diagnostic mental health applications following litigation wave",
+        "why_killer": "OpenAI faces 7 wrongful death lawsuits specifically for AI mental health interactions. If OpenAI, Anthropic, or Google restrict mental health use cases in their API terms of service (as OpenAI has already done partially), the platform loses its core AI triage capability. Woebot's shutdown demonstrates that even FDA-engaged companies cannot sustain when AI provider landscape shifts.",
+        "mitigation_feasible": true,
+        "early_warning_signal": "LLM providers adding mental health exclusions to API terms of service; increased content filtering blocking therapeutic conversation patterns"
+      }
+    ],
+    "risk_score": 39,
+    "sub_scores": {
+      "execution_feasibility": 16,
+      "regulatory_legal": 5,
+      "market_timing": 15,
+      "dependency_concentration": 3
+    },
+    "search_queries_used": [
+      "generative AI mental health regulation compliance 2025 2026",
+      "AI diagnostic medical device regulation latin america 2025",
+      "telemedicina regulacion paises latinoamerica 2025",
+      "mental health app minors COPPA children privacy regulation 2025 2026",
+      "telehealth cross-border licensing latin america regulation",
+      "generative AI healthcare API providers OpenAI GPT medical 2025 2026",
+      "digital health mental health startup investment funding latin america 2024 2025",
+      "LGPD proteccion datos personales salud mental menores latinoamerica",
+      "AI mental health startup failed regulatory shutdown 2024 2025",
+      "telehealth mental health Google Trends growth 2024 2025",
+      "mental health AI startup new entrants launches 2024 2025 latin america",
+      "OpenAI API healthcare BAA HIPAA pricing infrastructure cost 2025",
+      "AI mental health liability malpractice risk lawsuit 2025",
+      "OpenAI API alternatives healthcare Anthropic Google Gemini medical AI providers 2025",
+      "digital health latin america funding rounds 2025 2026 venture capital"
+    ]
+  },
+  "evidence": [
+    {
+      "source": "https://www.sidley.com/en/insights/newsupdates/2025/11/us-fda-and-cms-actions-on-generative-ai-enabled-mental-health-devices-yield-insights-across-ai",
+      "quote": "On November 6, 2025, FDA held a Digital Health Advisory Committee to address Generative AI-Enabled Digital Mental Health Medical Devices, acknowledging certain use cases are not medical devices but applying risk-based regulatory oversight to AI mental health tools.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.healthlawadvisor.com/novel-lawsuits-allege-ai-chatbots-encouraged-minors-suicides-mental-health-trauma-considerations-for-stakeholders",
+      "quote": "In November 2025, seven wrongful death lawsuits were filed in California against OpenAI, all by families who say ChatGPT led to severe mental breakdowns or suicides. FTC initiated formal inquiry in September 2025 into AI chatbot harms to minors.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://news.crunchbase.com/venture/vcs-bullish-latam-startup-funding-rebounds-2025/",
+      "quote": "Latin American startup investment climbed by 14.3% in 2025 to $4.1 billion, with healthtech ranked as the second most active vertical with rounds reaching up to US$400 million.",
+      "reliability": "high"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "risk-assessment",
+      "store": "file",
+      "ref": "validation/telemedicina-ia-salud-mental-latam/risk"
+    }
+  ],
+  "flags": [
+    "regulatory-uncertainty",
+    "dominant-incumbent-risk",
+    "critical-unmitigated-risk"
+  ],
+  "next_recommended": ["synthesis"]
+}
