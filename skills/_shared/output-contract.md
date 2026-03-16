@@ -6,6 +6,14 @@ Every department MUST return this exact JSON envelope. No exceptions.
 
 This contract extends the ATL output contract (`status`, `executive_summary`, `detailed_report`, `artifacts`, `next_recommended`, `risks`) with domain-specific fields for idea validation (`department`, `score`, `score_reasoning`, `data`, `evidence`). The ATL `risks` field is mapped to `flags` in our contract since our `flags` serve as operational alerts to the orchestrator rather than risk descriptions (risk analysis is a dedicated department).
 
+## Schema Strictness
+
+The `data` schema defined in each department's SKILL.md is an **exact contract**:
+1. **Field names are exact.** Use the precise key from the schema — do not rename, abbreviate, or synonym-swap (e.g., `churn_rate_monthly` not `monthly_churn_rate`; `estimated_ltv` not `ltv`).
+2. **Nesting is exact.** If the schema shows a field at the top level of `data`, it MUST be there. Do not reorganize.
+3. **Enum values are exact.** If the schema specifies `"high | medium | low"`, use one of those strings, not free text.
+4. **The `data` object always contains the full schema** regardless of `detail_level`. See `persistence-contract.md`.
+
 ## Envelope Schema
 
 ```json
@@ -61,7 +69,9 @@ Integer 0-100. See `scoring-convention.md` for rubrics per department and normal
 
 ### `data`
 
-Department-specific structured output. Each department defines its own schema (see individual SKILL.md files). This is the full analysis payload.
+Department-specific structured output. Each department defines its own schema (see individual SKILL.md files). This is the full analysis payload — downstream departments consume it as machine-readable input.
+
+**The `data` object MUST always contain ALL fields defined in the department's schema, regardless of `detail_level`.** Detail level affects `executive_summary`, `detailed_report`, and `evidence` only — never `data`. Stripping `data` fields breaks downstream departments that depend on them.
 
 ### `evidence`
 

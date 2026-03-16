@@ -207,16 +207,20 @@ Return the output contract envelope exactly as specified in `output-contract.md`
 
 ### Detail Level Adjustments
 
+> **`data` is always the full schema.** Detail level does NOT affect the `data` object — it controls only `executive_summary` length, `detailed_report` inclusion, and `evidence` count. Downstream departments depend on the complete `data` object.
+
 | Field | `concise` | `standard` | `deep` |
 |---|---|---|---|
 | `executive_summary` | 1 sentence | 1-2 sentences | 2-3 sentences |
 | `detailed_report` | Omit | Omit | Include: full methodology, raw search results, reasoning per sub-dimension |
-| `data` | Only: problem_exists, problem_statement, pain_intensity, problem_score, sub_scores | Full schema | Full schema + methodology notes in evidence_summary |
+| `data` | Full schema (always) | Full schema (always) | Full schema (always) |
 | `evidence` | Top 3 highest-reliability sources | All sources | All sources with reliability justification per item |
 
 **Always persist the full artifact** regardless of detail_level. Detail level only affects the returned output envelope.
 
 ### `data` Schema
+
+**Field names, nesting, and enum values in this schema are exact contracts. See `output-contract.md` Schema Strictness rules.**
 
 ```json
 {

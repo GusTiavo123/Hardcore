@@ -59,12 +59,18 @@ brew install gentleman-programming/tap/engram
 
 ### 3. Configurar tu agente
 
-**OpenCode:** Copiar `examples/opencode/opencode.json` a tu proyecto.
+**OpenCode:** Copiar `examples/opencode/opencode.json` a tu proyecto y las carpetas `commands/` para slash commands.
 
 ### 4. Usar
 
 ```
 /validate:new Una plataforma que ayuda a freelancers a gestionar contratos e invoices
+```
+
+O sin paradas intermedias:
+
+```
+/validate:fast Una plataforma que ayuda a freelancers a gestionar contratos e invoices
 ```
 
 ## Estructura del Proyecto
@@ -85,6 +91,12 @@ skills/
 └── hc-synthesis/SKILL.md         # Dept 6: GO/NO-GO Synthesis
 examples/
 └── opencode/                     # Config para OpenCode
+    ├── opencode.json             # Agent + MCP config
+    └── commands/                 # Slash commands
+        ├── validate-new.md       # /validate:new (con checkpoints)
+        └── validate-fast.md      # /validate:fast (sin paradas)
+scripts/
+└── README.md                     # Placeholder (install.sh pendiente)
 ```
 
 ## Compatibilidad
@@ -103,7 +115,7 @@ Ver [hardcore-validation-plan.md](./hardcore-validation-plan.md) para la especif
 
 - [x] **Phase 0: Foundation** — Estructura, convenciones, scoring con sub-dimensiones, orchestrator
 - [x] **Phase 1: Departamentos** — 6 skills implementados con proceso, queries, sub-scoring, persistencia
-- [ ] **Phase 2: Orquestación** — Pipeline end-to-end
+- [/] **Phase 2: Orquestación** — Orchestrator + OpenCode config + slash commands listos; pendiente testing end-to-end, error handling, configs claude-code/cursor
 - [ ] **Phase 3: Hardening** — Testing con 10 ideas, calibración
 
 ## Contexto

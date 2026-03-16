@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "engram": {
+      "type": "stdio",
+      "command": "C:/Users/gus/Desktop/Hardcore/tools/engram.exe",
+      "args": [
+        "mcp"
+      ],
+      "env": {}
+    },
+    "open-websearch": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:/Users/gus/Desktop/Hardcore/tools/node_modules/open-websearch/build/index.js"
+      ],
+      "env": {}
+    }
+  }
+}

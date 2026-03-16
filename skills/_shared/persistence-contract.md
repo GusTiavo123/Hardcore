@@ -89,10 +89,14 @@ A department detects Engram by checking if `mem_search` is available as an MCP t
 
 The orchestrator may pass `detail_level`: `concise | standard | deep`.
 
-| Level | `executive_summary` | `detailed_report` | `data` | `evidence` |
-|-------|---------------------|--------------------|--------|------------|
-| `concise` | 1 sentence | Omitted | Key metrics only | Top 3 sources |
-| `standard` | 1-2 sentences | Omitted | Full analysis | All sources |
-| `deep` | 2-3 sentences | Included | Full analysis + methodology notes | All sources + reliability assessment |
+> **CRITICAL**: The `data` object MUST always contain the FULL schema as defined in each department's SKILL.md, regardless of `detail_level`. Detail level controls ONLY: `executive_summary` length, `detailed_report` inclusion, and `evidence` count. The `data` object is consumed by downstream departments — stripping fields breaks the pipeline.
+
+| Level | `executive_summary` | `detailed_report` | `evidence` |
+|-------|---------------------|--------------------|------------|
+| `concise` | 1 sentence | Omitted | Top 3 sources |
+| `standard` | 1-2 sentences | Omitted | All sources |
+| `deep` | 2-3 sentences | Included | All sources + reliability assessment |
+
+**`data`**: Full schema always. Not affected by detail level.
 
 Detail level controls output verbosity but does NOT affect what gets persisted — always persist the full artifact regardless.

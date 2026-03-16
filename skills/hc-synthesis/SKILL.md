@@ -328,16 +328,20 @@ Set `department: "synthesis"` in the envelope.
 
 ### Detail Level Adjustments
 
+> **`data` is always the full schema.** Detail level does NOT affect the `data` object — it controls only `executive_summary` length, `detailed_report` inclusion, and `evidence` count. Downstream departments depend on the complete `data` object.
+
 | Field | `concise` | `standard` | `deep` |
 |---|---|---|---|
 | `executive_summary` | 1-2 sentences (verdict + weighted score) | 2-3 sentences (verdict + key reason + top concern) | 3-4 sentences (full context) |
 | `detailed_report` | Omit | Omit | Include: full department summaries, complete knockout analysis, all assumptions, complete pivot analysis |
-| `data` | Only: verdict, confidence, weighted_score, score_breakdown, knockouts_triggered, key_strengths (top 2), key_concerns (top 2), next_steps (top 2) | Full schema | Full schema + extended per-department analysis |
+| `data` | Full schema (always) | Full schema (always) | Full schema (always) |
 | `evidence` | Omit (Synthesis doesn't generate evidence) | Omit | Include: references to key evidence from each department |
 
 **Always persist the full artifact** regardless of detail_level. Detail level only affects the returned output envelope.
 
 ### `data` Schema
+
+**Field names, nesting, and enum values in this schema are exact contracts. See `output-contract.md` Schema Strictness rules.**
 
 ```json
 {
