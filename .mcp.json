@@ -2,7 +2,7 @@
   "mcpServers": {
     "engram": {
       "type": "stdio",
-      "command": "C:/Users/gus/Desktop/Hardcore/tools/engram.exe",
+      "command": "./tools/engram.exe",
       "args": [
         "mcp"
       ],
@@ -12,7 +12,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "C:/Users/gus/Desktop/Hardcore/tools/node_modules/open-websearch/build/index.js"
+        "./tools/node_modules/open-websearch/build/index.js"
       ],
       "env": {}
     }

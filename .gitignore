@@ -1,0 +1,11 @@
+# Tools binaries and dependencies (each PC runs setup.sh to install locally)
+tools/engram.exe
+tools/engram.zip
+tools/node_modules/
+tools/package-lock.json
+tools/package.json
+tools/LICENSE
+tools/README.md
+
+# Output from validation runs
+output/
