@@ -16,7 +16,8 @@
       "mcp__engram__mem_delete",
       "mcp__open-websearch__search",
       "mcp__open-websearch__fetchWebContent",
-      "mcp__engram__mem_session_summary"
+      "mcp__engram__mem_session_summary",
+      "mcp__engram__mem_stats"
     ]
   },
   "enabledMcpjsonServers": [
