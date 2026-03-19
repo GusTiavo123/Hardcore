@@ -9,7 +9,6 @@ dependencies:
   - hc-problem
   - hc-market
   - hc-competitive
-  - hc-bizmodel
 ---
 
 # HC Risk Assessment
@@ -42,20 +41,21 @@ If `idea` or `slug` are missing, return `status: "blocked"` with `flags: ["inval
 
 ## Step 0: Recover ALL Upstream Context
 
-You depend on **every previous department**. You MUST attempt to read all 4 outputs before starting.
+You depend on **Problem, Market, and Competitive** outputs. You MUST attempt to read all 3 before starting.
+
+**Note:** Risk runs in **parallel with BizModel** — BizModel data is NOT available at execution time. Financial risk assessment is based on your own research and upstream Market/Competitive data, not BizModel calculations.
 
 **If `persistence_mode` is `engram`:**
 ```
 1. mem_search(query: "validation/{slug}/problem", project: "hardcore") → get ID
 2. mem_search(query: "validation/{slug}/market", project: "hardcore") → get ID
 3. mem_search(query: "validation/{slug}/competitive", project: "hardcore") → get ID
-4. mem_search(query: "validation/{slug}/bizmodel", project: "hardcore") → get ID
-5. mem_get_observation(id) for EACH → full content (NEVER use mem_search results directly — they are truncated)
+4. mem_get_observation(id) for EACH → full content (NEVER use mem_search results directly — they are truncated)
 ```
 
-**If `persistence_mode` is `file`:** Read all 4 JSON files from `output/{slug}/`
+**If `persistence_mode` is `file`:** Read problem.json, market.json, competitive.json from `output/{slug}/`
 
-**If `persistence_mode` is `none`:** All outputs are in your prompt context.
+**If `persistence_mode` is `none`:** All available outputs are in your prompt context.
 
 **Recovery failure handling:**
 
@@ -64,7 +64,6 @@ You depend on **every previous department**. You MUST attempt to read all 4 outp
 | Problem | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose pain intensity and evidence quality context. Default to mid-range assumptions. |
 | Market | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose market stage and growth data for timing assessment. Use your own search results instead. |
 | Competitive | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose incumbent data and failure intelligence. Conduct your own competitive search in Step 1. |
-| BizModel | Soft | Proceed with `flags: ["missing-upstream-data"]`. You lose sensitivity analysis and LTV/CAC data for financial risk. Focus on non-financial risks. |
 
 Unlike other departments, Risk has **no hard dependencies** — you can always produce a risk assessment from your own research. But missing upstream data degrades your analysis quality significantly. Flag every missing dependency.
 
@@ -75,7 +74,6 @@ Unlike other departments, Risk has **no hard dependencies** — you can always p
 | **Problem** | `data.pain_intensity`, `data.evidence_summary`, `data.sub_scores` | Evidence quality assessment, problem-assumption risk |
 | **Market** | `data.market_stage`, `data.growth_rate`, `data.som.value`, `data.som.methodology`, `flags` | Market timing, scale risk, data quality |
 | **Competitive** | `data.direct_competitors[].traction`, `data.failed_competitors[]`, `data.market_gaps[]`, `flags` (especially `dominant-incumbent-found`) | Incumbent risk, failure patterns, entry barriers |
-| **BizModel** | `data.unit_economics.ltv_cac_ratio`, `data.sensitivity_analysis`, `data.assumptions[]`, `flags` (especially `sensitivity-fails`) | Financial risk, model fragility |
 
 **Extract industry/domain** from Problem's `data.industry` field — this becomes your search keyword for Steps 1-4. If the field is missing (legacy output), infer from `problem_statement` and the idea text.
 
@@ -172,7 +170,7 @@ For each dependency:
 
 ### Step 5: Build Risk Register
 
-For every risk identified across all 4 dimensions + financial risks from BizModel, document:
+For every risk identified across all 4 dimensions, document:
 
 | Field | Description |
 |---|---|
@@ -182,9 +180,7 @@ For every risk identified across all 4 dimensions + financial risks from BizMode
 | `impact` | `critical`, `high`, `medium`, `low` — what happens if it materializes |
 | `mitigation` | Specific action that reduces probability or impact |
 | `evidence` | What data point led to this risk |
-| `source_department` | Which upstream department flagged or sourced this risk (`problem`, `market`, `competitive`, `bizmodel`, `own-research`) |
-
-**Financial risks from BizModel**: If BizModel's sensitivity analysis showed any scenario with `viable: false`, create a risk entry with `category: "financial"` referencing the specific failed scenario.
+| `source_department` | Which upstream department flagged or sourced this risk (`problem`, `market`, `competitive`, `own-research`) |
 
 Record the search queries you actually executed in `search_queries_used`.
 
@@ -234,7 +230,7 @@ For each sub-dimension:
 - `"dominant-incumbent-risk"` — from Competitive: strong incumbent could crush new entrant
 - `"regulatory-uncertainty"` — pending legislation could change the game
 - `"single-point-of-failure"` — one critical dependency with no fallback
-- `"financial-model-fragile"` — BizModel sensitivity analysis has ≥ 2 failed scenarios
+- `"financial-viability-concern"` — competitive pricing data or market data suggests unit economics may be challenging
 - `"missing-upstream-data"` — couldn't recover one or more upstream department outputs
 - `"no-search-results"` — web search failed for most queries (>50% returned 0 relevant results)
 - `"evidence-mostly-unverified"` — more than half of evidence items have `reliability: "low"`
@@ -325,7 +321,7 @@ Return the output contract envelope exactly as specified in `output-contract.md`
       "impact": "critical | high | medium | low",
       "mitigation": "Specific action to reduce risk",
       "evidence": "Data point or source that surfaced this risk",
-      "source_department": "problem | market | competitive | bizmodel | own-research"
+      "source_department": "problem | market | competitive | own-research"
     }
   ],
   "dependencies": [
@@ -380,7 +376,7 @@ Always return `["synthesis"]` — Synthesis is the final department.
 2. **Your knockout power is real.** A score < 30 kills the idea regardless of everything else. Be accurate, not generous.
 3. **Every risk needs evidence.** "Competition might be tough" is not a risk. "Competitor X has $50M funding and 80% market share (source: Crunchbase)" is a risk.
 4. **Mitigations must be specific and pre-launch feasible.** "Build a better product" is not a mitigation. "Validate with 10 paid pilot customers before full build" is a mitigation.
-5. **Use upstream data.** Failed competitors from Competitive tell you about execution risk. Sensitivity failures from BizModel tell you about financial risk. Market stage from Market tells you about timing.
+5. **Use upstream data.** Failed competitors from Competitive tell you about execution risk. Market stage from Market tells you about timing. Competitive's pricing data tells you about financial viability signals.
 6. **Don't double-count.** If Competitive already identified a dominant incumbent, assess the risk it poses here but don't re-analyze the competitor landscape. Reference the upstream data.
 7. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (7-12 points).
 8. **Arithmetic must be exact.** `risk_score` MUST equal the sum of the 4 sub_scores values. Verify before returning.

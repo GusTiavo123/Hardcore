@@ -52,19 +52,17 @@ INPUT: idea (texto libre)
      │         │
      └────┬────┘
           │
-          ▼
-   ┌───────────┐
-   │ BUSINESS  │   Depends on Market + Competitive.
-   │   MODEL   │
-   └─────┬─────┘
-         │
-         ▼
-   ┌───────────┐
-   │   RISK    │   Depends on ALL above.
-   │ ASSESSMENT│
-   └─────┬─────┘
-         │
-         ▼
+     ┌────┴────┐
+     │         │
+     ▼         ▼
+┌─────────┐ ┌─────────┐
+│BUSINESS │ │  RISK   │   PARALLEL.
+│  MODEL  │ │ ASSESS. │   Both depend on Market + Competitive.
+└────┬────┘ └────┬────┘
+     │           │
+     └─────┬─────┘
+           │
+           ▼
    ┌───────────┐
    │  GO/NO-GO │   Synthesizes all scores.
    │ SYNTHESIS │
@@ -135,17 +133,14 @@ Both departments persist their own outputs. Update pipeline state, show consolid
 **Checkpoint** (if not fast mode):
 > "Market: {market_score}/100 — {market_summary}\nCompetitive: {competitive_score}/100 — {competitive_summary}\n¿Continuamos con Business Model?"
 
-### Step 3: Business Model
+### Step 3: Business Model + Risk Assessment (PARALLEL)
 
-1. Launch `skills/hc-bizmodel/SKILL.md` — passes same input format
-2. Reads Problem + Market + Competitive from Engram (or receives all three via context in `none` mode — see None Mode Protocol)
-3. Department persists its own output. Update pipeline state, show summary
+Launch BOTH sub-agents simultaneously:
 
-### Step 4: Risk Assessment
+1. `skills/hc-bizmodel/SKILL.md` — reads Problem + Market + Competitive
+2. `skills/hc-risk/SKILL.md` — reads Problem + Market + Competitive (BizModel data is NOT available since they run in parallel; Risk handles this via its soft-dependency fallback)
 
-1. Launch `skills/hc-risk/SKILL.md` — passes same input format
-2. Reads ALL previous outputs from Engram (or receives all via context in `none` mode — see None Mode Protocol)
-3. Department persists its own output. Update pipeline state, show summary
+Both departments persist their own outputs. Wait for both to complete. Update pipeline state, show consolidated summary.
 
 ### Step 5: Synthesis
 
@@ -251,7 +246,7 @@ When `persistence_mode` is `none`, departments cannot read from Engram or files.
 | Market | Problem |
 | Competitive | Problem |
 | BizModel | Problem + Market + Competitive |
-| Risk | Problem + Market + Competitive + BizModel |
+| Risk | Problem + Market + Competitive (BizModel not available — runs in parallel) |
 | Synthesis | Problem + Market + Competitive + BizModel + Risk |
 
 ### Early Abort in None Mode
@@ -290,8 +285,7 @@ Only include the departments listed in the table above for each launch. Do NOT p
 **Context growth warning**: In `none` mode, context grows with each department:
 - Problem: no inputs
 - Market/Competitive: 1 input each
-- BizModel: 3 inputs
-- Risk: 4 inputs
+- BizModel/Risk: 3 inputs each (parallel, both read Problem + Market + Competitive)
 - Synthesis: 5 inputs
 
 If context truncation occurs (agent signals it cannot process all inputs), consider switching to `file` mode: "El contexto es demasiado grande para modo `none`. Cambiando a modo `file` para persistir outputs localmente."

@@ -18,6 +18,7 @@ The `data` schema defined in each department's SKILL.md is an **exact contract**
 
 ```json
 {
+  "schema_version": "1.0",
   "status": "ok | warning | blocked | failed",
   "department": "problem | market | competitive | bizmodel | risk | synthesis",
   "executive_summary": "1-2 oraciones decision-grade para el orquestador",
@@ -33,6 +34,15 @@ The `data` schema defined in each department's SKILL.md is an **exact contract**
 ```
 
 ## Field Definitions
+
+### `schema_version`
+
+String identifying the output contract version. Currently `"1.0"`. This enables cross-session compatibility detection — when Synthesis reads an upstream output from a previous run, it can check whether the schema matches the current version. If a field is missing from an older-version output, Synthesis knows to use defaults rather than treating it as an error.
+
+Bump the version when:
+- A required `data` field is added or removed from any department's schema
+- The envelope structure itself changes (new top-level fields, renamed fields)
+- Scoring rubrics change in ways that affect score comparability
 
 ### `status`
 
@@ -133,15 +143,16 @@ Array of department names that should run next according to the DAG:
 
 ## Validation Rules
 
-1. `status` MUST be one of the four valid values
-2. `department` MUST match the department producing the output
-3. `score` MUST be integer 0-100
-4. `score_reasoning` MUST NOT be empty
-5. `executive_summary` MUST NOT exceed 2 sentences
-6. `evidence` SHOULD have at least 3 entries for `status: "ok"`
-7. If `status` is `blocked`, `flags` MUST explain why
-8. `data` schema is validated by each department's own contract (see SKILL.md)
-9. `detailed_report` is OPTIONAL — omit entirely if `detail_level` is not `deep`
+1. `schema_version` MUST be present and set to `"1.0"`
+2. `status` MUST be one of the four valid values
+3. `department` MUST match the department producing the output
+4. `score` MUST be integer 0-100
+5. `score_reasoning` MUST NOT be empty
+6. `executive_summary` MUST NOT exceed 2 sentences
+7. `evidence` SHOULD have at least 3 entries for `status: "ok"`
+8. If `status` is `blocked`, `flags` MUST explain why
+9. `data` schema is validated by each department's own contract (see SKILL.md)
+10. `detailed_report` is OPTIONAL — omit entirely if `detail_level` is not `deep`
 
 ## Output Assembly Protocol
 

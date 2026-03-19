@@ -148,20 +148,20 @@ Total competitors found: direct (same problem, similar solution), indirect (same
 | 11-15 | 6-15 competitors with at least 2 direct and 2 indirect |
 | 16-20 | 16+ competitors with clear mix of direct, indirect, and adjacent (validated active market) |
 
-#### 2. Incumbent Weakness (0-20, INVERTED: weaker incumbents = higher score)
+#### 2. Competitive Opportunity (0-20)
 
-Observable traction of the STRONGEST competitor: Crunchbase funding, employee count, reviews, web traffic. Higher score means LESS entrenched competition = MORE opportunity.
+How open is the market based on the traction of the STRONGEST competitor: Crunchbase funding, employee count, reviews, web traffic. Higher score = more opportunity, less incumbent entrenchment. Scoring follows the natural direction: 0 = locked-down market, 20 = wide-open market.
 
 **Strongest competitor selection**: Evaluate each direct competitor's traction signals and select the single most threatening one (the one that would score lowest on this rubric). If signals conflict across tiers (e.g., low funding but high review count), use the signal that places the competitor in the **lowest** tier — one dominant signal is enough to indicate entrenchment. See `hc-competitive/SKILL.md` Step 2 for the full selection protocol.
 
 | Points | Criteria |
 |--------|----------|
-| 0-5 | Strongest competitor has >$50M funding OR 500+ employees OR 1000+ reviews OR is a public company (dominant incumbent) |
-| 6-10 | Strongest competitor has $5M-$50M funding OR 50-500 employees OR 100-1000 reviews (established but not dominant) |
+| 0-5 | Strongest competitor has >$50M funding OR 500+ employees OR 1000+ reviews OR is a public company (market dominated) |
+| 6-10 | Strongest competitor has $5M-$50M funding OR 50-500 employees OR 100-1000 reviews (established players present) |
 | 11-15 | Strongest competitor has <$5M funding OR 10-50 employees OR 10-100 reviews (moderate traction, no dominant player) |
-| 16-20 | Strongest competitor has no known funding, <10 employees, <10 reviews (all early stage, wide open) |
+| 16-20 | Strongest competitor has no known funding, <10 employees, <10 reviews (wide open market) |
 
-**INVERSION SELF-CHECK (mandatory)**: After scoring, verify the direction: a score of 0-5 means "dominant incumbent exists, hard to compete" and MUST co-occur with the `"dominant-incumbent-found"` flag. A score of 16-20 means "no strong player" and MUST NOT co-occur with `"dominant-incumbent-found"`. If there is a contradiction, re-evaluate.
+**Consistency check**: A score of 0-5 means a dominant incumbent exists and MUST co-occur with the `"dominant-incumbent-found"` flag. A score of 16-20 means no strong player and MUST NOT co-occur with `"dominant-incumbent-found"`. If there is a contradiction, re-evaluate.
 
 #### 3. Market Gap Evidence (0-20)
 

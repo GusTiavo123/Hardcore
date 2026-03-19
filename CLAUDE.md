@@ -28,7 +28,7 @@ Before starting, read ALL shared conventions:
 ### The Pipeline (DAG)
 
 ```
-PROBLEM → (MARKET ∥ COMPETITIVE) → BIZMODEL → RISK → SYNTHESIS
+PROBLEM → (MARKET ∥ COMPETITIVE) → (BIZMODEL ∥ RISK) → SYNTHESIS
 ```
 
 Each department is a sub-agent. For each one:
@@ -39,6 +39,7 @@ Each department is a sub-agent. For each one:
 5. Show the `executive_summary` to the user
 
 **Market and Competitive run in parallel** — launch both simultaneously.
+**BizModel and Risk run in parallel** — launch both after Market+Competitive complete.
 
 ### Department Skills
 

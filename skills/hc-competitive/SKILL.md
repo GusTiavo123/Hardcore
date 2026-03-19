@@ -119,14 +119,14 @@ Record the search queries you actually executed in `search_queries_used`.
 
 ### Step 2: Select and Profile the Strongest Competitor
 
-**Strongest competitor selection protocol**: When multiple competitors exist, you MUST evaluate each and select the single most threatening one for the Incumbent Weakness sub-score. Use this procedure:
+**Strongest competitor selection protocol**: When multiple competitors exist, you MUST evaluate each and select the single most threatening one for the Competitive Opportunity sub-score. Use this procedure:
 
 1. For each direct competitor, note: funding ($), employee count, review count, and market presence signals.
-2. Pick the competitor that scores **lowest** on the Incumbent Weakness rubric (i.e., the most dominant/entrenched).
+2. Pick the competitor that scores **lowest** on the Competitive Opportunity rubric (i.e., the most dominant/entrenched).
 3. **Tie-breaking** — if two competitors fall in the same rubric tier, the one with the higher **review count** wins (reviews indicate customer adoption, which is the hardest traction to replicate).
 4. Document your selection explicitly in `score_reasoning`: name the competitor you selected, state why, and note the runner-up.
 
-**Contradiction check**: After scoring Incumbent Weakness, run the INVERSION SELF-CHECK from `scoring-convention.md` to verify the score direction is consistent with the `"dominant-incumbent-found"` flag.
+**Consistency check**: After scoring Competitive Opportunity, verify the score direction is consistent with the `"dominant-incumbent-found"` flag per `scoring-convention.md`.
 
 For each **direct competitor** (and the top 2-3 indirect), collect:
 
@@ -169,13 +169,13 @@ Apply the rubrics from `scoring-convention.md` section **"Competitive Intelligen
 | Sub-dimension | What to evaluate | Sub-score key | Max |
 |---|---|---|---|
 | Market Validation Signal | Total competitors found (more = validated market) | `market_validation` | 20 |
-| Incumbent Weakness | Traction of the STRONGEST competitor (**INVERTED**: weaker = higher score) | `incumbent_weakness` | 20 |
+| Competitive Opportunity | Market openness based on STRONGEST competitor's traction | `competitive_opportunity` | 20 |
 | Market Gap Evidence | Specific unmet needs from reviews (2+ reviewers) | `gap_evidence` | 20 |
 | Pricing Intelligence | Competitors with discoverable pricing | `pricing_intelligence` | 20 |
 | Failure Intelligence | Dead competitors + churn signals with identifiable causes | `failure_intelligence` | 20 |
 
-**IMPORTANT — Incumbent Weakness is INVERTED:**
-- A dominant incumbent (>$50M funding, 1000+ reviews) = LOW score (0-5) — hard to compete
+**Competitive Opportunity scoring direction (natural):**
+- A dominant incumbent (>$50M funding, 1000+ reviews) = LOW score (0-5) — market dominated
 - No dominant player (all early stage) = HIGH score (16-20) — wide open market
 
 For each sub-dimension:
@@ -217,7 +217,7 @@ Before persisting or returning, cross-reference every field in the `data` schema
 - [ ] `market_gaps[]` ← Step 3 (array with `gap`, `mention_count`, `sources[]`, `aligns_with_idea`)
 - [ ] `pricing_benchmark` ← Step 4 (object with `low`, `mid`, `high`, `currency`, `model`, `free_alternatives_exist`, `competitors_with_pricing`)
 - [ ] `search_queries_used[]` ← Step 1 (array of actual query strings executed)
-- [ ] `sub_scores` ← Step 6 (object with `market_validation`, `incumbent_weakness`, `gap_evidence`, `pricing_intelligence`, `failure_intelligence`)
+- [ ] `sub_scores` ← Step 6 (object with `market_validation`, `competitive_opportunity`, `gap_evidence`, `pricing_intelligence`, `failure_intelligence`)
 - [ ] `competitive_score` ← Step 6 (integer sum of all 5 sub_scores — verify arithmetic)
 
 ### Step 8: Persist (if applicable)
@@ -344,7 +344,7 @@ Return the output contract envelope exactly as specified in `output-contract.md`
   ],
   "sub_scores": {
     "market_validation": 0,
-    "incumbent_weakness": 0,
+    "competitive_opportunity": 0,
     "gap_evidence": 0,
     "pricing_intelligence": 0,
     "failure_intelligence": 0
@@ -358,8 +358,7 @@ Return the output contract envelope exactly as specified in `output-contract.md`
 ```
 Score: {total}/100
 - Market Validation Signal: {points}/20 ({total_competitors} competitors found: {direct} direct, {indirect} indirect, {adjacent} adjacent)
-- Incumbent Weakness: {points}/20 (strongest competitor: {name} with {funding/reviews/employees} — {assessment}; runner-up: {name2}) [INVERTED: high points = weak incumbents = opportunity]
-  INVERSION CHECK: {points} points means {low=dominant incumbent / high=wide open market}. Consistent with evidence: {yes/no + explanation if no}.
+- Competitive Opportunity: {points}/20 (strongest competitor: {name} with {funding/reviews/employees} — {assessment}; runner-up: {name2})
 - Market Gap Evidence: {points}/20 ({gap_count} gaps from reviews, {related} thematically related, {aligned} align with idea)
 - Pricing Intelligence: {points}/20 (pricing found for {count} competitors, tier detail for {detail_count})
 - Failure Intelligence: {points}/20 ({dead_count} dead competitors, {postmortem_count} post-mortems, {churn_count} churn signals)
@@ -373,7 +372,7 @@ Always return `["bizmodel"]` — Business Model depends on your pricing benchmar
 ## Critical Rules
 
 1. **Every competitor must be real.** Include a URL for each. If you're not sure a company exists, don't include it. A shorter list of verified competitors beats a long list of hallucinated ones.
-2. **Incumbent Weakness is INVERTED.** A wide-open market with no strong players scores HIGH. A market dominated by a well-funded incumbent scores LOW. This is counterintuitive — double-check your scoring.
+2. **Competitive Opportunity follows natural direction.** A wide-open market with no strong players scores HIGH. A market dominated by a well-funded incumbent scores LOW. Verify your score is consistent with the `"dominant-incumbent-found"` flag.
 3. **Gaps need 2+ reviewers.** A single person's complaint is not a market gap. Look for patterns across multiple reviews and products.
 4. **Failed competitors are valuable signal.** If many have failed for the same reason, that's a red flag. If they failed for reasons the idea addresses, that's opportunity.
 5. **Don't conflate "no competitors" with "opportunity".** Zero competitors often means zero market. The Market Validation Signal sub-dimension scores 0-1 competitors as LOW (0-5 points).
