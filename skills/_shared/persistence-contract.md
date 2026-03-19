@@ -2,17 +2,15 @@
 
 ## Relationship with Agent Teams Lite
 
-ATL defines 4 modes: `engram`, `openspec`, `hybrid`, `none`. Idea Validation uses 3 modes: `engram`, `file`, `none`. Our `file` mode is a simplified version of ATL's `openspec` — we write JSON envelopes to `output/` instead of specs/proposals to `openspec/changes/`. We don't implement `hybrid` since validation artifacts are either in Engram or local files, not both.
+ATL defines 4 modes: `engram`, `openspec`, `hybrid`, `none`. Idea Validation uses 2 modes: `engram` (default) and `file` (explicit fallback). Our `file` mode is a simplified version of ATL's `openspec` — we write JSON envelopes to `output/` instead of specs/proposals to `openspec/changes/`.
 
 ## Mode Resolution
 
-The orchestrator passes `persistence_mode` with one of: `engram | file | none`.
+The orchestrator passes `persistence_mode` with one of: `engram | file`.
 
-Default resolution (when not explicitly set):
-1. If Engram is available → use `engram`
-2. Otherwise → use `none`
+**Engram is required.** The pipeline cannot run without it. At startup, the orchestrator verifies Engram availability via `mem_search`. If Engram is unavailable, the pipeline halts with an error message asking the user to ensure Engram is running.
 
-`file` mode is only used when the orchestrator explicitly passes it.
+`file` mode is only used when the orchestrator explicitly passes it (e.g., for local archival alongside Engram).
 
 ## Behavior Per Mode
 
@@ -20,7 +18,6 @@ Default resolution (when not explicitly set):
 |------|-----------|----------|---------------|---------------|
 | `engram` | Engram (see `engram-convention.md`) | Engram | Never | Yes |
 | `file` | JSON files in `output/` directory | JSON files in `output/` directory | Yes | No |
-| `none` | Orchestrator prompt context | Nowhere (inline only) | Never | No |
 
 ### `engram` Mode (default)
 
@@ -56,34 +53,23 @@ Each JSON file contains the full output envelope (see `output-contract.md`).
 - No cross-session intelligence (no search, no timeline, no progressive disclosure)
 - No session lifecycle management (Engram-only feature)
 
-### `none` Mode
-
-- All department outputs are returned inline to the orchestrator
-- **No** persistence of any kind
-- The orchestrator passes previous outputs in the prompt context for each subsequent department
-- **Warning**: Context window fills up quickly. Only use for quick single-run validations.
-- No session lifecycle management
-
 ## State Persistence (Orchestrator)
 
 | Mode | Persist State | Recover State |
 |------|--------------|---------------|
 | `engram` | `mem_save(topic_key: "validation/{slug}/state", type: "config")` | `mem_search("validation/{slug}/state")` → `mem_get_observation(id)` |
 | `file` | Write `output/{slug}/state.yaml` | Read `output/{slug}/state.yaml` |
-| `none` | Not possible — state lives only in context | Not possible — warn user |
 
 ## Common Rules
 
-1. If mode is `none`, do NOT create or modify any project files. Return results inline only.
-2. If mode is `engram`, do NOT write any project files. Persist to Engram and return observation IDs.
-3. If mode is `file`, write files ONLY to the `output/` directory.
-4. **NEVER** auto-create `output/` unless in `file` mode.
-5. If unsure which mode to use, default to `engram` if available, otherwise `none`.
-6. When falling back to `none`, recommend the user install Engram for better results.
+1. If mode is `engram`, do NOT write any project files. Persist to Engram and return observation IDs.
+2. If mode is `file`, write files ONLY to the `output/` directory.
+3. **NEVER** auto-create `output/` unless in `file` mode.
+4. Default mode is always `engram`. If Engram is unavailable, the pipeline **halts** — do not attempt to continue without persistence.
 
 ## Detecting Engram Availability
 
-A department detects Engram by checking if `mem_search` is available as an MCP tool. If the tool exists and responds, Engram is available.
+The orchestrator verifies Engram at pipeline startup by calling `mem_search`. If the tool is unavailable or errors, the pipeline halts with: "Engram is required to run the validation pipeline. Please ensure the Engram MCP server is running."
 
 ## Detail Level
 

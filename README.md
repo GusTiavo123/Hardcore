@@ -81,7 +81,7 @@ skills/
 │   ├── output-contract.md        # JSON envelope de cada departamento
 │   ├── scoring-convention.md     # Sub-dimensiones, pesos, knockouts
 │   ├── engram-convention.md      # Naming, type mapping, session lifecycle
-│   └── persistence-contract.md   # Modos: engram / file / none
+│   └── persistence-contract.md   # Modos: engram (obligatorio) / file
 ├── hc-orchestrator/SKILL.md      # Orquestador delegate-only
 ├── hc-problem/SKILL.md           # Dept 1: Problem Validation
 ├── hc-market/SKILL.md            # Dept 2: Market Sizing
@@ -89,14 +89,17 @@ skills/
 ├── hc-bizmodel/SKILL.md          # Dept 4: Business Model
 ├── hc-risk/SKILL.md              # Dept 5: Risk Assessment
 └── hc-synthesis/SKILL.md         # Dept 6: GO/NO-GO Synthesis
+testing/
+├── PROTOCOL.md                   # Protocolo de testing y checklist
+├── suite.yaml                    # 10 ideas curadas con expectativas
+├── runs/                         # Resultados de runs reales (commiteados)
+└── analysis/                     # Análisis de varianza cross-machine
+calibration/
+└── scenarios.md                  # 13 escenarios de calibración de scoring
 examples/
 └── opencode/                     # Config para OpenCode
-    ├── opencode.json             # Agent + MCP config
-    └── commands/                 # Slash commands
-        ├── validate-new.md       # /validate:new (con checkpoints)
-        └── validate-fast.md      # /validate:fast (sin paradas)
 scripts/
-└── README.md                     # Placeholder (install.sh pendiente)
+└── setup.sh                      # Instalador de herramientas (Engram + open-websearch)
 ```
 
 ## Compatibilidad
@@ -115,8 +118,9 @@ Ver [hardcore-validation-plan.md](./hardcore-validation-plan.md) para la especif
 
 - [x] **Phase 0: Foundation** — Estructura, convenciones, scoring con sub-dimensiones, orchestrator
 - [x] **Phase 1: Departamentos** — 6 skills implementados con proceso, queries, sub-scoring, persistencia
-- [/] **Phase 2: Orquestación** — Orchestrator + OpenCode config + slash commands listos; pendiente testing end-to-end, error handling, configs claude-code/cursor
-- [ ] **Phase 3: Hardening** — Testing con 10 ideas, calibración
+- [/] **Phase 2: Orquestación + Testing** — Orchestrator + Claude Code integration + testing protocol con 10 ideas curadas. Pendiente: runs reales en múltiples máquinas
+- [ ] **Phase 3: Hardening** — Varianza ≤5pts, calibración de knockouts, accuracy ≥80%
+- [ ] **Idea Loop** — Meta-orchestrator de generación iterativa (diseño en idea-loop-architecture.md)
 
 ## Contexto
 

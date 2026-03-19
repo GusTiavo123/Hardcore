@@ -33,7 +33,7 @@ You receive from the orchestrator:
 {
   "idea": "original idea description",
   "slug": "kebab-case-slug",
-  "persistence_mode": "engram | file | none",
+  "persistence_mode": "engram | file",
   "detail_level": "concise | standard | deep"
 }
 ```
@@ -55,8 +55,6 @@ You MUST attempt to read all 5 department outputs before starting synthesis.
 ```
 
 **If `persistence_mode` is `file`:** Read all available JSON files from `output/{slug}/`
-
-**If `persistence_mode` is `none`:** All available outputs are in your prompt context.
 
 **Recovery failure handling:**
 
@@ -318,9 +316,7 @@ mem_save(
 
 **If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write to `output/{slug}/synthesis.json` and `output/{slug}/report.json`.
 
-**If `none`:** Return inline only.
-
-After persisting (or in `none` mode), record both artifact references:
+After persisting, record both artifact references:
 ```json
 [
   {

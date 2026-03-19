@@ -29,7 +29,7 @@ You receive from the orchestrator:
 {
   "idea": "original idea description",
   "slug": "kebab-case-slug",
-  "persistence_mode": "engram | file | none",
+  "persistence_mode": "engram | file",
   "detail_level": "concise | standard | deep"
 }
 ```
@@ -52,8 +52,6 @@ You depend on three upstream departments:
 ```
 
 **If `persistence_mode` is `file`:** Read `output/{slug}/competitive.json`, `output/{slug}/market.json`, and `output/{slug}/problem.json`
-
-**If `persistence_mode` is `none`:** All outputs are in your prompt context.
 
 **Recovery failure handling:**
 
@@ -124,9 +122,9 @@ Execute **3-5 search queries** to find published benchmarks for your unit econom
 Reliability levels:
 - `high`: Published benchmark reports (ProfitWell, KeyBanc, OpenView, Bessemer), public company data
 - `medium`: VC/analyst blog posts with cited methodology, industry surveys
-- `low`: Uncited blog posts, single company anecdotes, LLM knowledge without URL
+- `low`: Uncited blog posts, single company anecdotes, unverified claims
 
-If search yields no specific benchmarks, fall back to these defaults (flag each with `source: "industry-default"`, `reliability: "low"`):
+If search yields no specific benchmarks for a particular metric, you may use these industry defaults as a starting point (flag each with `source: "industry-default"`, `reliability: "low"`). This is acceptable only for individual benchmark inputs (churn, CAC, margin) — NOT as a replacement for web search overall:
 - SaaS SMB: 3-7% monthly churn, $100-$300 CAC (content/paid), 70-85% gross margin
 - SaaS Mid-market: 1-3% monthly churn, $300-$1000 CAC, 70-85% gross margin
 - SaaS Enterprise: <1% monthly churn, $1000-$5000 CAC, 75-90% gross margin
@@ -285,9 +283,7 @@ mem_save(
 
 **If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/bizmodel.json`.
 
-**If `none`:** Return inline only.
-
-After persisting (or in `none` mode), record the artifact reference:
+After persisting, record the artifact reference:
 ```json
 {
   "name": "bizmodel-analysis",
@@ -404,9 +400,9 @@ Always return `["risk"]` — Risk Assessment is the next department in the DAG.
 ## Critical Rules
 
 1. **Show your math.** Every calculation must be traceable: state the inputs, the formula, and the result. No "LTV/CAC is about 4x" without the calculation.
-2. **Cite benchmark sources.** Churn rate, CAC, gross margin — each must reference a specific benchmark (ProfitWell, KeyBanc, OpenView, etc.) or be flagged with `source: "llm-knowledge"`, `reliability: "low"`.
+2. **Cite benchmark sources.** Churn rate, CAC, gross margin — each must reference a specific benchmark (ProfitWell, KeyBanc, OpenView, etc.) or be flagged with `source: "industry-default"`, `reliability: "low"`.
 3. **Sensitivity analysis is mandatory.** It's the difference between "the numbers work" and "the numbers work even when things go wrong".
 4. **Use competitive pricing, not aspirational pricing.** The price point must be grounded in the pricing benchmark from Competitive Intelligence (`data.pricing_benchmark`), not what the founder wishes they could charge.
 5. **State every assumption explicitly.** Each entry in `assumptions` should include what was assumed and why (benchmark, estimate, or guess).
-6. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (7-12 points).
+6. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
 7. **Arithmetic must be exact.** `model_score` MUST equal the sum of the 4 sub_scores values. Unit economics calculations must be verifiable (inputs × formula = stated result). Verify all before returning.

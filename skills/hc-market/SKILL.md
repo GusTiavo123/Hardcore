@@ -27,7 +27,7 @@ You receive from the orchestrator:
 {
   "idea": "original idea description",
   "slug": "kebab-case-slug",
-  "persistence_mode": "engram | file | none",
+  "persistence_mode": "engram | file",
   "detail_level": "concise | standard | deep"
 }
 ```
@@ -48,8 +48,6 @@ You MUST read the Problem Validation output before starting your analysis. It pr
 ```
 
 **If `persistence_mode` is `file`:** Read `output/{slug}/problem.json`
-
-**If `persistence_mode` is `none`:** The orchestrator passes the Problem output in your prompt context.
 
 **If recovery fails** (mem_search returns no results, file doesn't exist, or context is missing): return `status: "blocked"` with `flags: ["missing-dependency"]` and `executive_summary` explaining that Problem Validation output could not be found. Do NOT proceed without it.
 
@@ -106,7 +104,7 @@ Execute **5-8 search queries** targeting institutional sources.
 Reliability levels:
 - `high`: Institutional reports (Gartner, Statista, Grand View Research, Fortune BI), government/census data, public company filings
 - `medium`: VC/analyst posts with cited numbers, industry association reports, reputable news
-- `low`: Blog posts without citations, press releases, LLM knowledge without URL
+- `low`: Blog posts without citations, press releases, unverified claims
 
 Record the search queries you actually executed in `search_queries_used`.
 
@@ -256,9 +254,7 @@ mem_save(
 
 **If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/market.json`.
 
-**If `none`:** Return inline only.
-
-After persisting (or in `none` mode), record the artifact reference:
+After persisting, record the artifact reference:
 ```json
 {
   "name": "market-analysis",
@@ -357,6 +353,6 @@ Always return `["bizmodel"]` — Business Model depends on your output (and on C
 2. **Always cite the source and year** for every market figure. Stale data (>3 years) gets flagged.
 3. **SOM must be conservative.** When estimating, use the lower bound. Optimistic SOM projections are the #1 source of bad validation calls.
 4. **Early adopters must be reachable.** "SMBs" is not a segment. "Freelance developers earning >$100k who are active on r/freelance (250k members)" is a segment.
-5. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (7-12 points).
+5. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
 6. **Distinguish between TAM you found vs TAM you estimated.** Be transparent in methodology.
 7. **Arithmetic must be exact.** `market_score` MUST equal the sum of the 4 sub_scores values. Verify before returning.

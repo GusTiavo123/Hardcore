@@ -99,8 +99,9 @@ Array of evidence items supporting the analysis:
 - Every factual claim MUST have at least one evidence entry
 - `high`: Official reports, peer-reviewed, government data
 - `medium`: Blog posts, forum threads with multiple confirmations, reputable news
-- `low`: Single anecdotal source, LLM knowledge without URL, unverified
-- If no URL is available, set `source: "llm-knowledge"` and `reliability: "low"`
+- `low`: Single anecdotal source, unverified claims
+
+**Web search is mandatory.** Every department must use real web search to find evidence. If web search fails entirely (>50% of queries return 0 relevant results), the department MUST return `status: "failed"` — do NOT fall back to LLM knowledge. The pipeline halts and the user is informed.
 
 ### `artifacts`
 
@@ -109,7 +110,7 @@ Array of persisted artifacts:
 ```json
 {
   "name": "problem-analysis",
-  "store": "engram | file | none",
+  "store": "engram | file",
   "ref": "observation-id or topic_key"
 }
 ```

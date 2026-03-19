@@ -72,8 +72,6 @@ Input:
   "detail_level": "{level}"
 }
 
-{If none mode: include upstream department outputs here}
-
 Execute the full process defined in the SKILL.md and return the output envelope.
 ```
 
@@ -81,11 +79,11 @@ Each department needs **web search** capabilities. The sub-agent must use WebSea
 
 ## Persistence Mode Resolution
 
-1. If Engram MCP tools are available (`mem_search`, `mem_save`, etc.) → use `"engram"`
-2. If Engram is not available → use `"none"` (pass outputs inline between departments)
-3. User can explicitly request `"file"` mode (writes to `output/{slug}/`)
+**Engram is required.** The pipeline cannot run without it.
 
-When using `none` mode, you MUST pass the full output envelope from completed departments into the prompt context of downstream departments. See the None Mode Protocol in `skills/hc-orchestrator/SKILL.md`.
+1. At startup, verify Engram MCP tools are available (`mem_search`, `mem_save`, etc.) → use `"engram"`
+2. If Engram is not available → **halt the pipeline** with an error asking the user to start Engram
+3. User can explicitly request `"file"` mode in addition to Engram (writes to `output/{slug}/`)
 
 ## Knockout Rules (Non-Negotiable)
 
@@ -113,6 +111,17 @@ After Synthesis completes, present to the user:
 - Next steps and validation experiments
 - If PIVOT: pivot suggestions
 
+## Exporting Test Results
+
+When the user asks to export results after a validation (e.g., "export results to testing"), follow the protocol in `testing/PROTOCOL.md`:
+
+1. Create directory `testing/runs/{YYYY-MM-DD}_{machine}_{idea-id}/`
+   - `machine`: ask the user for their machine identifier if not known (e.g., "desktop", "laptop")
+   - `idea-id`: from `testing/suite.yaml` if the idea matches, otherwise use the slug
+2. Recover all 6 department outputs from Engram and write each as `{dept}.json`
+3. Generate `verdict.yaml` with scores, verdict, and validation checks against suite expectations
+4. Show a summary of checklist pass/fail to the user
+
 ## Language
 
 Respond in the same language the user uses. The specs are in English but the user-facing communication follows the user's language (typically Spanish).
@@ -125,7 +134,7 @@ skills/
 │   ├── output-contract.md      # JSON envelope every dept returns
 │   ├── scoring-convention.md   # Sub-dimensions, rubrics, weights, knockouts
 │   ├── engram-convention.md    # Engram naming, recovery, session lifecycle
-│   └── persistence-contract.md # Mode resolution (engram/file/none)
+│   └── persistence-contract.md # Mode resolution (engram/file)
 ├── hc-orchestrator/SKILL.md    # Orchestrator (your primary instructions)
 ├── hc-problem/SKILL.md         # Dept 1: Problem Validation
 ├── hc-market/SKILL.md          # Dept 2: Market Sizing
@@ -133,4 +142,9 @@ skills/
 ├── hc-bizmodel/SKILL.md        # Dept 4: Business Model
 ├── hc-risk/SKILL.md            # Dept 5: Risk Assessment
 └── hc-synthesis/SKILL.md       # Dept 6: GO/NO-GO Synthesis
+testing/
+├── PROTOCOL.md                 # Testing protocol, checklist, phase gates
+├── suite.yaml                  # 10 curated test ideas with expected outcomes
+├── runs/                       # Committed run results (per machine, per idea)
+└── analysis/                   # Cross-machine variance analysis
 ```

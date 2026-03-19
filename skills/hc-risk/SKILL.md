@@ -32,7 +32,7 @@ You receive from the orchestrator:
 {
   "idea": "original idea description",
   "slug": "kebab-case-slug",
-  "persistence_mode": "engram | file | none",
+  "persistence_mode": "engram | file",
   "detail_level": "concise | standard | deep"
 }
 ```
@@ -54,8 +54,6 @@ You depend on **Problem, Market, and Competitive** outputs. You MUST attempt to 
 ```
 
 **If `persistence_mode` is `file`:** Read problem.json, market.json, competitive.json from `output/{slug}/`
-
-**If `persistence_mode` is `none`:** All available outputs are in your prompt context.
 
 **Recovery failure handling:**
 
@@ -107,7 +105,7 @@ Search for evidence about technical and operational feasibility.
 Reliability levels:
 - `high`: Official documentation, pricing pages, API registries, job boards with counts, infrastructure pricing calculators
 - `medium`: Engineering blog posts with specifics, Stack Overflow developer surveys, tech news with cited data
-- `low`: Uncited blog posts, opinion pieces, LLM knowledge without URL
+- `low`: Uncited blog posts, opinion pieces, unverified claims
 
 **Evaluate:**
 - Are all required APIs/services publicly available? How many redundant providers?
@@ -277,9 +275,7 @@ mem_save(
 
 **If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/risk.json`.
 
-**If `none`:** Return inline only.
-
-After persisting (or in `none` mode), record the artifact reference:
+After persisting, record the artifact reference:
 ```json
 {
   "name": "risk-assessment",
@@ -378,5 +374,5 @@ Always return `["synthesis"]` — Synthesis is the final department.
 4. **Mitigations must be specific and pre-launch feasible.** "Build a better product" is not a mitigation. "Validate with 10 paid pilot customers before full build" is a mitigation.
 5. **Use upstream data.** Failed competitors from Competitive tell you about execution risk. Market stage from Market tells you about timing. Competitive's pricing data tells you about financial viability signals.
 6. **Don't double-count.** If Competitive already identified a dominant incumbent, assess the risk it poses here but don't re-analyze the competitor landscape. Reference the upstream data.
-7. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (7-12 points).
+7. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
 8. **Arithmetic must be exact.** `risk_score` MUST equal the sum of the 4 sub_scores values. Verify before returning.

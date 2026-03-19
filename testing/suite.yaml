@@ -1,0 +1,109 @@
+# Test Suite — Idea Validation Pipeline
+# Curated ideas for validating that the pipeline produces correct, complete, and reproducible results.
+#
+# Coverage: 10 ideas spanning GO/PIVOT/NO-GO, multiple industries, different knockout triggers.
+# Each idea runs through the full pipeline (fast mode). Results are committed to testing/runs/.
+#
+# After changing rubrics, weights, or department logic, re-run at least 3 ideas (1 per verdict type).
+
+version: "1.0"
+
+ideas:
+  # ============================================================
+  # GO CANDIDATES (3) — should produce GO or strong PIVOT (65+)
+  # ============================================================
+
+  - id: "go-api-docs-devtools"
+    text: "A CLI tool that automatically generates interactive API documentation from TypeScript codebases, with team collaboration features and hosted docs portal — targeting engineering teams at mid-size companies"
+    expected_verdict: GO
+    expected_score_range: [68, 85]
+    expected_knockouts: []
+    rationale: "Strong problem (devs universally hate writing docs), large addressable market (dev tools SaaS), competitive but with clear gaps in auto-generation, proven subscription model with benchmarks"
+    tags: [devtools, saas, b2b, english-market]
+    priority: high
+
+  - id: "go-invoice-freelancers"
+    text: "Software de facturación y gestión de cobros automatizado para freelancers de tecnología en Latinoamérica, con integración a los sistemas tributarios locales de Argentina, México y Colombia"
+    expected_verdict: GO
+    expected_score_range: [65, 80]
+    expected_knockouts: []
+    rationale: "Real pain (invoicing+taxes is a nightmare for LATAM freelancers), growing freelance market, competitors exist but none covers multi-country tax integration, validated SaaS model"
+    tags: [fintech, saas, b2b, latam, spanish-queries]
+    priority: high
+
+  - id: "go-ecommerce-returns"
+    text: "A returns management platform for mid-size e-commerce brands that automates return labels, refund processing, and resale of returned inventory through a secondary marketplace"
+    expected_verdict: GO
+    expected_score_range: [68, 82]
+    expected_knockouts: []
+    rationale: "Returns cost e-commerce 15-30% of revenue, growing pain with BOPIS/online growth, competitors validate market but gaps in resale automation, strong unit economics"
+    tags: [ecommerce, saas, b2b, english-market]
+    priority: medium
+
+  # ============================================================
+  # NO-GO CANDIDATES (3) — should trigger specific knockouts
+  # ============================================================
+
+  - id: "nogo-vr-elderly-pets"
+    text: "A virtual reality social platform exclusively for elderly people to interact with AI-generated virtual pets in immersive 3D environments"
+    expected_verdict: NO-GO
+    expected_knockouts: ["problem"]
+    rationale: "No evidence elderly people want VR pet interaction — problem doesn't exist. Extremely niche, no complaints or workarounds for this specific intersection"
+    tags: [consumer, vr, niche, english-market]
+    priority: high
+
+  - id: "nogo-artisan-cheese-saas"
+    text: "SaaS de gestión de inventario y trazabilidad exclusivo para productores artesanales de queso de cabra en la Patagonia argentina"
+    expected_verdict: NO-GO
+    expected_knockouts: ["market"]
+    rationale: "Real pain might exist but market is microscopic — probably <500 potential customers total. SOM would be negligible. Market knockout expected."
+    tags: [saas, niche, latam, spanish-queries]
+    priority: high
+
+  - id: "nogo-ai-medical-diagnosis"
+    text: "An AI system that provides autonomous medical diagnoses for serious conditions (cancer, cardiac) directly to patients without physician oversight, operating globally"
+    expected_verdict: NO-GO
+    expected_knockouts: ["risk"]
+    rationale: "Problem exists (access to diagnosis) but regulatory barriers are insurmountable — FDA, CE marking, medical device classification, liability. Risk knockout expected."
+    tags: [healthtech, ai, regulatory, english-market]
+    priority: medium
+
+  # ============================================================
+  # PIVOT CANDIDATES (4) — should produce PIVOT with varied reasons
+  # ============================================================
+
+  - id: "pivot-ai-tutoring-kids"
+    text: "An AI-powered personalized tutoring platform for K-12 students that replaces human tutors entirely, using generative AI for real-time teaching across all subjects"
+    expected_verdict: PIVOT
+    expected_score_range: [55, 69]
+    expected_knockouts: []
+    rationale: "Big market, real pain, but COPPA/children's privacy risks + dominant incumbents (Khan Academy, Duolingo) + parents resist 'no human' model. Likely PIVOT toward hybrid or B2B2C"
+    tags: [edtech, ai, consumer, english-market]
+    priority: high
+
+  - id: "pivot-marketplace-nutricionistas"
+    text: "Marketplace que conecta nutricionistas independientes con pacientes en LATAM, con planes de dieta generados por IA y seguimiento automatizado"
+    expected_verdict: PIVOT
+    expected_score_range: [50, 68]
+    expected_knockouts: []
+    rationale: "Pain exists but marketplace chicken-egg problem, regulatory fragmentation across LATAM countries, established telemedicine players could add this. PIVOT toward B2B (clinics) or SaaS (tools for nutritionists)"
+    tags: [healthtech, marketplace, latam, spanish-queries]
+    priority: medium
+
+  - id: "pivot-crypto-remittances"
+    text: "A cryptocurrency-based remittance service for migrant workers sending money from the US to Central America, bypassing traditional wire transfer fees"
+    expected_verdict: PIVOT
+    expected_score_range: [55, 70]
+    expected_knockouts: []
+    rationale: "Real pain (high fees), big market, but crypto regulation + money transmitter licensing + established players (Wise, Remitly). Strong problem but risk likely blocks GO. PIVOT toward fiat-rails or B2B partnerships"
+    tags: [fintech, crypto, regulatory, english-market]
+    priority: medium
+
+  - id: "pivot-restaurant-waste"
+    text: "Plataforma SaaS para restaurantes que predice desperdicio de alimentos usando datos de ventas históricas y sugiere ajustes de menú y compras, integrándose con proveedores locales"
+    expected_verdict: PIVOT
+    expected_score_range: [58, 72]
+    expected_knockouts: []
+    rationale: "Growing ESG pressure makes this relevant, pain exists but restaurants are notoriously hard to sell SaaS to (high churn, low willingness to pay for tech). BizModel likely weak. Could PIVOT to chains or food distributors"
+    tags: [foodtech, saas, b2b, latam, spanish-queries]
+    priority: medium

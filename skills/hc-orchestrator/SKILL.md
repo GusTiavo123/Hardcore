@@ -29,7 +29,7 @@ Before doing ANYTHING, read these files:
 - `skills/_shared/output-contract.md` — JSON envelope every department returns
 - `skills/_shared/scoring-convention.md` — Rubrics, weights, GO/NO-GO rules
 - `skills/_shared/engram-convention.md` — Naming, persistence, recovery protocol, session lifecycle
-- `skills/_shared/persistence-contract.md` — Mode resolution (engram/file/none)
+- `skills/_shared/persistence-contract.md` — Mode resolution (engram/file)
 
 ## The DAG
 
@@ -85,9 +85,9 @@ OUTPUT: Verdict + Report
 
 4. Resolve `detail_level`: `normal` mode → `"standard"`, `fast` mode → `"concise"`. User can override to `"deep"` explicitly.
 
-5. Resolve `persistence_mode`: Check if Engram is available (try `mem_search`). If yes → `"engram"`. If not → `"none"`. User can explicitly request `"file"`.
+5. **Verify Engram availability**: Call `mem_search(query: "ping", project: "hardcore")`. If Engram responds → set `persistence_mode: "engram"`. If Engram is unavailable → **halt the pipeline** with: "Engram es obligatorio para ejecutar el pipeline de validación. Asegurate de que el servidor MCP de Engram esté corriendo." User can explicitly request `"file"` mode in addition to Engram.
 
-6. **Start Engram session** (if persistence mode is `engram`):
+6. **Start Engram session**:
    ```
    mem_session_start(
      id: "validation-{slug}-{YYYY-MM-DD}",
@@ -126,7 +126,7 @@ Launch BOTH sub-agents simultaneously:
 1. `skills/hc-market/SKILL.md` — passes same input format
 2. `skills/hc-competitive/SKILL.md` — passes same input format
 
-Both read Problem from Engram independently (or receive it via context in `none` mode — see None Mode Protocol). Wait for both to complete.
+Both read Problem from Engram independently. Wait for both to complete.
 
 Both departments persist their own outputs. Update pipeline state, show consolidated summary.
 
@@ -160,7 +160,7 @@ Show to user:
 - Next steps / validation experiments
 - If PIVOT: pivot suggestions
 
-**Close Engram session** (if persistence mode is `engram`):
+**Close Engram session**:
 ```
 mem_session_summary(
   session_id: "validation-{slug}-{YYYY-MM-DD}",
@@ -210,8 +210,6 @@ Input:
   "detail_level": "{level}"
 }
 
-{If persistence_mode is "none": include upstream department output envelopes here per the None Mode Protocol}
-
 CRITICAL: Your `data` object must contain EVERY field from the data schema in your SKILL.md.
 Cross-reference the Output Assembly Checklist (Step X.5) before returning.
 Missing fields break downstream departments.
@@ -232,64 +230,6 @@ Each department is the **authoritative persister** of its own output. The orches
 | Pipeline state (DAG progress) | The orchestrator (after each department completes) | `config` |
 | Session lifecycle (start/summary/end) | The orchestrator | Session API |
 
-If `persistence_mode` is `none`, departments return output inline and skip persistence. The orchestrator passes previous outputs in prompt context for downstream departments (see None Mode Protocol).
-
-## None Mode Protocol
-
-When `persistence_mode` is `none`, departments cannot read from Engram or files. The orchestrator MUST pass upstream outputs in the sub-agent's prompt context.
-
-**Per-department context requirements:**
-
-| Department | Upstream outputs to pass in context |
-|---|---|
-| Problem | (none — root node) |
-| Market | Problem |
-| Competitive | Problem |
-| BizModel | Problem + Market + Competitive |
-| Risk | Problem + Market + Competitive (BizModel not available — runs in parallel) |
-| Synthesis | Problem + Market + Competitive + BizModel + Risk |
-
-### Early Abort in None Mode
-
-When Problem triggers a knockout (score < 40) in `fast` mode with `persistence_mode: "none"`, the orchestrator skips directly to Synthesis. In this case:
-
-1. Pass **only** the Problem output envelope in Synthesis's prompt context.
-2. Synthesis receives 1 of 5 departments and applies the Early Abort Protocol (see `hc-synthesis/SKILL.md`).
-3. The Synthesis prompt context MUST include a clear header: `## Early Abort — Only Problem data available (knockout triggered)`.
-4. Do NOT pass empty/placeholder objects for the missing departments — Synthesis handles missing data via its recovery failure table.
-
-### Mid-Pipeline Mode Switch
-
-If a department signals context truncation (e.g., BizModel or Risk cannot process all upstream outputs passed inline), switch from `none` to `file` mode mid-pipeline:
-
-1. Persist all completed department outputs to `output/{slug}/` as JSON files.
-2. Update `persistence_mode` to `"file"` for all subsequent department launches.
-3. Inform the user: "El contexto es demasiado grande para modo `none`. Cambiando a modo `file`."
-4. The current department that triggered the switch MUST be relaunched with `persistence_mode: "file"` so it can read from files instead of context.
-
-**Format**: Include the FULL output envelope JSON from each required upstream department, prefixed with the department name:
-
-```
-## Problem Validation Output:
-{full JSON envelope from hc-problem}
-
-## Market Sizing Output:
-{full JSON envelope from hc-market}
-
-## Competitive Intelligence Output:
-{full JSON envelope from hc-competitive}
-```
-
-Only include the departments listed in the table above for each launch. Do NOT pass outputs from departments that haven't completed yet.
-
-**Context growth warning**: In `none` mode, context grows with each department:
-- Problem: no inputs
-- Market/Competitive: 1 input each
-- BizModel/Risk: 3 inputs each (parallel, both read Problem + Market + Competitive)
-- Synthesis: 5 inputs
-
-If context truncation occurs (agent signals it cannot process all inputs), consider switching to `file` mode: "El contexto es demasiado grande para modo `none`. Cambiando a modo `file` para persistir outputs localmente."
-
 ## State Schema
 
 After each department completes (or on abort), persist pipeline state:
@@ -302,13 +242,11 @@ mem_save(
   type: "config",
   project: "hardcore",
   scope: "project",
-  content: "**What**: Pipeline state for {slug} [validation] [state]\n\n**Where**: validation/{slug}/state\n\n**Data**:\nslug: {slug}\nphase: {last-completed-department}\nmode: fast | normal\ndetail_level: concise | standard | deep\npersistence_mode: engram | file | none\ncompleted:\n  problem: {true|false}\n  market: {true|false}\n  competitive: {true|false}\n  bizmodel: {true|false}\n  risk: {true|false}\n  synthesis: {true|false}\nscores:\n  problem: {score|null}\n  market: {score|null}\n  competitive: {score|null}\n  bizmodel: {score|null}\n  risk: {score|null}\nlast_updated: {ISO datetime}"
+  content: "**What**: Pipeline state for {slug} [validation] [state]\n\n**Where**: validation/{slug}/state\n\n**Data**:\nslug: {slug}\nphase: {last-completed-department}\nmode: fast | normal\ndetail_level: concise | standard | deep\npersistence_mode: engram | file\ncompleted:\n  problem: {true|false}\n  market: {true|false}\n  competitive: {true|false}\n  bizmodel: {true|false}\n  risk: {true|false}\n  synthesis: {true|false}\nscores:\n  problem: {score|null}\n  market: {score|null}\n  competitive: {score|null}\n  bizmodel: {score|null}\n  risk: {score|null}\nlast_updated: {ISO datetime}"
 )
 ```
 
 **If `file`:** Write to `output/{slug}/state.yaml`
-
-**If `none`:** State lives only in context. Cannot be recovered across sessions.
 
 ## State Recovery
 
@@ -329,8 +267,8 @@ On recovery (context compaction or new session):
 | Department returns `status: "blocked"` | Halt, show reason to user, ask how to proceed |
 | Department returns `status: "failed"` | Halt, show error, suggest re-running that department |
 | Department returns `status: "warning"` | Proceed, but show warning flags prominently |
-| Engram unavailable | Fall back to `none` mode, warn user about limitations |
-| Web search returns no results | Department should flag `"no-search-results"` and use LLM knowledge with `reliability: "low"` |
+| Engram unavailable | **Halt pipeline.** Engram is required. Show: "Engram es obligatorio. Asegurate de que el servidor MCP de Engram esté corriendo." |
+| Web search fails (no results on >50% of queries) | **Department returns `status: "failed"`.** Pipeline halts. Show the failed queries and ask the user to check connectivity or reformulate the idea. Web search is mandatory — the pipeline cannot produce valid results without real evidence. |
 | User aborts at checkpoint | See Abort Handling below |
 
 ## Abort Handling

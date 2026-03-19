@@ -247,4 +247,4 @@ Track real validations here with actual outcomes for calibration.
 
 | Date | Slug | Weighted | Verdict | Outcome (3-6 months later) |
 |------|------|----------|---------|---------------------------|
-| 2026-03-15 | telemedicina-ia-salud-mental-latam | 68.5 | PIVOT | _pending_ |
+| | | | | |

@@ -40,7 +40,7 @@ Lo que cambia es el dominio. La mecánica (delegate-only, contexto fresco, Engra
 - Skills como archivos Markdown puros (zero dependencies)
 - DAG de dependencias entre fases
 - Archivos `_shared/` para convenciones DRY
-- Política de persistencia pluggable (engram / file / none)
+- Política de persistencia pluggable (engram / file)
 
 **De Engram:**
 - MCP tools para persistencia (mem_save, mem_search, mem_get_observation, etc.)
@@ -56,7 +56,7 @@ Lo que cambia es el dominio. La mecánica (delegate-only, contexto fresco, Engra
 |---|---|---|---|
 | Output contract | `risks` field | `flags` field | Nuestros flags son alertas operativas; risk analysis es un departamento dedicado |
 | Output contract | Sin `score` | Con `score` + `score_reasoning` | Necesitamos scoring para el weighted verdict |
-| Persistence modes | 4 (engram/openspec/hybrid/none) | 3 (engram/file/none) | No necesitamos hybrid; `file` es openspec simplificado |
+| Persistence modes | 4 (engram/openspec/hybrid/none) | 2 (engram/file) | Engram es obligatorio; `file` es fallback explícito para archival local |
 | Engram `type` | Usado tal cual | Mapeado: discovery/decision/config | Nuestros tipos originales no eran enums válidos de Engram |
 | Engram `tags` | Disponible | No usado (no existe en la API) | Keywords embebidos en content para FTS5 search |
 | Content format | `**What**/**Why**/**Where**/**Learned**` | `**What**/**Why**/**Where**/**Data**` | Adaptado al dominio de validación |
@@ -74,7 +74,7 @@ idea-validation/
 │
 ├── skills/
 │   ├── _shared/                         # Convenciones compartidas por todos los depts
-│   │   ├── persistence-contract.md      # Reglas de persistencia (engram/file/none)
+│   │   ├── persistence-contract.md      # Reglas de persistencia (engram/file)
 │   │   ├── engram-convention.md         # Naming, type mapping, session lifecycle
 │   │   ├── scoring-convention.md        # Sub-dimensiones, pesos, knockouts
 │   │   └── output-contract.md           # Contrato JSON que retorna cada dept
@@ -698,7 +698,7 @@ mem_search("validation problem", project: "hardcore")         → todos los prob
 - `_shared/output-contract.md` — envelope JSON con `detailed_report`, `flags` vs ATL `risks`
 - `_shared/scoring-convention.md` — 22 sub-dimensiones medibles, pesos simulados, knockouts
 - `_shared/engram-convention.md` — type mapping válido, sin `tags`, content format adaptado, session lifecycle
-- `_shared/persistence-contract.md` — 3 modos (engram/file/none) con degradación graceful
+- `_shared/persistence-contract.md` — 2 modos (engram obligatorio / file como fallback explícito)
 - `hc-orchestrator/SKILL.md` — DAG completo, session lifecycle, state recovery
 
 ### Phase 1: Departamentos uno a uno ✅ DONE

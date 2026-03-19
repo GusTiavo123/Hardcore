@@ -27,7 +27,7 @@ You receive from the orchestrator:
 {
   "idea": "original idea description",
   "slug": "kebab-case-slug",
-  "persistence_mode": "engram | file | none",
+  "persistence_mode": "engram | file",
   "detail_level": "concise | standard | deep"
 }
 ```
@@ -48,8 +48,6 @@ You MUST read the Problem Validation output first. It provides the refined probl
 ```
 
 **If `persistence_mode` is `file`:** Read `output/{slug}/problem.json`
-
-**If `persistence_mode` is `none`:** Problem output is in your prompt context.
 
 **If recovery fails** (mem_search returns no results, file doesn't exist, or context is missing): return `status: "blocked"` with `flags: ["missing-dependency"]` and `executive_summary` explaining that Problem Validation output could not be found. Do NOT proceed without it.
 
@@ -106,7 +104,7 @@ Search systematically across multiple sources. Classify each as direct, indirect
 Reliability levels:
 - `high`: Product directory listings (G2, Capterra with review counts), Crunchbase profiles, pricing pages, app store listings
 - `medium`: TechCrunch/news articles, VC/analyst posts, ProductHunt submissions with upvote counts
-- `low`: Blog posts, social media mentions, LLM knowledge without URL
+- `low`: Blog posts, social media mentions, unverified claims
 
 Record the search queries you actually executed in `search_queries_used`.
 
@@ -240,9 +238,7 @@ mem_save(
 
 **If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/competitive.json`.
 
-**If `none`:** Return inline only.
-
-After persisting (or in `none` mode), record the artifact reference:
+After persisting, record the artifact reference:
 ```json
 {
   "name": "competitive-analysis",
@@ -377,5 +373,5 @@ Always return `["bizmodel"]` — Business Model depends on your pricing benchmar
 4. **Failed competitors are valuable signal.** If many have failed for the same reason, that's a red flag. If they failed for reasons the idea addresses, that's opportunity.
 5. **Don't conflate "no competitors" with "opportunity".** Zero competitors often means zero market. The Market Validation Signal sub-dimension scores 0-1 competitors as LOW (0-5 points).
 6. **Pricing benchmark is critical downstream.** Business Model uses it for unit economics. Be thorough in collecting pricing data.
-7. **If web search fails entirely**, use your knowledge but flag every item with `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (6-10 points).
+7. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
 8. **Arithmetic must be exact.** `competitive_score` MUST equal the sum of the 5 sub_scores values. Verify before returning.

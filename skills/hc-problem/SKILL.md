@@ -26,7 +26,7 @@ You receive from the orchestrator:
 {
   "idea": "original idea description in natural language",
   "slug": "kebab-case-slug",
-  "persistence_mode": "engram | file | none",
+  "persistence_mode": "engram | file",
   "detail_level": "concise | standard | deep"
 }
 ```
@@ -97,7 +97,7 @@ Record each useful source as an evidence item:
 Reliability levels:
 - `high`: Official reports, peer-reviewed, government data, verified product pricing pages
 - `medium`: Forum threads with multiple confirmations, reputable news, G2/Capterra reviews
-- `low`: Single anecdotal source, LLM knowledge without URL, unverified claims
+- `low`: Single anecdotal source, unverified claims
 
 #### B. Signal counts
 
@@ -205,9 +205,7 @@ mem_save(
 
 **If `file`:** Create directory `output/{slug}/` if it doesn't exist. Write the full output envelope to `output/{slug}/problem.json`.
 
-**If `none`:** Skip persistence, return output inline only.
-
-After persisting (or in `none` mode), record the artifact reference:
+After persisting, record the artifact reference:
 ```json
 {
   "name": "problem-analysis",
@@ -299,5 +297,5 @@ Always return `["market", "competitive"]` — these are next in the DAG and can 
 2. **Every competitor/product you mention must be real.** Include the URL. If you're not confident it exists, set `reliability: "low"`.
 3. **Count conservatively.** When in doubt whether two threads are the same complaint, count them as 1.
 4. **Separate searching from judging.** First collect ALL evidence (Steps 2-3), then score (Step 4). Don't let a desired score influence what you search for or how you count.
-5. **If web search fails entirely**, use your knowledge but flag EVERY such item as `source: "llm-knowledge"`, `reliability: "low"` and set the `"no-search-results"` flag. Sub-dimension scores based purely on LLM knowledge must not exceed the second tier (6-10 points).
+5. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
 6. **Arithmetic must be exact.** `problem_score` MUST equal the sum of the 5 sub_scores values. Verify before returning.
