@@ -1,0 +1,30 @@
+idea_id: "nogo-artisan-cheese-saas"
+machine: "desktop"
+date: "2026-03-20"
+mode: "fast"
+engram_session_id: "validation-artisan-cheese-saas-2026-03-20"
+
+scores:
+  problem: 40
+  market: 25
+  competitive: 49
+  bizmodel: 51
+  risk: 47
+weighted: 40.5
+verdict: "NO-GO"
+
+expected_verdict: "NO-GO"
+verdict_match: true
+score_in_range: false  # no expected_score_range in suite for NO-GO ideas
+expected_knockouts: ["market"]
+actual_knockouts: ["market", "multi-weakness (problem < 45, market < 45)"]
+knockout_match: true  # expected market knockout WAS triggered, plus additional multi-weakness
+
+all_departments_completed: true
+schema_complete: true
+arithmetic_verified: true  # (40×.30)+(25×.25)+(49×.15)+(51×.20)+(47×.10) = 12+6.25+7.35+10.2+4.7 = 40.5
+evidence_has_urls: true
+engram_persisted: true
+
+pass: true  # verdict matches, expected knockout triggered
+notes: "Market knockout triggered as expected (25 < 40). Additional multi-weakness knockout also triggered (Problem 40 + Market 25, both < 45). Problem scored 40 (barely passing its own knockout) because the base problem (inventory/traceability for artisan dairy) exists generically, but the ultra-niche Patagonia goat cheese segment has minimal online evidence. First PASS in the test suite."

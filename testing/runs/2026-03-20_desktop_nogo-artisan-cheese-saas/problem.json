@@ -1,0 +1,42 @@
+{
+  "problem_exists": true,
+  "problem_statement": "Small-scale artisan goat cheese producers in Argentine Patagonia struggle with inventory management and regulatory traceability, relying on manual paper records or generic spreadsheets that are error-prone and time-consuming, while existing software solutions are designed for larger dairy operations and are too expensive or complex for family-scale producers.",
+  "target_user": "Small-scale artisan goat cheese producers in Argentine Patagonia (85% family-type operations, largely informal, with minimal technical infrastructure)",
+  "industry": "artisan dairy production / food traceability",
+  "pain_intensity": "medium",
+  "current_solutions": [
+    { "solution": "CheeseCrafter", "type": "paid", "satisfaction": "medium" },
+    { "solution": "DairyCraftPro", "type": "paid", "satisfaction": "medium" },
+    { "solution": "Acctivate (for QuickBooks)", "type": "paid", "satisfaction": "medium" },
+    { "solution": "BatchMaster ERP", "type": "paid", "satisfaction": "medium" },
+    { "solution": "Strinos ERP", "type": "paid", "satisfaction": "medium" },
+    { "solution": "E21 ERP", "type": "paid", "satisfaction": "medium" },
+    { "solution": "SIKI Software (Argentina)", "type": "paid", "satisfaction": "medium" },
+    { "solution": "Aelis ERP (Spain)", "type": "paid", "satisfaction": "medium" },
+    { "solution": "Paper/pen manual records", "type": "workaround", "satisfaction": "low" },
+    { "solution": "Google Forms + Google Sheets", "type": "workaround", "satisfaction": "low" }
+  ],
+  "evidence_summary": "6 unique complaint threads found across cheese forums, dairy industry publications, and Argentine agricultural media. Pattern: small artisan producers face record-keeping pain (manual processes, errors, regulatory gaps) but complaint volume is low \u2014 the niche is too small to generate significant online discussion. 85% of Patagonian caprine producers are informal family operations with only 4% of caprine stock formally declared via electronic transit documents. Existing paid solutions (6+) target medium-to-large dairy operations, not micro-artisanal producers.",
+  "search_queries_used": [
+    "artisan cheese inventory management software traceability",
+    "\"cheese production\" inventory software frustrating OR difficult OR \"waste of time\"",
+    "small dairy producer traceability software complaint OR problem OR challenge",
+    "\"gesti\u00f3n de inventario\" \"queso artesanal\" OR \"productores artesanales\" software",
+    "cheese maker inventory tracking spreadsheet OR manual OR workaround",
+    "dairy traceability software site:g2.com OR site:capterra.com",
+    "\"queso de cabra\" Patagonia trazabilidad regulaci\u00f3n SENASA",
+    "artisan cheese maker \"too expensive\" OR \"can't afford\" software small producer",
+    "\"small cheese\" OR \"artisan dairy\" record keeping challenge frustration reddit",
+    "productores caprinos Patagonia argentina problemas gesti\u00f3n trazabilidad",
+    "cheese production software pricing CheeseCrafter DairyCraftPro cost",
+    "\"food traceability\" small producer \"too complex\" OR \"too expensive\" OR \"can't use\" OR \"not designed for\""
+  ],
+  "sub_scores": {
+    "complaint_volume": 6,
+    "complaint_recency": 8,
+    "pain_signals": 6,
+    "workaround_evidence": 9,
+    "paid_alternatives": 11
+  },
+  "problem_score": 40
+}
