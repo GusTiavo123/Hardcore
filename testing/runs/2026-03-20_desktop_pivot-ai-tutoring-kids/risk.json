@@ -1,0 +1,129 @@
+{
+  "department": "risk",
+  "slug": "ai-tutoring-k12",
+  "score": 62,
+  "sub_scores": {
+    "execution_feasibility": 18,
+    "regulatory_legal": 8,
+    "market_timing": 20,
+    "dependency_concentration": 16
+  },
+  "risks": [
+    {
+      "category": "regulatory",
+      "risk": "Updated COPPA rule (April 2026) requires explicit parental consent for AI features processing children's input, with penalties up to $51,744 per violation per day. Systematic failure in de-identification for a 100K-user platform could result in tens of millions in penalties.",
+      "probability": "high",
+      "impact": "critical",
+      "mitigation": "Implement COPPA-compliant consent management from day one using specialized edtech compliance tools (SecurePrivacy, etc.). Build automated data deletion at defined retention intervals to qualify for safe harbor reduced liability.",
+      "evidence": "FTC updated COPPA rule effective April 22, 2026 — first major update since 2013. Penalties up to $51,744/violation/day per FTC enforcement guidelines.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "regulatory",
+      "risk": "121+ state student privacy laws beyond FERPA create a patchwork of compliance requirements that vary by jurisdiction, increasing legal complexity and cost for nationwide rollout.",
+      "probability": "high",
+      "impact": "high",
+      "mitigation": "Start with a handful of states with clearest compliance paths, use edtech compliance platforms that track multi-state requirements, join Student Data Privacy Consortium for guidance.",
+      "evidence": "As of 2025, 121+ state laws protect student privacy beyond FERPA. 53 AI education bills proposed across 21 states in 2025 session.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "regulatory",
+      "risk": "EU AI Act (effective August 2026) classifies education AI as high-risk, requiring conformity assessments, risk management systems, and human oversight — with penalties up to 35M EUR or 7% of global turnover.",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Initially focus on US market only. If expanding to EU, budget 12-18 months for AI Act conformity assessment and build required transparency/human oversight features into architecture from the start.",
+      "evidence": "EU AI Act full enforcement August 2, 2026. Education classified as high-risk AI use case. Penalties exceed GDPR at up to €35M or 7% global annual turnover.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "execution",
+      "risk": "Achieving reliable math accuracy in AI tutoring remains unsolved — ChatGPT shows ~50% math accuracy, and UPenn study found students using AI tutors scored 17% worse on tests despite solving more practice problems.",
+      "probability": "high",
+      "impact": "critical",
+      "mitigation": "Invest heavily in math-specific fine-tuning, implement verification layers (symbolic math engines like Wolfram Alpha API for answer validation), and build pedagogical scaffolding that teaches concepts rather than giving answers.",
+      "evidence": "Problem department found ChatGPT 50% math accuracy. UPenn study showed 17% worse test scores with AI tutoring. Khanmigo reviews cite incorrect answers for basic elementary math.",
+      "source_department": "problem"
+    },
+    {
+      "category": "market",
+      "risk": "95% of students opt out of online tutoring software, and school districts are pivoting back to in-person tutoring — suggesting fundamental engagement and retention challenges for AI-only tutoring.",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Design for engagement from the start with gamification, progress tracking, parent dashboards. Consider hybrid model (AI + occasional human check-ins) rather than pure replacement. Target direct-to-parent channel first where opt-out rates may be lower than school-mandated tools.",
+      "evidence": "Competitive department found 95% student opt-out rate from online tutoring software. Education Next, K-12 Dive report districts pivoting to in-person.",
+      "source_department": "competitive"
+    },
+    {
+      "category": "dependency",
+      "risk": "Core product depends on LLM APIs (OpenAI/Anthropic/Google) with history of frequent deprecations, pricing changes, and policy updates that could disrupt service or economics.",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Implement LLM abstraction layer supporting multiple providers. Monitor API deprecation notices. Consider fine-tuning open-source models (Llama, Qwen) as fallback to reduce vendor lock-in.",
+      "evidence": "OpenAI deprecated o1-preview, o1-mini, gpt-4o-realtime-preview models in 2025. LLM API prices dropped 80% in one year — volatility cuts both ways.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "market",
+      "risk": "Google owns Photomath ($550M acquisition) and Socratic, and could unify them with Gemini into a free comprehensive AI tutor, leveraging massive distribution through Google Search, Android, and YouTube.",
+      "probability": "medium",
+      "impact": "critical",
+      "mitigation": "Differentiate on pedagogy and learning outcomes (not just answer-giving). Build proprietary curriculum alignment, progress tracking, and parent reporting features that a general-purpose Google product would not prioritize. Target niche segments (homeschool, specific grade bands) where Google is less focused.",
+      "evidence": "Competitive department: Photomath acquired by Google for $550M (2023), 100M+ downloads, 729K+ ratings. Google also owns Socratic.",
+      "source_department": "competitive"
+    },
+    {
+      "category": "financial",
+      "risk": "Competitive pricing data shows AI tutoring ranges from free (Khan Academy, Socratic) to $4/mo (Khanmigo), creating a very low price ceiling that challenges unit economics when LLM API costs are factored in.",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Focus on premium value proposition (guaranteed learning outcomes, curriculum alignment, progress reports for parents) to justify higher pricing. Use cost-efficient models (GPT-5 nano at $0.05/M tokens) and prompt caching (90% savings) to keep per-student costs low.",
+      "evidence": "Competitive department: Khanmigo at $4/mo, Khan Academy free, Socratic free. LLM API costs: GPT-5 nano $0.05/M input tokens, prompt caching saves 90%.",
+      "source_department": "competitive"
+    },
+    {
+      "category": "regulatory",
+      "risk": "FTC actively investigating AI chatbots targeting children — launched wide-ranging inquiry in September 2025, issued orders to 7 major companies. Active enforcement against edtech (Illuminate Education settlement, Sendit complaint).",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Proactively implement FTC-recommended safety measures: content moderation, age-gating, parental controls, data minimization, transparent privacy practices. Consider joining an FTC-approved COPPA safe harbor program.",
+      "evidence": "FTC launched inquiry into AI companion chatbots Sept 2025, issued orders to Alphabet, Meta, OpenAI, Snap, X. FTC settlement with Illuminate Education for student data breach.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "execution",
+      "risk": "Idea proposes replacing human tutors entirely, but evidence shows AI cannot replicate emotional support, motivation, and the human connection that drives student engagement — this positioning risks market rejection.",
+      "probability": "medium",
+      "impact": "medium",
+      "mitigation": "Reposition as AI-augmented tutoring that supplements human interaction rather than full replacement. Build features for emotional engagement (encouragement, streak tracking, adaptive difficulty) while being transparent about AI limitations.",
+      "evidence": "Problem department: 8+ mentions of gap in emotional support/human connection. 70% of teachers say AI weakens critical thinking. LAUSD pulled AI tutor weeks after launch.",
+      "source_department": "problem"
+    }
+  ],
+  "dependencies": [
+    {"dependency": "LLM API providers (OpenAI, Anthropic, Google)", "type": "technology", "criticality": "high", "fallback": "Multiple providers available (GPT, Claude, Gemini) plus open-source models (Llama, Qwen). Can implement abstraction layer for provider switching.", "history": "OpenAI deprecated multiple models in 2025 (o1-preview, o1-mini, gpt-4o-realtime-preview). Pricing dropped 80% in one year. Google deprecated Bard in favor of Gemini."},
+    {"dependency": "Apple App Store / Google Play Store", "type": "platform", "criticality": "medium", "fallback": "Web app (PWA) as alternative distribution. Direct-to-school district sales bypass app stores entirely.", "history": "Apple has restricted apps for children (requiring parental controls, limiting data collection). Google Play enforces Families Policy for kids' apps."},
+    {"dependency": "School district procurement process", "type": "channel", "criticality": "medium", "fallback": "Direct-to-parent (B2C) channel, homeschool market, after-school programs as alternative distribution. Not dependent on school districts alone.", "history": "LAUSD pulled AllHere AI tutor weeks after launch. District procurement cycles are 6-18 months. Budget constraints and policy changes can freeze purchasing."},
+    {"dependency": "COPPA/FERPA regulatory status quo", "type": "regulatory", "criticality": "high", "fallback": "No fallback — compliance is mandatory. Must adapt to regulatory changes. Can mitigate by building compliance into architecture from start.", "history": "FTC updated COPPA for first time since 2013 (April 2026). 53 state AI education bills in 2025. Regulatory environment actively evolving and tightening."}
+  ],
+  "overall_risk_level": "medium",
+  "top_3_killers": [
+    {"risk": "Regulatory tsunami — converging COPPA update, 121+ state laws, EU AI Act, and active FTC enforcement create a compliance burden that could consume a startup's resources and expose it to catastrophic penalties", "why_killer": "A single COPPA violation costs $51,744/day. A platform serving thousands of children under 13 across multiple states faces overlapping, sometimes contradictory compliance requirements. One data incident or compliance failure could result in FTC action, multi-million dollar fines, and loss of school district trust — effectively ending the business.", "mitigation_feasible": true, "early_warning_signal": "FTC inquiry or enforcement action against a similar AI tutoring startup; state attorney general investigation; school district requiring compliance certifications you cannot provide"},
+    {"risk": "Google could launch a free, comprehensive AI tutor by combining Photomath + Socratic + Gemini, making the entire paid AI tutoring market unviable", "why_killer": "Google already owns the #1 math app (Photomath, 100M+ downloads) and an educational Q&A app (Socratic), plus has the world's most capable free LLM (Gemini). A unified free product with Google's distribution would eliminate the market for paid alternatives, exactly as ChatGPT destroyed Chegg's business model.", "mitigation_feasible": true, "early_warning_signal": "Google announces integration of Photomath/Socratic with Gemini; Google launches 'Google Tutor' or similar branded education product; Gemini adds education-specific features"},
+    {"risk": "AI tutoring accuracy and pedagogical effectiveness remain fundamentally unsolved — students using AI tutors perform worse on tests, and 95% opt out of online tutoring software", "why_killer": "The core value proposition is that AI can replace human tutors, but current evidence shows AI tutoring may actually harm learning outcomes (17% worse test scores in UPenn study). If the product cannot demonstrably improve learning — not just homework completion — it faces the same fate as BYJU'S and AllHere: initial adoption followed by disillusionment and abandonment.", "mitigation_feasible": true, "early_warning_signal": "Internal A/B tests show no improvement in student test scores; retention drops below 20% after first month; teacher/parent backlash about AI accuracy"}
+  ],
+  "search_queries_used": [
+    "generative AI tutoring API SDK open source edtech 2025 2026",
+    "AI tutoring platform technical architecture tech stack infrastructure cost",
+    "AI education edtech COPPA FERPA compliance regulation 2025 2026",
+    "AI tutoring edtech enforcement action fine penalty children data privacy 2024 2025 2026",
+    "AI tutoring K-12 startup launch funding investment 2025 2026",
+    "AI education K-12 Google Trends growth trend 2024 2025 2026",
+    "LLM API cost per token OpenAI GPT Claude Gemini education pricing 2025 2026",
+    "edtech AI legislation bill proposed 2025 2026 children artificial intelligence regulation state federal",
+    "AI tutoring developer engineer job postings edtech machine learning NLP 2025 2026",
+    "OpenAI API platform dependency risk restriction education developers 2024 2025",
+    "AI tutoring OR AI tutor K-12 school district ban restrict concerns 2025 2026",
+    "COPPA compliance cost edtech startup compliance as a service tools 2025 2026"
+  ]
+}

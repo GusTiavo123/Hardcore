@@ -1,0 +1,30 @@
+idea_id: "pivot-ai-tutoring-kids"
+machine: "desktop"
+date: "2026-03-20"
+mode: "fast"
+engram_session_id: "validation-ai-tutoring-kids-2026-03-20"
+
+scores:
+  problem: 72
+  market: 78
+  competitive: 65
+  bizmodel: 54
+  risk: 62
+weighted: 67.9
+verdict: "PIVOT"
+
+expected_verdict: "PIVOT"
+verdict_match: true
+score_in_range: true  # 67.9 within expected [55, 69]
+expected_knockouts: []
+actual_knockouts: []
+knockout_match: true
+
+all_departments_completed: true
+schema_complete: true
+arithmetic_verified: true
+evidence_has_urls: true
+engram_persisted: true
+
+pass: true
+notes: "PIVOT verdict matches expected. Score 67.9 within expected range [55-69] (barely, at top end). Competitive Opportunity again 3/20 due to Google/Photomath dominance. BizModel weak at 54 (LTV/CAC 1.67x) but revenue model strongly validated (22/25). Market scored highest of all 5 runs so far at 78. Second PASS in the test suite."
