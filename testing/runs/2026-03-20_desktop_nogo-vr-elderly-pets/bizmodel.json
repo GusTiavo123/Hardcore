@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "department": "bizmodel",
+  "executive_summary": "Unit economics for VR elderly pets platform are deeply unfavorable — LTV/CAC ratio of 0.89x with 37-month payback driven by high hardware costs depressing gross margin to 55% and modest ARPU of $39/mo constrained by medium pain intensity and free alternatives.",
+  "score": 30,
+  "score_reasoning": "Score: 30/100 — LTV/CAC Ratio: 4/25 (LTV $715 / CAC $800 = 0.89x; hardware-enabled SaaS gross margin 55% from CloudZero/Benchmarkit 2025; churn 3% monthly from B2B SaaS SMB benchmarks; CAC $800 from eldercare tech benchmark) Revenue Model Validation: 13/25 (3 companies using subscription for senior living tech: Rendever 500+ communities with 95% retention, MyndVR $600K+ contracted revenue with multi-year deals, ElliQ government-subsidized distribution; Rendever reasonably well-documented) Payback Period: 3/25 (37.3 months; CAC $800 / monthly margin $21.45; well above 24-month concerning threshold) Pricing Power: 10/25 (pricing spans ~8x from $29.95-$250/mo; 1 free alternative Alcove; ElliQ at $59/mo as premium; narrow competitive band at low end constrains upward pricing) Total: 4 + 13 + 3 + 10 = 30",
+  "data": {
+    "recommended_model": "subscription",
+    "model_justification": "All three direct competitors (Rendever, MyndVR, Alcove) use subscription models with hardware upfront + monthly/annual recurring fees. Senior living facilities prefer predictable recurring costs. Subscription aligns with ongoing content delivery, AI pet updates, and VR platform maintenance.",
+    "pricing_suggestion": {
+      "price_point": 39,
+      "billing": "monthly",
+      "currency": "USD",
+      "justification": "Mid-to-low range of competitive benchmark ($29.95-$250/mo) reflecting medium pain intensity from Problem department. Priced above MyndVR consumer ($29.95/mo) but well below ElliQ ($59/mo) and care.coach ($150-250/mo) to compete on accessibility while acknowledging free alternative (Alcove)."
+    },
+    "unit_economics": {
+      "arpu_monthly": 39,
+      "churn_rate_monthly": 0.03,
+      "churn_source": "B2B SaaS SMB monthly churn benchmark 3-5% (Optifai 2025, WeAreFounders 2026); used lower bound 3% reflecting institutional multi-year contracts per MyndVR precedent",
+      "gross_margin": 0.55,
+      "margin_source": "Hardware-enabled SaaS gross margin 50-65% (CloudZero 2025, Benchmarkit 2025); mid-range 55% reflecting VR headset hardware costs + content delivery infrastructure",
+      "estimated_ltv": 714.99,
+      "estimated_cac": 800,
+      "cac_source": "Eldercare technology CAC benchmark ~$1000 (FinancialModelsLab 2025); adjusted to $800 reflecting B2B SaaS average $702 (Optifai 2025) and relationship-driven senior living sales channel (conferences, physician referrals)",
+      "ltv_cac_ratio": 0.89,
+      "payback_months": 37.3
+    },
+    "sensitivity_analysis": {
+      "cac_plus_20": {
+        "ltv_cac_ratio": 0.74,
+        "payback_months": 44.8,
+        "viable": false,
+        "assessment": "CAC increase to $960 further deteriorates already-negative unit economics, making the business model entirely unviable."
+      },
+      "churn_plus_20": {
+        "ltv_cac_ratio": 0.74,
+        "payback_months": 37.3,
+        "viable": false,
+        "assessment": "Higher churn at 3.6% monthly reduces LTV to $596, deepening the LTV/CAC deficit below 1.0x."
+      },
+      "price_minus_20": {
+        "ltv_cac_ratio": 0.72,
+        "payback_months": 46.6,
+        "viable": false,
+        "assessment": "Price reduction to $31.20/mo compresses already-thin margins, pushing payback to nearly 4 years with sub-1.0 LTV/CAC."
+      }
+    },
+    "model_precedents": [
+      {
+        "company": "Rendever",
+        "model": "subscription",
+        "segment": "Senior living facilities (VR platform for elderly)",
+        "evidence": "$3.74M funded, 500+ senior living communities, 95% retention rate, acquired Alcove from AARP Jan 2023, NIH/NIA research grants",
+        "source": "https://www.rendever.com/"
+      },
+      {
+        "company": "MyndVR (Mynd Immersive)",
+        "model": "subscription",
+        "segment": "Senior living facilities and home consumers (VR for elderly)",
+        "evidence": "$2.17M funded via HTC Vive X accelerator, $600K+ contracted revenue by 2020, multi-year B2B contracts $2K-$175K/year",
+        "source": "https://republic.com/myndvr"
+      },
+      {
+        "company": "ElliQ (Intuition Robotics)",
+        "model": "subscription",
+        "segment": "Elderly living alone (AI companion robot)",
+        "evidence": "$249 hardware + $59/mo subscription; government-subsidized distribution in NY, FL, WA; validates willingness to pay for digital elderly companionship",
+        "source": "https://elliq.com/"
+      },
+      {
+        "company": "Inspiren",
+        "model": "subscription",
+        "segment": "Senior living facilities (AI-powered care technology)",
+        "evidence": "$35M Series B funding for AI senior living technology; integrates care planning, safety, and staff efficiency",
+        "source": "https://www.fiercehealthcare.com/ai-and-machine-learning/inspiren-banks-35m-scale-ai-powered-senior-living-technology"
+      }
+    ],
+    "assumptions": [
+      "ARPU $39/mo based on low-to-mid competitive range for medium pain intensity (competitive pricing benchmark)",
+      "Monthly churn 3% from B2B SaaS SMB benchmarks — lower bound reflecting institutional contracts (industry benchmark)",
+      "Gross margin 55% for hardware-enabled SaaS model with VR headset costs (industry benchmark CloudZero/Benchmarkit 2025)",
+      "CAC $800 blending eldercare tech benchmark ($1000) with B2B SaaS average ($702), assuming conference/referral-driven sales (estimate)",
+      "Subscription model assumes B2B institutional sales to senior living facilities, not direct-to-consumer",
+      "Free tier competitor (Alcove) constrains pricing floor",
+      "No freemium conversion adjustment applied — model assumes 100% paid subscribers at institutional level"
+    ],
+    "search_queries_used": [
+      "SaaS SMB churn rate benchmark 2025 2026",
+      "eldercare technology customer acquisition cost CAC benchmark senior living",
+      "subscription SaaS gross margin benchmark 2025 hardware plus software",
+      "VR subscription platform revenue model success case study elderly healthcare",
+      "\"subscription\" \"senior living\" OR \"eldercare\" technology company successful funded profitable",
+      "Rendever MyndVR ElliQ revenue model subscription B2B senior living ARR growth",
+      "healthcare SaaS LTV CAC benchmark B2B senior care profitwell openview 2025"
+    ],
+    "sub_scores": {
+      "ltv_cac_ratio": 4,
+      "revenue_model_validation": 13,
+      "payback_period": 3,
+      "pricing_power": 10
+    },
+    "model_score": 30
+  },
+  "evidence": [],
+  "artifacts": [
+    {
+      "name": "bizmodel-analysis",
+      "store": "engram",
+      "ref": "validation/vr-elderly-pets/bizmodel"
+    }
+  ],
+  "flags": [],
+  "next_recommended": ["synthesis"]
+}
