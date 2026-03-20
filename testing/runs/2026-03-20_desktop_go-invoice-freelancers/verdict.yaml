@@ -1,0 +1,34 @@
+# Auto-generated after pipeline run
+idea_id: "go-invoice-freelancers"
+machine: "desktop"
+date: "2026-03-20"
+mode: "fast"
+engram_session_id: "validation-invoice-freelancers-latam-2026-03-20"
+
+scores:
+  problem: 70
+  market: 61
+  competitive: 52
+  bizmodel: 58
+  risk: 58
+weighted: 61.5
+verdict: "PIVOT"
+
+# Validation against suite expectations
+expected_verdict: "GO"
+verdict_match: false
+score_in_range: false                    # 61.5 not in expected [65, 80]
+expected_knockouts: []
+actual_knockouts: []
+knockout_match: true
+
+# Quality checks
+all_departments_completed: true
+schema_complete: true
+arithmetic_verified: true                # (70×.30)+(61×.25)+(52×.15)+(58×.20)+(58×.10) = 21+15.25+7.8+11.6+5.8 = 61.45 ≈ 61.5
+evidence_has_urls: true
+engram_persisted: true
+
+# Overall
+pass: false
+notes: "Verdict mismatch: expected GO but got PIVOT (61.5 < 70 threshold). Primary driver: Competitive Opportunity scored 3/20 due to Siigo/Aspel dominance ($121M PE, 2700 employees). Market SOM only $1.5M. Suite expected [65-80] but weighted score 61.5 fell below range. The idea has real pain (Problem 70) but the incumbents and small SOM pulled it down. Consider whether suite expectation should be adjusted to PIVOT, or whether the competitive scoring rubric penalizes too harshly for large incumbents in markets where they don't serve the target niche."

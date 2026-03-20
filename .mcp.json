@@ -2,7 +2,7 @@
   "mcpServers": {
     "engram": {
       "type": "stdio",
-      "command": "./tools/engram.exe",
+      "command": "./tools/engram",
       "args": [
         "mcp"
       ],

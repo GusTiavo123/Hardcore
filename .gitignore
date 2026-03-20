@@ -1,4 +1,5 @@
 # Tools binaries and dependencies (each PC runs setup.sh to install locally)
+tools/engram
 tools/engram.exe
 tools/engram.zip
 tools/node_modules/

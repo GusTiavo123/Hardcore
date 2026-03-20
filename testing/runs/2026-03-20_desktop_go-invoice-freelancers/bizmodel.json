@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "status": "warning",
+  "department": "bizmodel",
+  "executive_summary": "Unit economics viables pero ajustados para facturación freelancers LATAM — LTV/CAC 2.5x con payback 10 meses y modelo subscription validado por 5+ precedentes (Alegra, Siigo, FreshBooks/Facturama, Nubox), pero pricing power limitado por alternativas free y margen thin ante sensibilidad de precio.",
+  "score": 58,
+  "score_reasoning": "Score: 58/100\n- LTV/CAC Ratio: 13/25 (LTV $500 / CAC $200 = 2.5x; ARPU $25 from competitive benchmark, CAC $200 estimated for LATAM community channels — 1 input is assumption not benchmark, placing in tier 13-18 bottom third)\n- Revenue Model Validation: 18/25 (5 precedents using subscription for similar segment: Alegra $22M Series A 80% YoY 365K users, Siigo $121M PE 1.2M clients, FreshBooks/Facturama acquisition, Nubox 40K companies, Bonsai/HoneyBook — at least 1 well-documented, solidly in tier 13-18 top third)\n- Payback Period: 13/25 (10.0 months; CAC $200 / monthly margin $20 = 10 months — tier 7-12 months, top of tier approaching next threshold)\n- Pricing Power: 14/25 (pricing spans 9.3x from $6-$56; 1 premium player Siigo at $56; 1 free alternative Zoho Invoice + SAT free tool; tier 13-18 bottom third due to free floor pressure)\nTotal: 13 + 18 + 13 + 14 = 58",
+  "data": {
+    "recommended_model": "subscription",
+    "model_justification": "All major LATAM invoicing competitors (Siigo, Alegra, Bind ERP, Facturama) use subscription model. SaaS with recurring value from ongoing invoicing, tax compliance updates, and payment collection. Subscription aligns with continuous regulatory changes (CFDI 4.0 updates, AFIP monotributo changes, DIAN requirements) that require ongoing software maintenance and updates.",
+    "pricing_suggestion": {
+      "price_point": 25,
+      "billing": "monthly",
+      "currency": "USD",
+      "justification": "Pain intensity is high (70/100 problem score, high pain_intensity). Competitive benchmark: low $6, mid $15, high $56 USD/mo. Pricing at mid-to-high range ($25) justified by: (1) high pain allows premium over commodity tools, (2) multi-country compliance is a differentiated feature no competitor offers, (3) positioned below enterprise Siigo ($56) but above basic single-country tools ($6-15). Freelancer target can afford $25/mo given avg hourly rates $18-55 USD."
+    },
+    "unit_economics": {
+      "arpu_monthly": 25,
+      "churn_rate_monthly": 0.04,
+      "churn_source": "SMB SaaS benchmark 3-5% monthly churn (Optifai 2025 report, 939 B2B SaaS companies). Using 4.0% — middle of range, accounting for some stickiness from tax compliance lock-in (switching costs: must reconfigure CFDI/AFIP/DIAN integration).",
+      "gross_margin": 0.80,
+      "margin_source": "SaaS gross margin benchmark 75-85% (CloudZero 2025, Stripe SaaS margin guide). Using 80% — standard cloud SaaS with no heavy AI compute costs, invoicing is lightweight infrastructure.",
+      "estimated_ltv": 500,
+      "estimated_cac": 200,
+      "cac_source": "SMB SaaS CAC benchmark $300-$900 (First Page Sage 2025, Genesys Growth 2026). Adjusted down to $200 for LATAM market: (1) lower CPC in Spanish-language markets, (2) strong community channels identified (SysArmy 10K+, FrontendCafe 23K+, PHP Mexico), (3) content marketing primary channel. Fintech average $1,450 is enterprise-weighted and not applicable to SMB/freelancer segment.",
+      "ltv_cac_ratio": 2.5,
+      "payback_months": 10.0
+    },
+    "sensitivity_analysis": {
+      "cac_plus_20": {"ltv_cac_ratio": 2.08, "payback_months": 12.0, "viable": true, "assessment": "Still viable at 2.08x LTV/CAC and 12-month payback, though approaching minimum thresholds — leaves little room for further CAC increases."},
+      "churn_plus_20": {"ltv_cac_ratio": 2.08, "payback_months": 10.0, "viable": true, "assessment": "LTV drops to $417 with 4.8% churn, ratio falls to 2.08x — viable but highlights importance of strong onboarding to prevent early churn concentration typical in SMB SaaS."},
+      "price_minus_20": {"ltv_cac_ratio": 2.0, "payback_months": 12.5, "viable": true, "assessment": "At $20/mo ARPU, LTV/CAC hits exactly 2.0x boundary — technically viable but dangerously thin margins; price competition from free alternatives could push below viability."}
+    },
+    "model_precedents": [
+      {"company": "Alegra", "model": "subscription", "segment": "SMB invoicing and accounting in Latin America", "evidence": "$22.1M Series A (Riverwood Capital 2023), 365K+ registered users across 25 countries, 80% YoY growth for 7 consecutive years, expanding to Africa", "source": "https://www.riverwoodcapital.com/investment/alegra/"},
+      {"company": "Siigo/Aspel", "model": "subscription", "segment": "SMB invoicing and accounting in Mexico and Colombia", "evidence": "$121M PE investment from Accel-KKR, 1.2M+ clients, 2700 employees, acquired Aspel (Mexico leader since 1981) in 2022", "source": "https://www.accel-kkr.com/portfolio-company/siigo/"},
+      {"company": "FreshBooks (acquired Facturama)", "model": "subscription", "segment": "Freelancer invoicing globally, expanded to Mexico via Facturama acquisition", "evidence": "Acquired Facturama (19K users, Mexico CFDI) in Sep 2020 to expand LATAM presence. FreshBooks serves millions of freelancers globally with subscription model.", "source": "https://www.globenewswire.com/en/news-release/2020/09/23/2098093/0/en/FreshBooks-acquires-Mexico-Based-E-Invoicing-Company-Facturama.html"},
+      {"company": "Nubox", "model": "subscription", "segment": "SMB cloud accounting and invoicing in Chile and Colombia", "evidence": "40K+ companies, founded 2001, Riverwood Capital backed via SUMA portfolio (acquired 2016). Leading cloud SaaS for SMBs in Chile.", "source": "https://www.riverwoodcapital.com/investment/suma/"},
+      {"company": "Bonsai/HoneyBook", "model": "subscription", "segment": "Freelancer business management (invoicing, contracts, proposals)", "evidence": "HoneyBook raised $120M+ total, Bonsai widely used by freelancers. Both prove subscription model works for freelancer segment at $19-$36/mo price points.", "source": "https://www.honeybook.com/blog/honeybook-vs-bonsai"}
+    ],
+    "assumptions": [
+      "ARPU $25/mo based on competitive pricing benchmark mid-to-high range ($15-$56) and high pain intensity from Problem validation",
+      "Monthly churn 4.0% based on SMB SaaS benchmark (3-5% range) with moderate stickiness from tax compliance integration lock-in",
+      "Gross margin 80% based on standard SaaS benchmarks (75-85%) for lightweight cloud infrastructure without AI compute costs",
+      "CAC $200 estimated below US SMB benchmarks ($300-$900) due to lower LATAM CPCs and strong community acquisition channels (SysArmy, FrontendCafe)",
+      "Freemium conversion not modeled — using pure subscription with free trial (15-day trial like Alegra model)",
+      "Single-user freelancer pricing — no team/enterprise tier modeled in base case"
+    ],
+    "search_queries_used": [
+      "SaaS SMB churn rate benchmark 2025 2026",
+      "SaaS SMB customer acquisition cost CAC benchmark 2025 fintech",
+      "SaaS gross margin benchmark invoicing billing software 2025",
+      "subscription invoicing software freelancer success case study SaaS Latin America",
+      "SaaS LTV CAC benchmark fintech SMB profitwell openview 2025",
+      "Alegra SaaS fintech Latin America funding revenue growth subscription model",
+      "FreshBooks Xero subscription invoicing freelancer funding revenue ARR",
+      "SaaS CAC payback period benchmark SMB low ACV 2025 months",
+      "Contabilizate Nubox Siigo subscription accounting invoicing software Latin America SMB freelancer funding revenue",
+      "Wave FreshBooks Bonsai Honeybook subscription invoicing freelancer funding revenue ARR"
+    ],
+    "sub_scores": {
+      "ltv_cac_ratio": 13,
+      "revenue_model_validation": 18,
+      "payback_period": 13,
+      "pricing_power": 14
+    },
+    "model_score": 58
+  },
+  "evidence": [
+    {"source": "https://optif.ai/learn/questions/b2b-saas-churn-rate-benchmark/", "quote": "SMB SaaS (ACV <$10K) tolerates 3-5% monthly churn due to high volume and low CAC. Based on 939 B2B SaaS companies Q1-Q3 2025.", "reliability": "high"},
+    {"source": "https://firstpagesage.com/reports/saas-cac-payback-benchmarks/", "quote": "Companies with ACV of $5,000 or less have a median CAC payback period of 9 months. SMB SaaS CAC benchmark $300-$900.", "reliability": "high"},
+    {"source": "https://www.riverwoodcapital.com/investment/alegra/", "quote": "Alegra has grown at a yearly rate of over 80% for the seventh year running, with 365K+ registered users from 25 countries using subscription invoicing and accounting.", "reliability": "high"}
+  ],
+  "artifacts": [{"name": "bizmodel-analysis", "store": "engram", "ref": "validation/invoice-freelancers-latam/bizmodel"}],
+  "flags": ["sensitivity-fails"],
+  "next_recommended": ["risk"]
+}
