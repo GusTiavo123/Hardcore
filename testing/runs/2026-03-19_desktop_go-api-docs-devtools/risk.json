@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "department": "risk",
+  "executive_summary": "Moderate risk profile (68/100) — strong execution feasibility with mature TypeScript ecosystem and low infrastructure costs, but significant competitive concentration risk from Postman (30M+ users, Fern acquisition) and SmartBear ($1.5B+) consolidating the market, plus dependency on npm distribution channel facing escalating supply chain attacks.",
+  "score": 68,
+  "score_reasoning": "Score: 68/100 (INVERTED: 100 = lowest risk)\n- Execution Feasibility: 21/25 (TypeScript Compiler API publicly available, ts-morph with 2798 npm dependents, TypeDoc as OSS reference, 5420+ active TS job postings Feb 2026, infrastructure ~$50-200/mo at MVP scale)\n- Regulatory & Legal: 22/25 (adjusted framework count 1.0 — SOC 2 navigable via Vanta/Drata at ~$10K/yr, GDPR navigable via standard DPA templates; no enforcement actions; no pending legislation)\n- Market Timing: 16/25 (Google Trends stable/growing; 5+ new entrants in 18mo; 3+ funding rounds: Mintlify $18.5M Sep 2024, Fern $9M 2025, Postman-Fern acquisition Jan 2026; however Postman acquisition signals consolidation)\n- Dependency & Concentration: 9/25 (2 critical dependencies — TypeScript compiler/ecosystem and npm distribution channel; npm supply chain attacks doubled to 26/mo in 2025; heavy channel concentration; Postman's 30M+ users create extreme distribution asymmetry)\nTotal: 21 + 22 + 16 + 9 = 68",
+  "data": {
+    "risks": [
+      {"category": "dependency", "risk": "Heavy dependence on TypeScript ecosystem", "probability": "low", "impact": "critical", "mitigation": "Design parser architecture to be language-pluggable from day 1", "evidence": "TypeScript used by 69% of large developers (Daily.dev 2025), 5420 job postings Feb 2026", "source_department": "own-research"},
+      {"category": "dependency", "risk": "npm as primary distribution channel — supply chain attacks doubled to 26/month in 2025", "probability": "medium", "impact": "high", "mitigation": "Distribute via multiple channels (npm, Homebrew, GitHub Releases, Docker)", "evidence": "CISA alert Sep 2025 on widespread npm supply chain compromise", "source_department": "own-research"},
+      {"category": "market", "risk": "Dominant incumbent SmartBear/SwaggerHub ($1.5B+) and Postman (30M+ users) acquiring Fern", "probability": "high", "impact": "high", "mitigation": "Focus on TypeScript-native niche where incumbents are weakest", "evidence": "SmartBear 1000+ employees, Postman acquired Fern Jan 2026", "source_department": "competitive"},
+      {"category": "market", "risk": "Well-funded direct competitors Mintlify ($21.8M) and Scalar (20K+ GitHub stars)", "probability": "high", "impact": "medium", "mitigation": "Differentiate on TypeScript-native compilation, offline CLI-first workflow", "evidence": "Mintlify $18.5M Series A Sep 2024, Scalar 14K+ stars", "source_department": "competitive"},
+      {"category": "execution", "risk": "TypeScript Compiler API is complex and poorly documented for AST manipulation at scale", "probability": "medium", "impact": "medium", "mitigation": "Use ts-morph as abstraction layer; start with Express/Fastify/NestJS patterns", "evidence": "ts-morph 2798 npm dependents; TypeScript Wiki Compiler API docs are sparse", "source_department": "own-research"},
+      {"category": "financial", "risk": "Competitive pricing pressure from free/OSS alternatives compress willingness to pay", "probability": "high", "impact": "medium", "mitigation": "Position on team collaboration value, not raw doc generation", "evidence": "Pricing range $0-$3000+/mo, 3+ dominant free alternatives", "source_department": "competitive"},
+      {"category": "timing", "risk": "Postman-Fern acquisition signals market consolidation", "probability": "medium", "impact": "high", "mitigation": "Move fast; focus on underserved segments", "evidence": "Postman acquired Fern Jan 2026; SmartBear acquired Stoplight Aug 2023", "source_department": "competitive"},
+      {"category": "execution", "risk": "Hosted documentation platforms carry supply chain risk (Mintlify 5 CVEs Nov 2025)", "probability": "medium", "impact": "medium", "mitigation": "Offer self-hosted deployment; pursue SOC 2 early", "evidence": "Discord permanently abandoned Mintlify after XSS vulnerability", "source_department": "own-research"},
+      {"category": "regulatory", "risk": "SOC 2 compliance required for enterprise sales — $45K-70K initial", "probability": "high", "impact": "low", "mitigation": "Budget SOC 2 from Series A; use Vanta/Drata", "evidence": "Cavanex SOC 2 cost breakdown 2026", "source_department": "own-research"}
+    ],
+    "dependencies": [
+      {"dependency": "TypeScript language and compiler", "type": "technology", "criticality": "high", "fallback": "Could extend to JavaScript/JSDoc parsing", "history": "Maintained by Microsoft, Apache 2.0, 10+ years of growth"},
+      {"dependency": "npm package registry", "type": "channel", "criticality": "high", "fallback": "Homebrew, GitHub Releases, Docker Hub, direct binary downloads", "history": "Supply chain incidents but registry never unavailable. GitHub owns npm since 2020."},
+      {"dependency": "Developer community channels", "type": "channel", "criticality": "medium", "fallback": "Content marketing, SEO, conference talks, partnerships", "history": "No history of restricting developer tool promotion"},
+      {"dependency": "Cloud hosting providers", "type": "platform", "criticality": "medium", "fallback": "Multiple interchangeable providers", "history": "Commodity infrastructure"},
+      {"dependency": "Postman/SmartBear not entering TypeScript-native CLI niche", "type": "customer", "criticality": "medium", "fallback": "Pivot to deeper IDE integration or vertical-specific docs", "history": "Active M&A signals platform expansion intent"}
+    ],
+    "overall_risk_level": "medium",
+    "top_3_killers": [
+      {"risk": "Dominant incumbents consolidating the market through acquisitions", "why_killer": "Distribution asymmetry is extreme — Postman has 500K+ organizations. If they ship TypeScript-native doc generation, addressable market could shrink to near zero for standalone product.", "mitigation_feasible": true, "early_warning_signal": "Postman announces TypeScript-native doc generation feature"},
+      {"risk": "Free/OSS alternatives compress pricing power to unsustainable levels", "why_killer": "TypeDoc, Scalar MIT, Mintlify free tier. If market converges on free doc generation, unit economics may not support venture-scale at $7.5M SOM.", "mitigation_feasible": true, "early_warning_signal": "Mintlify expands free tier to include team features"},
+      {"risk": "npm supply chain security deterioration", "why_killer": "Attacks doubled to 26/month in 2025. Enterprise security teams restricting npm installs would reduce primary distribution channel.", "mitigation_feasible": true, "early_warning_signal": "Enterprise customers requesting non-npm installation options"}
+    ],
+    "search_queries_used": [
+      "TypeScript API documentation generation CLI open source SDK library",
+      "TypeScript developer engineer job postings API documentation tools 2025",
+      "API documentation platform infrastructure hosting cost developer tools SaaS",
+      "developer tools SaaS SOC 2 compliance cost",
+      "TypeScript compiler API open source AST parser npm packages",
+      "Mintlify Fern API documentation startup funding 2024 2025 series",
+      "Postman acquired Fern API documentation 2026 impact",
+      "Mintlify security incident breach 2025 vulnerability",
+      "API documentation Google Trends interest growing 2024 2025",
+      "developer tools CLI startup distribution channels npm GitHub marketplace",
+      "SmartBear Swagger API documentation market dominance developer tools",
+      "GDPR developer tools data processing agreement compliance SaaS startup",
+      "API documentation tools venture capital investment funding rounds 2024 2025 2026",
+      "TypeScript developer jobs demand 2025 2026 market",
+      "developer documentation SaaS hosting cost AWS infrastructure static site"
+    ],
+    "sub_scores": {"execution_feasibility": 21, "regulatory_legal": 22, "market_timing": 16, "dependency_concentration": 9},
+    "risk_score": 68
+  },
+  "evidence": [
+    {"source": "https://typescriptjobs.net/blog/top-companies-hiring-typescript-developers-february-2026", "quote": "We're tracking 5,420 active positions across 1,301 companies this month.", "reliability": "high"},
+    {"source": "https://www.npmjs.com/package/ts-morph", "quote": "TypeScript compiler wrapper. There are 2798 other projects using ts-morph.", "reliability": "high"},
+    {"source": "https://cavanex.com/blog/soc-2-compliance-cost-2026", "quote": "Most companies spend between $45,000 and $70,000 total for SOC 2 compliance in 2026.", "reliability": "high"},
+    {"source": "https://blog.postman.com/postman-acquires-fern/", "quote": "Postman has acquired Fern, a developer experience company.", "reliability": "high"},
+    {"source": "https://byteiota.com/mintlify-xss-exposes-discord-x-vercel-to-takeovers/", "quote": "Discord shut down its entire developer documentation for two hours on November 7, 2025. Discord permanently abandoned the platform.", "reliability": "medium"},
+    {"source": "https://www.cisa.gov/news-events/alerts/2025/09/23/widespread-supply-chain-compromise-impacting-npm-ecosystem", "quote": "CISA alert: Widespread Supply Chain Compromise Impacting npm Ecosystem.", "reliability": "high"},
+    {"source": "https://dataintelo.com/report/api-documentation-tools-market", "quote": "API Documentation Tools market size reached USD 1.38 billion globally in 2024, CAGR of 14.2%.", "reliability": "high"},
+    {"source": "https://openalternative.co/categories/api-documentation-generators/using/typescript", "quote": "Scalar: Open-source API documentation platform, 14,334 stars.", "reliability": "high"},
+    {"source": "https://www.npmjs.com/package/typedoc", "quote": "TypeDoc: Create API documentation for TypeScript projects. 1031 other projects using typedoc.", "reliability": "high"}
+  ],
+  "artifacts": [{"name": "risk-assessment", "store": "engram", "ref": "validation/cli-api-docs-typescript/risk"}],
+  "flags": ["dominant-incumbent-risk", "financial-viability-concern"],
+  "next_recommended": ["synthesis"]
+}

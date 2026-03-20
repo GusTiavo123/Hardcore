@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0",
+  "status": "warning",
+  "department": "competitive",
+  "executive_summary": "Crowded, validated market with 16+ competitors including a dominant incumbent (SmartBear/SwaggerHub, 1000+ employees, $1.5B+ valuation) and well-funded focused players (Mintlify $21.8M a16z-backed, ReadMe $9M with 3000+ customers, Fern $13M acquired by Postman) — but clear gaps exist around TypeScript-native CLI tooling, affordable team collaboration for mid-size companies, and docs-as-code workflows that the proposed idea directly addresses.",
+  "score": 60,
+  "score_reasoning": "Score: 60/100\n- Market Validation Signal: 17/20 (16+ competitors found: 8 direct, 4 indirect, 4 adjacent — validated active market with clear mix of direct/indirect/adjacent)\n- Competitive Opportunity: 4/20 (strongest competitor: SmartBear/SwaggerHub with 1000+ employees and $1.5B+ valuation — market dominated at scale, though doc rendering quality widely criticized as inferior; runner-up: Mintlify with $21.8M funding from a16z, 18 employees)\n- Market Gap Evidence: 14/20 (6 gaps from reviews, 4 thematically related around affordability + TypeScript-native + collaboration, 4 align with idea)\n- Pricing Intelligence: 16/20 (pricing found for 8+ competitors with tier detail for 6+: clear pricing band from $0/free to $3000+/mo identifiable)\n- Failure Intelligence: 9/20 (2 dead/disrupted competitors: Slate archived Jan 2026, Stoplight effectively sunset post-SmartBear acquisition Aug 2023; 4+ churn threads with identifiable reasons around forced migrations and pricing complaints)\nTotal: 17 + 4 + 14 + 16 + 9 = 60",
+  "data": {
+    "direct_competitors": [
+      {"name": "Mintlify", "url": "https://mintlify.com", "pricing": {"model": "freemium", "range": "$0-$250+/mo", "detail": "Hobby: Free (full platform). Pro: $250/mo (5 members). Enterprise: custom"}, "strengths": ["Beautiful docs out of the box", "Pioneered /llms.txt standard", "Auto-generates MCP servers", "Generous free tier", "Git-native MDX workflow"], "weaknesses": ["Pro $250/mo steep jump from free", "5-member Pro limit", "Security incidents Nov 2025", "Young platform"], "traction": {"funding": "$21.8M ($18.5M Series A, Sep 2024)", "employees": "18", "reviews": "6 on G2 (4.8/5)", "source": "crunchbase, g2"}, "estimated_size": "Series A, $1M+ ARR"},
+      {"name": "ReadMe", "url": "https://readme.com", "pricing": {"model": "freemium", "range": "$0-$3000+/mo", "detail": "Free/Startup $99/Business $399/Enterprise $3000+"}, "strengths": ["Best Try It testing", "AI Owlbot chatbot", "3000+ customers", "API metrics"], "weaknesses": ["Expensive fast", "WYSIWYG not docs-as-code", "Buggy editor", "Poor mobile"], "traction": {"funding": "$9M (Series A, 2019)", "employees": "~50-100", "reviews": "43 on G2", "source": "crunchbase, g2"}, "estimated_size": "$5M-$15M ARR est"},
+      {"name": "Redocly", "url": "https://redocly.com", "pricing": {"model": "freemium", "range": "$0-$69+/mo", "detail": "OSS Free/Pro ~$69-99/Enterprise custom"}, "strengths": ["24k+ GitHub stars", "Best OpenAPI rendering", "Excellent CLI", "Git-native"], "weaknesses": ["OpenAPI-only focus", "Limited social proof"], "traction": {"funding": "Seed", "employees": "~50", "reviews": "1 on G2", "source": "pitchbook"}, "estimated_size": "Seed stage"},
+      {"name": "Fern (acquired by Postman)", "url": "https://buildwithfern.com", "pricing": {"model": "freemium", "range": "$0-$49/user/mo", "detail": "Postman pricing: Basic $14/Pro $29/Enterprise $49 per user"}, "strengths": ["SDK generation 9 languages", "150+ customers", "YC-backed", "Postman distribution"], "weaknesses": ["Integration in progress", "May lose identity"], "traction": {"funding": "$13M ($9M Series A, 2025)", "employees": "~15-25", "reviews": "Limited", "source": "crunchbase"}, "estimated_size": "Acquired by Postman Jan 2026"},
+      {"name": "Stoplight (SmartBear)", "url": "https://stoplight.io", "pricing": {"model": "freemium", "range": "$0-$362/mo", "detail": "Free/Basic $44/Startup $113/Pro $362"}, "strengths": ["Visual API designer", "Mock servers"], "weaknesses": ["No updates since acquisition", "Forced migration", "Uncertain future"], "traction": {"funding": "$21.9M (acquired)", "employees": "~5", "reviews": "Multiple pre-acquisition", "source": "tracxn"}, "estimated_size": "Being sunset"},
+      {"name": "Scalar", "url": "https://scalar.com", "pricing": {"model": "freemium", "range": "$0-$24+/mo", "detail": "Free MIT/Pro $24/Enterprise custom"}, "strengths": ["Best playground", "20K+ GitHub stars", "Affordable"], "weaknesses": ["Newer", "Smaller ecosystem"], "traction": {"funding": "1 investor", "employees": "~10-20", "reviews": "Limited", "source": "tracxn"}, "estimated_size": "Early stage"},
+      {"name": "SwaggerHub/SmartBear API Hub", "url": "https://swagger.io", "pricing": {"model": "freemium", "range": "$0-$59+/mo", "detail": "OSS Free/Individual $23/Enterprise $59"}, "strengths": ["Industry standard", "50+ language codegen", "Massive ecosystem"], "weaknesses": ["Opaque pricing", "Confusing feature matrix", "Inferior doc rendering"], "traction": {"funding": "SmartBear $1.5B+ valuation", "employees": "1000+", "reviews": "High counts", "source": "smartbear.com"}, "estimated_size": "$1.5B+ parent"},
+      {"name": "Bump.sh", "url": "https://bump.sh", "pricing": {"model": "subscription", "range": "$50-$250+/mo", "detail": "Basic $50/Pro $250/Custom"}, "strengths": ["Unique change management", "Auto changelog"], "weaknesses": ["No free tier", "Narrow focus", "Steep for specialization"], "traction": {"funding": "Unknown", "employees": "~10-15", "reviews": "Limited", "source": "bump.sh"}, "estimated_size": "Early stage"}
+    ],
+    "indirect_competitors": [
+      {"name": "TypeDoc", "url": "https://typedoc.org", "approach": "OSS CLI generates HTML from TypeScript source. Library docs only", "relevance": "Closest to TS-native CLI but no API playground, no collaboration, no hosted portal. 1031 npm dependents"},
+      {"name": "Docusaurus", "url": "https://docusaurus.io", "approach": "Meta's OSS React docs framework. Needs plugin for OpenAPI", "relevance": "Free but more setup, not TS-native. ~40% lower ops cost vs SaaS"},
+      {"name": "GitBook", "url": "https://gitbook.com", "approach": "WYSIWYG docs with Git sync. $79/site + $10-15/user/mo", "relevance": "Not TS-native, not CLI-first"},
+      {"name": "Document360", "url": "https://document360.com", "approach": "Knowledge management platform with API docs feature", "relevance": "Knowledge base focus, not API-first"}
+    ],
+    "adjacent_competitors": [
+      {"name": "Postman", "url": "https://postman.com", "current_focus": "API testing platform, 30M+ users, acquired Fern", "pivot_threat": "Already in docs via Fern acquisition", "evidence": "Fern acquired Jan 2026"},
+      {"name": "DeepDocs", "url": "https://deepdocs.dev", "current_focus": "AI software documentation platform", "pivot_threat": "Could extend to TS-specific API docs", "evidence": "Active marketing on doc drift"},
+      {"name": "Apidog", "url": "https://apidog.com", "current_focus": "All-in-one API platform", "pivot_threat": "Could add TS-native features", "evidence": "Marketing as Stoplight/Postman alternative"},
+      {"name": "APIDoc v5.0", "url": "https://www.apidoc.app", "current_focus": "Multi-protocol docs from TypeScript code", "pivot_threat": "Already TS-native CLI, could add collaboration", "evidence": "Native TS compilation, interactive CLI"}
+    ],
+    "failed_competitors": [
+      {"name": "Slate", "url": "https://github.com/slatedocs/slate", "year_failed": 2026, "reason_failed": "Creator archived Jan 2026 in protest. Used by NASA, Sony, Best Buy. 36.2K stars", "source": "https://github.com/slatedocs/slate"},
+      {"name": "Stoplight", "url": "https://stoplight.io", "year_failed": 2023, "reason_failed": "Acquired by SmartBear Aug 2023, no updates since, customers forced to migrate", "source": "https://dev.to/arobakid/how-to-migrate-from-stoplight-a-complete-guide-to-better-api-documentation-alternatives-in-2025-202i"}
+    ],
+    "market_gaps": [
+      {"gap": "Expensive pricing for mid-size teams", "mention_count": 15, "sources": ["ToolRadar", "Reddit", "Dev.to", "G2 reviews"], "aligns_with_idea": true},
+      {"gap": "No TypeScript-native documentation generation", "mention_count": 5, "sources": ["overcast.blog", "TypeDoc limitations", "alternativeto.net"], "aligns_with_idea": true},
+      {"gap": "Poor docs-as-code workflow in WYSIWYG tools", "mention_count": 8, "sources": ["ToolRadar", "ReadMe reviews", "technicalwriterhq", "Reddit"], "aligns_with_idea": true},
+      {"gap": "Limited team collaboration at affordable price points", "mention_count": 10, "sources": ["Mintlify Pro 5-member limit", "Stoplight Basic 3 users", "Bump.sh Basic 3 users", "GitBook dual pricing"], "aligns_with_idea": true},
+      {"gap": "Poor mobile editing experience", "mention_count": 3, "sources": ["ReadMe review", "G2"], "aligns_with_idea": false},
+      {"gap": "Search functionality for large doc sites", "mention_count": 4, "sources": ["ReadMe complaints", "Stoplight pain points"], "aligns_with_idea": false}
+    ],
+    "pricing_benchmark": {"low": 0, "mid": 99, "high": 3000, "currency": "USD/mo", "model": "per-seat", "free_alternatives_exist": true, "competitors_with_pricing": 8},
+    "search_queries_used": [
+      "API documentation generation tool G2 alternatives reviews",
+      "API documentation platform Capterra reviews comparison",
+      "API documentation tool TypeScript ProductHunt",
+      "API documentation software alternatives comparison 2025",
+      "API documentation startup funding Crunchbase series A series B",
+      "API documentation tool shutdown failed post-mortem pivoted",
+      "Mintlify funding Crunchbase valuation 2024 2025",
+      "ReadMe API documentation funding Crunchbase employees",
+      "Stoplight API documentation funding employees Crunchbase",
+      "Redocly API documentation funding employees pricing",
+      "Fern API documentation startup funding investors",
+      "ReadMe.io G2 reviews rating API documentation 2024 2025",
+      "Mintlify G2 reviews complaints weaknesses negative review",
+      "ReadMe API documentation G2 reviews complaints negative",
+      "SwaggerHub Stoplight churn cancel switched alternative reddit",
+      "Slate API documentation archived shutdown January 2026",
+      "Bump.sh Theneo Apidog funding traction",
+      "Scalar API documentation GitHub stars funding",
+      "TypeScript API documentation generator TypeDoc alternatives CLI",
+      "ReadMe API documentation reviews G2 pricing"
+    ],
+    "sub_scores": {"market_validation": 17, "competitive_opportunity": 4, "gap_evidence": 14, "pricing_intelligence": 16, "failure_intelligence": 9},
+    "competitive_score": 60
+  },
+  "evidence": [
+    {"source": "https://toolradar.com/blog/best-api-documentation-tools", "quote": "Mintlify Pro at $250/month is a jump from free. ReadMe gets expensive fast — Startup $79 to Business $349 steep.", "reliability": "medium"},
+    {"source": "https://www.cbinsights.com/company/mintlify/financials", "quote": "Mintlify has raised $21.8M over 3 rounds. Latest funding round was a Series A for $18.5M on September 5, 2024.", "reliability": "high"},
+    {"source": "https://sacra.com/c/mintlify/", "quote": "Mintlify raised an $18M Series A in September 2024 led by Andreessen Horowitz.", "reliability": "high"},
+    {"source": "https://tracxn.com/d/companies/readme/__82GSpsc8bUCwffMFY8qofmAuacf30CexllehGP79Hf0/funding-and-investors", "quote": "ReadMe has raised a total funding of $9M over 4 rounds from 12 investors.", "reliability": "high"},
+    {"source": "https://www.g2.com/sellers/readme-d9598c4e-09d2-410d-973f-e2de04d99f12", "quote": "ReadMe powers interactive developer hubs for more than 3000 leading API platform teams. Read 43 Reviews on G2.", "reliability": "high"},
+    {"source": "https://siliconangle.com/2025/04/10/fern-gets-9m-funding-automate-creation-maintenance-software-development-kits/", "quote": "Fern gets $9M in funding. Total capital raised $13 million, 150+ organizations as customers.", "reliability": "high"},
+    {"source": "https://dev.to/arobakid/how-to-migrate-from-stoplight-a-complete-guide-to-better-api-documentation-alternatives-in-2025-202i", "quote": "Since SmartBear acquired Stoplight in 2023: No updates to Studio. Customers pushed to API Hub.", "reliability": "medium"},
+    {"source": "https://github.com/slatedocs/slate", "quote": "Slate was an API documentation generator created by @lord in 2013. Used by NASA, Sony, Best Buy. Archived Jan 2026. 36.2K stars.", "reliability": "high"},
+    {"source": "https://www.reddit.com/r/microservices/comments/1212kud/swagger_hub_alternatives/", "quote": "Looking for alternative to SwaggerHub. Reason: SwaggerHub is really expensive tool.", "reliability": "medium"}
+  ],
+  "artifacts": [{"name": "competitive-analysis", "store": "engram", "ref": "validation/cli-api-docs-typescript/competitive"}],
+  "flags": ["dominant-incumbent-found"],
+  "next_recommended": ["bizmodel"]
+}

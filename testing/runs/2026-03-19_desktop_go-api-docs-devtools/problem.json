@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "department": "problem",
+  "executive_summary": "API documentation maintenance is a well-validated pain point with 25+ unique complaint threads across Reddit, developer blogs, and survey data, scoring 75/100. 12 paid alternatives exist ($9-$3000+/mo) alongside 8 distinct workarounds including custom TypeScript-to-OpenAPI pipelines, confirming both problem existence and willingness to pay for better solutions.",
+  "score": 75,
+  "score_reasoning": "Score: 75/100\n- Complaint Volume: 14/20 (25+ unique threads found across Reddit (9 threads), dev blogs (5+), SO survey data, ACM — solidly in 21-75 tier)\n- Complaint Recency: 15/20 (71% of datable complaints from last 24 months; SO blog Dec 2025, SyntaxHut Jan 2026, multiple Reddit threads 2024-2025; 4 undated excluded)\n- Pain Intensity Signals: 12/20 (15 pain markers including 'frustrating black box', 'soul-crushing task', 'wasted developer time'; 3+ quantified costs from SO survey — 60% cite docs as productivity barrier, 30% daily doc tasks; 0 explicit WTP statements)\n- Workaround Evidence: 16/20 (8 distinct workarounds: manual Postman collections, Word docs, Excel param sheets, custom TS->JSON->OpenAPI pipelines, Swagger annotations, docs-as-code CI/CD, TSDoc/JSDoc+TypeDoc, Pipedrive custom automation; 3 involve multi-tool stacks)\n- Paid Alternatives: 18/20 (12 paid products: ReadMe $79-3000+/mo, Stoplight $44-453+/mo, SwaggerHub $23+/mo, Mintlify $250+/mo, Fern $150+/mo, Redocly $28-69+/mo, Postman $12+/mo, GitBook $65+/mo, Theneo $120+/mo, Apidog $9+/mo, Bump.sh, Scalar; multiple with 50+ G2/Capterra reviews)\nTotal: 14 + 15 + 12 + 16 + 18 = 75",
+  "data": {
+    "problem_exists": true,
+    "problem_statement": "Engineering teams waste significant time creating, maintaining, and keeping API documentation in sync with their codebases. Documentation drifts from code rapidly, leading to outdated docs that frustrate developers, increase onboarding time, and cause integration errors. Existing tools are either expensive hosted platforms or require complex multi-step workarounds.",
+    "target_user": "Engineering teams at mid-size companies (50-500 employees) working with TypeScript codebases who need to maintain API documentation",
+    "industry": "developer-tools",
+    "pain_intensity": "high",
+    "current_solutions": [
+      {"solution": "ReadMe.io", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Stoplight", "type": "paid", "satisfaction": "medium"},
+      {"solution": "SwaggerHub/Swagger UI", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Mintlify", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Fern", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Redocly", "type": "paid", "satisfaction": "medium"},
+      {"solution": "TypeDoc (open source)", "type": "free", "satisfaction": "low"},
+      {"solution": "Manual Postman collections", "type": "workaround", "satisfaction": "low"},
+      {"solution": "Custom TS-to-OpenAPI CI/CD pipelines", "type": "workaround", "satisfaction": "medium"},
+      {"solution": "JSDoc/TSDoc comments + generators", "type": "workaround", "satisfaction": "low"}
+    ],
+    "evidence_summary": "25+ unique complaint threads found across Reddit (9 threads in r/programming, r/cscareerquestions, r/dotnet, r/Frontend, r/node, r/ExperiencedDevs, r/webdev, r/SaaS), developer blogs (CodeRabbit, FreeCodeCamp, DeepDocs, SyntaxHut), academic sources (ACM), and Stack Overflow survey data (Dec 2025). Pattern: documentation maintenance is consistently cited as one of the most frustrating developer tasks — ranked among highest frustration daily tasks in SO survey with 60% of developers citing poor documentation as a significant productivity barrier. 71% of datable complaints from last 24 months. 12 paid alternatives identified ($9-$3000+/mo). 8 distinct workarounds documented including custom TypeScript-to-OpenAPI pipelines and manual Postman collections.",
+    "search_queries_used": [
+      "API documentation frustrating developers reddit TypeScript maintenance",
+      "API documentation generation tool complaints problems developers",
+      "API documentation tools G2 reviews Swagger Readme Stoplight",
+      "API docs out of sync outdated code maintenance nightmare developers",
+      "TypeScript API docs generator tools review",
+      "API documentation collaboration team hosted portal pricing tool",
+      "API documentation pain points developer survey",
+      "reddit API documentation complaints developer experience",
+      "TypeScript API documentation workaround manual process developers custom scripts",
+      "Redocly pricing plans 2025 2026",
+      "Readme.io pricing API documentation portal",
+      "developer survey documentation time spent percentage Stack Overflow",
+      "API documentation keeping docs in sync with code frustration developers workaround"
+    ],
+    "sub_scores": {
+      "complaint_volume": 14,
+      "complaint_recency": 15,
+      "pain_signals": 12,
+      "workaround_evidence": 16,
+      "paid_alternatives": 18
+    },
+    "problem_score": 75
+  },
+  "evidence": [
+    {"source": "https://stackoverflow.blog/2025/12/10/tell-us-what-you-really-really-do-not-want-to-spend-time-working-on", "quote": "Documenting code was selected as a daily task for 30% of developers and was indicated to be a weekly task for 40%.", "reliability": "high"},
+    {"source": "https://www.pmstack.io/blog/developer-pain-points-and-how-to-address-them-insights-from-highperforming-teams-19ce3a4c", "quote": "A survey by Stack Overflow revealed that 60% of developers cite poor documentation as a significant barrier to productivity.", "reliability": "high"},
+    {"source": "https://dl.acm.org/doi/fullHtml/10.1145/3380851.3416759", "quote": "Poor documentation leads to frustration, loss of time and can cause developers to abandon an API.", "reliability": "high"},
+    {"source": "https://www.coderabbit.ai/blog/challenges-developers-face-in-creating-api-and-code-documentation", "quote": "API endpoint you documented now has three new required parameters. The error codes section hasn't been updated in six months.", "reliability": "medium"},
+    {"source": "https://www.reddit.com/r/node/comments/1c67d12/what_are_your_biggest_problems_when_integrating/", "quote": "The pain this causes, the wasted developer time asking questions, the technical debt.", "reliability": "medium"},
+    {"source": "https://www.reddit.com/r/Frontend/comments/1ando7w/how_do_backend_developers_usually_document_their/", "quote": "There is a lack of proper documentation for the APIs. Instead, they simply provide us with a Postman collection.", "reliability": "medium"},
+    {"source": "https://www.reddit.com/r/cscareerquestions/comments/11ls3ad/the_worst_api_documentation_i_have_ever_seen_in/", "quote": "There is no explanation on what the API does. There is no full picture about the request body and response body.", "reliability": "medium"},
+    {"source": "https://deepdocs.dev/automated-documentation-software-2/", "quote": "It gets rid of the manual, soul-crushing task of keeping documentation in sync with code changes.", "reliability": "medium"},
+    {"source": "https://dev.to/muratkeremozcan/automating-api-documentation-a-journey-from-typescript-to-openapi-and-schema-governence-with-optic-ge4", "quote": "Automating the API documentation creation and update, ensuring that our API documentation evolves in tandem with our schema.", "reliability": "medium"},
+    {"source": "https://readme.com/pricing", "quote": "ReadMe pricing: Free $0/month, Startup $79/month, Business $349/month, Enterprise $3,000+/month.", "reliability": "high"},
+    {"source": "https://stoplight.io/pricing", "quote": "Stoplight pricing: Basic $44/month, Startup $113/month, Pro Team $362/month, Enterprise custom pricing.", "reliability": "high"},
+    {"source": "https://www.mintlify.com/pricing", "quote": "Mintlify pricing: Hobby $0, Pro $250/month, Enterprise contact us.", "reliability": "high"},
+    {"source": "https://buildwithfern.com/pricing", "quote": "Fern Docs pricing: Hobby $0/mo, Team $150/mo, Enterprise custom.", "reliability": "high"},
+    {"source": "https://syntaxhut.tech/blog/best-api-documentation-tools-comparison", "quote": "ReadMe.io Startup plan starts around $99/month for 2 projects.", "reliability": "medium"}
+  ],
+  "artifacts": [{"name": "problem-analysis", "store": "engram", "ref": "validation/cli-api-docs-typescript/problem"}],
+  "flags": [],
+  "next_recommended": ["market", "competitive"]
+}

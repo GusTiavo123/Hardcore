@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "status": "warning",
+  "department": "market",
+  "executive_summary": "API documentation tools market valued at $1.29-1.7B (2024) with ~11.2% CAGR, placing this in a growing market with solid data coverage. SOM estimated at $7.5M with 3 identifiable early adopter segments (TypeScript/Node developers, DevRel teams, VC-backed startup engineering teams) reachable through channels totaling 800K+ combined members, though the modest SOM limits the immediate opportunity ceiling.",
+  "score": 64,
+  "score_reasoning": "Score: 64/100\n- Data Availability: 22/25 (6+ market size estimates found from multiple sources including Dataintelo, Growth Market Reports, WiseGuy Reports, Verified Market Reports, Fortune BI, Research and Markets — all published 2025; API documentation tools estimates converge within 1.3x at $1.29B-$1.7B)\n- Market Scale (SOM): 11/25 (SOM $7.5M based on 2% of $373M SAM; TAM is in $1-10B range so 2-3% convention applies; cross-validated against Mintlify reaching $1M+ ARR in ~2 years with 35 employees)\n- Growth Trajectory: 14/25 (Median CAGR 11.2% from 3 sources: Dataintelo 14.2%, Growth Market Reports 10.4%, WiseGuy ~11.2% implied; solidly in 10-24% tier but at the lower end)\n- Early Adopter Identifiability: 17/25 (3 segments meeting all 3 criteria: TypeScript/Node devs at mid-size SaaS cos, DevRel/API platform teams, VC-backed startup engineering teams; channels include r/node 334K, r/reactjs 493K, API World conference 3K+, dev.to 1M+, Hacker News 500K+)\nTotal: 22 + 11 + 14 + 17 = 64",
+  "data": {
+    "tam": {"value": 1380000000, "currency": "USD", "source": "Dataintelo (2025), Growth Market Reports (2025), WiseGuy Reports (2025) — median of $1.29B, $1.38B, $1.7B estimates", "methodology": "top-down-institutional"},
+    "sam": {"value": 373000000, "currency": "USD", "source": "Filtered from TAM: cloud-based deployment, SME + mid-size enterprise, software component only, North America + Europe focus (~27% of TAM)", "methodology": "top-down-institutional"},
+    "som": {"value": 7500000, "currency": "USD", "source": "2% of SAM ($373M) per scoring convention for $1B-$10B TAM range; cross-checked against Mintlify ($1M+ ARR in ~2 years with 35 people)", "methodology": "top-down-estimated"},
+    "growth_rate": "11.2% CAGR (2025-2033)",
+    "growth_source": "Median of Dataintelo (14.2%), Growth Market Reports (10.4%), WiseGuy Reports (~11.2% implied)",
+    "market_stage": "growing",
+    "early_adopters": [
+      {"segment": "TypeScript/Node.js developers at mid-size SaaS companies", "estimated_size": 50000, "evidence_of_spending": "Pay for ReadMe ($99-$399/mo), Mintlify, Stoplight, Redocly — established purchasing pattern for documentation tools", "reachable_channels": [{"name": "r/node", "type": "subreddit", "members": 334169}, {"name": "r/reactjs", "type": "subreddit", "members": 493000}, {"name": "r/typescript", "type": "subreddit", "members": 15000}, {"name": "TypeScript Discord communities", "type": "other", "members": 5000}]},
+      {"segment": "API platform teams and Developer Relations (DevRel) professionals", "estimated_size": 20000, "evidence_of_spending": "Budget $100K-$400K annually on documentation tooling (LinkedIn/DX reports); pay for Postman ($49-$499/mo), ReadMe, Stoplight enterprise plans", "reachable_channels": [{"name": "API World Conference", "type": "conference", "members": 3000}, {"name": "dev.to community", "type": "other", "members": 1000000}, {"name": "Write the Docs community", "type": "conference", "members": 5000}]},
+      {"segment": "Engineering teams at VC-backed startups (50-500 employees)", "estimated_size": 30000, "evidence_of_spending": "Mintlify reports 20%+ of recent YC batch as customers; startups actively budget for developer tools; Fern and Mintlify prove purchasing intent in this segment", "reachable_channels": [{"name": "Hacker News", "type": "other", "members": 500000}, {"name": "r/startups", "type": "subreddit", "members": 1200000}, {"name": "ProductHunt", "type": "other", "members": 500000}]}
+    ],
+    "search_queries_used": [
+      "API documentation tools market size 2024 2025 2026",
+      "API management platform market size TAM SAM report statista grand view research",
+      "API documentation software CAGR forecast 2025 2030",
+      "developer documentation tools market growth rate revenue",
+      "engineering teams mid-size companies API documentation spending budget willingness to pay",
+      "TypeScript developers community subreddit conference meetup members",
+      "r/typescript members subscribers reddit 2025",
+      "Readme.io Mintlify Fern funding revenue ARR developer documentation startup"
+    ],
+    "sub_scores": {"data_availability": 22, "market_scale": 11, "growth_trajectory": 14, "early_adopter_identifiability": 17},
+    "market_score": 64
+  },
+  "evidence": [
+    {"source": "https://dataintelo.com/report/api-documentation-tools-market", "quote": "The API Documentation Tools market size reached USD 1.38 billion globally in 2024, with a robust compound annual growth rate (CAGR) of 14.2% projected through 2033.", "reliability": "medium"},
+    {"source": "https://growthmarketreports.com/report/api-documentation-tools-market", "quote": "The global API Documentation Tools market size reached USD 1.29 billion in 2024. The market is projected to expand at a CAGR of 10.4% from 2025 to 2033.", "reliability": "medium"},
+    {"source": "https://www.wiseguyreports.com/reports/api-documentation-management-software-market", "quote": "The API Documentation Management Software Market Size was valued at 1,700 USD Million in 2024.", "reliability": "medium"},
+    {"source": "https://www.researchandmarkets.com/report/api-management", "quote": "The API Management Market, valued at USD 6.9B in 2024, is projected to reach USD 24.1B by 2030, growing at a 23% CAGR.", "reliability": "high"},
+    {"source": "https://aeo.sig.ai/brands/mintlify", "quote": "Mintlify achieved $1M+ ARR in 2024 and raised $21.7M total funding, including an $18.5M Series A led by Andreessen Horowitz.", "reliability": "medium"},
+    {"source": "https://getdx.com/blog/developer-documentation/", "quote": "Poor documentation easily costs $500K-$2M annually in a mid-sized engineering team.", "reliability": "medium"},
+    {"source": "https://techcrunch.com/2024/09/05/mintlify-is-building-a-next-gen-platform-for-writing-software-docs/", "quote": "Mintlify, a startup building a next-gen platform for writing software docs, has raised $18.5 million in a new funding round.", "reliability": "high"},
+    {"source": "https://siliconangle.com/2025/04/10/fern-gets-9m-funding-automate-creation-maintenance-software-development-kits/", "quote": "Fern gets $9M in funding to automate the creation and maintenance of software development kits.", "reliability": "high"},
+    {"source": "https://subranking.com/subreddit/node", "quote": "r/node has 334,169 members, experiencing strong growth with 4,099 new members in the last 30 days.", "reliability": "medium"},
+    {"source": "https://jobs.ashbyhq.com/Mintlify/40f8d981-eb4f-421c-9477-786de42a588f", "quote": "Mintlify docs platform serves 100 million+ developers every year and powers documentation for 18,000+ companies.", "reliability": "medium"}
+  ],
+  "artifacts": [{"name": "market-analysis", "store": "engram", "ref": "validation/cli-api-docs-typescript/market"}],
+  "flags": ["som-is-estimate"],
+  "next_recommended": ["bizmodel"]
+}
