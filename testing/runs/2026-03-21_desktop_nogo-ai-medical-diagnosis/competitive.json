@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0",
+  "status": "warning",
+  "department": "competitive",
+  "executive_summary": "The AI medical diagnostics space is a heavily validated but dominated market (59/100) with 17+ competitors including public companies Tempus ($12.8B market cap) and HeartFlow ($1.5B valuation), plus heavily funded players like Aidoc ($420M+), Viz.ai ($252M), and Lunit ($561M) — ALL operating with physician oversight; the only FDA-approved autonomous AI diagnostic (IDx-DR) covers diabetic retinopathy only, and multiple companies that aggressively pursued autonomous AI diagnosis (Babylon Health $4B, Olive AI $4B) have collapsed.",
+  "score": 59,
+  "score_reasoning": "Score: 59/100\n- Market Validation Signal: 18/20 (17+ competitors found: 9 direct, 5 indirect, 3 adjacent — clear mix of direct AI diagnostic companies, imaging incumbents, and adjacent symptom checkers validates an active, well-funded market)\n- Competitive Opportunity: 2/20 (strongest competitor: Tempus AI — public company NASDAQ:TEM, $12.8B market cap, $1.27B revenue, 2000+ employees; runner-up: Aidoc — $420M+ funding, 1600+ hospitals, 20+ FDA clearances — market heavily dominated by well-capitalized incumbents)\n- Market Gap Evidence: 12/20 (5 gaps identified from reviews: AI accuracy only 50-62% for symptom checkers, no autonomous approval for serious conditions, poor EHR integration, geographic access limits, cost barriers — at least 2 thematically related around accuracy/autonomy, but the key gap of autonomous diagnosis exists due to regulatory prohibition rather than market failure)\n- Pricing Intelligence: 12/20 (pricing found for 4 competitors with meaningful detail: Ada Health free/$9.99/mo, K Health $29-$49/mo, HeartFlow per-procedure/public, enterprise models for Aidoc/Tempus/PathAI; consumer tier $0-$49/mo, enterprise tier $100K+/yr)\n- Failure Intelligence: 15/20 (4 dead competitors with 3+ detailed post-mortems: Babylon Health 2023 $4B collapse, Olive AI 2023 $4B shutdown, Kintsugi 2026 $30M shutdown, Cydoc 2025 7-year failure; clear failure patterns: overpromised AI autonomy, unsustainable unit economics, regulatory runway mismatch, EHR integration costs)\nTotal: 18 + 2 + 12 + 12 + 15 = 59",
+  "data": {
+    "direct_competitors": [
+      {
+        "name": "Tempus AI",
+        "url": "https://www.tempus.com/",
+        "pricing": {"model": "usage", "range": "Per-test genomic sequencing, enterprise contracts", "detail": "Public company (NASDAQ: TEM), $1.27B revenue in 2025, per-test pricing for genomic profiling, data licensing to pharma"},
+        "strengths": ["Largest clinical+molecular data library in oncology", "AI-powered precision medicine platform", "Public company with 83% YoY revenue growth", "Acquired Paige AI ($81M) and Arterys for pathology+radiology", "Multi-modal: genomics, digital pathology, clinical data"],
+        "weaknesses": ["Not profitable yet despite $1.27B revenue", "Focused on oncology, limited in cardiac/general diagnostics", "Complex enterprise sales cycle", "Requires physician interpretation of results"],
+        "traction": {"funding": "$2.3B+ total raised, IPO 2024", "employees": "2000+", "reviews": "Limited G2/Capterra presence (enterprise/clinical product)", "source": "crunchbase, nasdaq"},
+        "estimated_size": "Public company, $12.8B market cap, $1.27B annual revenue"
+      },
+      {
+        "name": "Aidoc",
+        "url": "https://www.aidoc.com/",
+        "pricing": {"model": "subscription", "range": "Enterprise per-study or annual platform fee", "detail": "Custom enterprise pricing, available via AWS Marketplace, annual aiOS platform license"},
+        "strengths": ["20+ FDA clearances (most in radiology AI)", "1600+ hospitals deployed, 45M patients annually", "aiOS platform consolidates multiple AI algorithms", "93% sensitivity for pulmonary embolism detection", "30% reduction in turnaround time for critical cases"],
+        "weaknesses": ["Enterprise-only, no patient-facing product", "Custom pricing not transparent", "Radiology-focused, expanding to cardiology/oncology", "Requires existing PACS/EMR infrastructure"],
+        "traction": {"funding": "$420M+ total ($150M Series E July 2025)", "employees": "300+", "reviews": "Limited public reviews (enterprise B2B)", "source": "crunchbase, fiercehealthcare"},
+        "estimated_size": "Late-stage, $420M+ raised, approaching $1B+ valuation"
+      },
+      {
+        "name": "Viz.ai",
+        "url": "https://www.viz.ai/",
+        "pricing": {"model": "subscription", "range": "Enterprise per-hospital annual contracts", "detail": "Platform licensing for care coordination, custom pricing per health system"},
+        "strengths": ["AI-powered care coordination for time-sensitive conditions", "1700+ hospitals in US and Europe", "Stroke detection with rapid alert to care teams", "$48.8M revenue in 2024", "Strong integration with existing clinical workflows"],
+        "weaknesses": ["Focused primarily on stroke/neurovascular", "Enterprise sales cycle is long", "Limited to imaging-based conditions", "Not patient-facing"],
+        "traction": {"funding": "$252M+ raised, Series D", "employees": "312-395", "reviews": "Limited public reviews", "source": "crunchbase, tracxn, getlatka"},
+        "estimated_size": "Unicorn, $1.2B valuation, $48.8M revenue"
+      },
+      {
+        "name": "PathAI",
+        "url": "https://www.pathai.com/",
+        "pricing": {"model": "subscription", "range": "Enterprise platform licensing + per-case for biopharma", "detail": "AISight platform for labs, partnership pricing for pharma clinical trials"},
+        "strengths": ["450+ pathologists, 15M+ annotated images", "FDA 510(k) + CE-IVDR certified", "Partnership with Quest Diagnostics", "Open ecosystem via AISight Link API", "Leader in digital pathology AI"],
+        "weaknesses": ["Pathology-only, not general diagnostics", "Requires digital pathology infrastructure", "Enterprise/biopharma focused", "Complex integration with lab workflows"],
+        "traction": {"funding": "$240M+ raised", "employees": "200+", "reviews": "Limited public reviews", "source": "crunchbase, inventiva"},
+        "estimated_size": "Late-stage, $240M+ raised"
+      },
+      {
+        "name": "Ada Health",
+        "url": "https://ada.com/",
+        "pricing": {"model": "freemium", "range": "Free - $9.99/mo premium", "detail": "Free symptom assessment, Premium plan $9.99/mo with personalized health insights. Enterprise B2B for health systems."},
+        "strengths": ["#1 medical app in 130+ countries", "6M+ users, 45K daily assessments", "AI symptom checker with personalized results", "Free tier drives adoption", "CE-marked medical device in EU"],
+        "weaknesses": ["Accuracy ~50-70% depending on study", "Not a diagnostic tool — triage/guidance only", "Cannot prescribe or treat", "Premium conversion rates unclear", "No physician oversight built in"],
+        "traction": {"funding": "$200M+ raised", "employees": "200+", "reviews": "4.5+ stars on app stores, Trustpilot reviews", "source": "crunchbase, app stores"},
+        "estimated_size": "Late-stage, $200M+ raised"
+      },
+      {
+        "name": "K Health",
+        "url": "https://khealth.com/",
+        "pricing": {"model": "subscription", "range": "$29-$49/mo", "detail": "$29/mo primary care access, $49/mo with mental health, $73/mo for weight loss program. No insurance required."},
+        "strengths": ["24/7 AI-powered primary care access", "Licensed physicians in the loop", "Affordable vs traditional care", "AI symptom checker is free entry point", "Treats 100s of conditions"],
+        "weaknesses": ["US-only (48 continental states)", "Text-based, limited examination capability", "AI assists but doesn't diagnose autonomously", "Mental health limited to medication management", "3/5 stars on some review platforms"],
+        "traction": {"funding": "$270M+ raised", "employees": "200+", "reviews": "4.4 stars App Store, mixed Trustpilot", "source": "crunchbase, choosingtherapy"},
+        "estimated_size": "Late-stage, $270M+ raised"
+      },
+      {
+        "name": "HeartFlow",
+        "url": "https://www.heartflow.com/",
+        "pricing": {"model": "usage", "range": "Per-procedure, reimbursement-based", "detail": "Public company (NASDAQ: HTFL), per-procedure billing, UnitedHealthcare coverage secured. 70% gross margins."},
+        "strengths": ["FDA-cleared AI cardiac diagnostic", "Public company with 38% YoY revenue growth", "AI converts CT images to 3D heart models", "Non-invasive alternative to catheterization", "Backed by Bain Capital, $554M raised"],
+        "weaknesses": ["Cardiac-only, very narrow focus", "99% of revenue from single product (FFRCT)", "Still not profitable", "Requires coronary CTA imaging as input"],
+        "traction": {"funding": "$554M raised, IPO raised $364M", "employees": "688", "reviews": "Limited patient-facing reviews", "source": "nasdaq, getlatka"},
+        "estimated_size": "Public company, $1.5B valuation, $161M annual revenue"
+      },
+      {
+        "name": "Digital Diagnostics (LumineticsCore/IDx-DR)",
+        "url": "https://www.digitaldiagnostics.com/",
+        "pricing": {"model": "usage", "range": "Per-test, CMS reimbursement-based", "detail": "FDA De Novo cleared autonomous AI. Reimbursed by CMS. Per-screening fee at point of care."},
+        "strengths": ["ONLY FDA-approved fully autonomous AI diagnostic", "No physician interpretation needed", "Point-of-care diabetic retinopathy screening", "Published in Nature, NEJM", "Deployed at major health systems"],
+        "weaknesses": ["Extremely narrow: diabetic retinopathy ONLY", "Cannot diagnose cancer, cardiac, or other conditions", "Took 20+ years of research to get one approval", "Scaling beyond one condition is extremely slow"],
+        "traction": {"funding": "$100M+ raised", "employees": "100+", "reviews": "Limited (clinical product)", "source": "fda.gov, nature.com, hbs.edu"},
+        "estimated_size": "Growth stage, $100M+ raised"
+      },
+      {
+        "name": "Lunit",
+        "url": "https://www.lunit.io/",
+        "pricing": {"model": "subscription", "range": "Per-study or embedded in hardware licensing", "detail": "Available standalone or embedded in GE Healthcare, Philips, Fujifilm imaging equipment. Per-study cloud pricing."},
+        "strengths": ["$561M raised, 4500+ hospitals in 55 countries", "13% increased cancer detection in dense breasts (Lancet)", "97% accuracy in chest X-ray cancer detection", "Embedded in major imaging hardware (GE, Philips, Fujifilm)", "Acquired Volpara Health Technologies"],
+        "weaknesses": ["Imaging-only, no patient-facing component", "Requires physician interpretation", "Limited to chest X-ray and mammography primarily", "Complex multi-country regulatory landscape"],
+        "traction": {"funding": "$561M raised", "employees": "300+", "reviews": "Limited public reviews", "source": "inventiva, lunit.io"},
+        "estimated_size": "Late-stage, $561M raised, global deployment"
+      }
+    ],
+    "indirect_competitors": [
+      {"name": "Teladoc Health", "url": "https://www.teladoc.com/", "approach": "Telehealth platform connecting patients with licensed physicians via video/phone consultations", "relevance": "Solves access-to-diagnosis problem via physician telehealth, not autonomous AI. Major incumbent with $2B+ revenue."},
+      {"name": "Siemens Healthineers", "url": "https://www.siemens-healthineers.com/", "approach": "Medical device incumbent embedding AI into imaging hardware (AI-Pathway Companion, AI-Rad Companion)", "relevance": "Massive installed base of imaging equipment with integrated AI. Could dominate AI diagnostics through hardware lock-in."},
+      {"name": "Philips Healthcare", "url": "https://www.philips.com/healthcare", "approach": "Medical imaging incumbent with AI-powered CT tools, SmartSpeed MRI, Advanced Visualization Workspace", "relevance": "Similar to Siemens — embedded AI in existing hardware. Vendor-neutral approach enables broad adoption."},
+      {"name": "GE Healthcare", "url": "https://www.gehealthcare.com/", "approach": "Medical imaging with embedded AI capabilities across modalities", "relevance": "One of the 'big three' imaging incumbents. AI embedded in hardware gives massive distribution advantage."},
+      {"name": "Google Health (Med-PaLM/MedLM)", "url": "https://health.google/", "approach": "Large language models (Med-PaLM, MedLM) for medical question answering and clinical decision support", "relevance": "Could pivot from research to clinical deployment. Google's scale and AI capabilities represent existential threat to startups."}
+    ],
+    "adjacent_competitors": [
+      {"name": "Docus AI", "url": "https://docus.ai/", "current_focus": "AI-powered lab test interpretation and clinical report generation for diagnostic laboratories", "pivot_threat": "Could expand from lab result interpretation to full diagnostic assessment", "evidence": "Already building doctor-ready AI clinical reports from lab data, adding differential diagnosis suggestions"},
+      {"name": "Ubie Health", "url": "https://ubiehealth.com/", "current_focus": "AI-powered symptom checker and digital triage for patients and hospitals, based in Japan", "pivot_threat": "Expanding globally from Japan, could move from triage to more assertive diagnostic suggestions", "evidence": "Hospital deployment for digital triage, partnerships with health systems, global expansion underway"},
+      {"name": "Buoy Health", "url": "https://www.buoyhealth.com/", "current_focus": "AI-powered symptom triage and care navigation", "pivot_threat": "Could deepen diagnostic capabilities beyond triage", "evidence": "$86.7M raised, partnerships with health systems for care navigation"}
+    ],
+    "failed_competitors": [
+      {"name": "Babylon Health", "url": "https://www.babylonhealth.com/", "year_failed": 2023, "reason_failed": "Collapsed after $4B valuation. Overpromised AI capabilities (critics noted basic decision trees rather than true AI), unsustainable unit economics, failed SPAC deal, difficult US market entry, regulatory reality collision. Raised $850M+ but ran massive losses.", "source": "https://finance.yahoo.com/news/fallout-babylon-health-scandalous-collapse-191639744.html"},
+      {"name": "Olive AI", "url": "https://www.oliveai.com/", "year_failed": 2023, "reason_failed": "Shut down after $4B valuation and $832M raised. Healthcare AI automation built on brittle RPA scripts that failed to scale. Overpromised technical capabilities, challenging economics, management missteps.", "source": "https://www.healthcaredive.com/news/olive-ai-shuts-down/698455/"},
+      {"name": "Kintsugi", "url": "https://www.kintsugihealth.com/", "year_failed": 2026, "reason_failed": "Shut down after $30M raised and 7 years. AI voice biomarker for mental health screening. Regulatory pathway (FDA) was scientifically valid but economically fatal — runway measured in months while regulatory timelines measured in years.", "source": "https://www.forbes.com/sites/victordey/2026/02/17/kintsugi-ceo-says-building-ai-for-healthcare-is-financially-unsustainable-for-startups/"},
+      {"name": "Cydoc", "url": "https://glassboxmedicine.com/2026/02/21/why-i-shut-down-my-bootstrapped-health-ai-startup-after-7-years-a-founders-postmortem/", "year_failed": 2025, "reason_failed": "Bootstrapped health AI startup shut down after 7 years. Broken business model: hosting+AI costs ~$70/doctor, customers willing to pay <$100/mo, EHR integrations cost $4-6K each. Lost 3 of 4 customers due to workflow friction, staff turnover, and scope creep.", "source": "https://glassboxmedicine.com/2026/02/21/why-i-shut-down-my-bootstrapped-health-ai-startup-after-7-years-a-founders-postmortem/"}
+    ],
+    "market_gaps": [
+      {"gap": "AI diagnostic accuracy insufficient for serious conditions — symptom checkers achieve only 50-62% accuracy, inadequate for cancer/cardiac diagnosis without physician oversight", "mention_count": 10, "sources": ["dialzara.com AI symptom checker review", "Nature systematic review of symptom checkers", "Comparison study PMC10582809", "Multiple app store reviews"], "aligns_with_idea": true},
+      {"gap": "No autonomous AI diagnosis approved for serious conditions (cancer, cardiac) — only IDx-DR approved for diabetic retinopathy. Regulatory barrier, not market gap.", "mention_count": 8, "sources": ["FDA.gov IDx-DR De Novo", "retina-specialist.com AI for DR screening 2025", "Problem validation evidence", "Multiple regulatory analyses"], "aligns_with_idea": true},
+      {"gap": "Poor EHR and workflow integration creates adoption friction — even validated AI tools lose customers due to integration costs ($4-6K per integration) and workflow disruption", "mention_count": 6, "sources": ["Cydoc post-mortem", "bekey.io failed AI pilots in hospitals", "medcitynews.com clinical decision support market", "Pew Research oversight gaps"], "aligns_with_idea": false},
+      {"gap": "Geographic accessibility — AI diagnostic tools concentrated in US/EU, limited availability in developing countries where physician shortages are most acute", "mention_count": 5, "sources": ["Qure.ai global deployment focus", "Lunit emerging market expansion", "povertyactionlab.org EVAH RFP", "inventiva.co.in top diagnostics startups"], "aligns_with_idea": true},
+      {"gap": "Cost barriers for individual patients — enterprise pricing models ($100K+ annual contracts) exclude direct patient access; consumer tools provide only triage, not diagnosis", "mention_count": 4, "sources": ["Ada Health pricing page", "K Health pricing", "Multiple enterprise pricing analyses", "choosingtherapy.com K Health review"], "aligns_with_idea": true}
+    ],
+    "pricing_benchmark": {"low": 0, "mid": 30, "high": 500, "currency": "USD/mo", "model": "usage", "free_alternatives_exist": true, "competitors_with_pricing": 4},
+    "search_queries_used": [
+      "AI medical diagnosis software competitors alternatives",
+      "AI clinical decision support healthcare companies funding",
+      "Ada Health K Health Viz.ai competitors AI diagnostics healthcare",
+      "AI diagnosis healthcare startup shutdown failed post-mortem",
+      "Babylon Health shutdown failed 2023 reasons post-mortem AI diagnosis",
+      "Aidoc pricing plans cost per study radiology AI",
+      "Ada Health pricing plans subscription cost symptom checker",
+      "Viz.ai Tempus PathAI pricing cost healthcare AI",
+      "K Health app pricing subscription plans cost 2024 2025",
+      "Ada Health app review negative complaint inaccurate wrong diagnosis",
+      "AI symptom checker app reviews complaints problems inaccurate misdiagnosis",
+      "Olive AI healthcare shutdown failed 2023 $850M",
+      "Kintsugi health AI startup shutdown 2026 $30M failed",
+      "Aidoc G2 reviews complaints weaknesses radiology AI",
+      "Viz.ai funding total raised employees Crunchbase valuation",
+      "HeartFlow funding raised valuation employees cardiac AI diagnosis",
+      "Tempus AI public company revenue market cap 2025 precision medicine",
+      "AI healthcare diagnostics market gaps unmet needs physician oversight",
+      "IDx-DR Digital Diagnostics LumineticsCore autonomous AI FDA approved pricing",
+      "Zebra Medical Vision acquired Nanox 2021 radiology AI",
+      "Buoy Health AI triage symptom checker funding status 2025"
+    ],
+    "sub_scores": {
+      "market_validation": 18,
+      "competitive_opportunity": 2,
+      "gap_evidence": 12,
+      "pricing_intelligence": 12,
+      "failure_intelligence": 15
+    },
+    "competitive_score": 59
+  },
+  "evidence": [
+    {
+      "source": "https://www.inventiva.co.in/trends/top-10-ai-health-diagnostics-startups-in-2026/",
+      "quote": "Aidoc has raised over 420 million dollars in total funding, including a massive 150 million dollar Series E round in July 2025. The aiOS platform currently supports clinical care for more than 45 million patients annually across over 150 healthcare systems globally. Aidoc holds over 20 FDA clearances, more than any other company in the radiology AI category.",
+      "reliability": "medium"
+    },
+    {
+      "source": "https://stockanalysis.com/stocks/tem/revenue/",
+      "quote": "In the year 2025, Tempus AI had annual revenue of $1.27B with 83.41% growth. Market cap $12.8B.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://glassboxmedicine.com/2026/02/21/why-i-shut-down-my-bootstrapped-health-ai-startup-after-7-years-a-founders-postmortem/",
+      "quote": "I realized our business model was broken. Doctors in the small practices we had been targeting wanted to pay fewer than $100 per month. Hosting and AI costs had gone up to about $70 per doctor. Each EHR integration costs $4,000-$6,000. It would take 11 years per practice just to break even.",
+      "reliability": "high"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "competitive-analysis",
+      "store": "engram",
+      "ref": "validation/ai-medical-diagnosis/competitive"
+    }
+  ],
+  "flags": [
+    "dominant-incumbent-found",
+    "score-below-threshold"
+  ],
+  "next_recommended": ["bizmodel"]
+}

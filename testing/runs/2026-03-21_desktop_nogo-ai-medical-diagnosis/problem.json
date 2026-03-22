@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "status": "ok",
+  "department": "problem",
+  "executive_summary": "The underlying problem of delayed medical diagnosis access is real and painful (73/100), with 31-day average specialist waits, a projected 86K physician shortage by 2036, and patients resorting to ChatGPT and ER visits as workarounds — but the specific proposal for autonomous AI diagnosis of serious conditions WITHOUT physician oversight faces fundamental regulatory prohibitions (FDA Class III), safety evidence (symptom checkers ~50% accurate), and the cautionary collapse of Babylon Health ($2B+ loss).",
+  "score": 73,
+  "score_reasoning": "Score: 73/100\n- Complaint Volume: 12/20 (25-30 unique threads found across NPR, STAT News, AAFP, patient forums, medical journals, Boston Globe)\n- Complaint Recency: 17/20 (85%+ from last 24 months, including NPR Jan 2026, ECRI 2026 report, Henry Ford Health Feb 2026)\n- Pain Intensity Signals: 11/20 (12-15 pain markers, 2-3 quantified costs including 31-day avg specialist wait and 86K physician shortage by 2036, 0 WTP statements for autonomous AI without physician)\n- Workaround Evidence: 16/20 (7 distinct workarounds: ChatGPT self-diagnosis, ER visits instead of waiting, telemedicine, symptom checker apps, online health forums, seeking second opinions, medical tourism)\n- Paid Alternatives: 17/20 (8-10 paid products: Ada Health, K Health, Teladoc, Viz.ai, Aidoc, HeartFlow, IDx-DR, Tempus, Freenome — all with physician oversight except IDx-DR for one narrow condition)\nTotal: 12 + 17 + 11 + 16 + 17 = 73",
+  "data": {
+    "problem_exists": true,
+    "problem_statement": "Patients worldwide face delayed or inaccessible medical diagnoses for serious conditions (cancer, cardiac) due to specialist shortages (projected 86,000 physician deficit by 2036), long wait times (31-day average, up to 68 days for some specialties), and geographic barriers. However, the proposed autonomous AI diagnosis WITHOUT physician oversight faces fundamental regulatory prohibitions, safety concerns (AI symptom checkers are only ~50% accurate), and patient trust barriers (46% of physicians cite misdiagnosis as top concern).",
+    "target_user": "Patients worldwide, particularly in underserved and remote areas, seeking diagnoses for serious medical conditions like cancer and cardiac disease",
+    "industry": "healthcare AI diagnostics",
+    "pain_intensity": "high",
+    "current_solutions": [
+      {"solution": "Ada Health", "type": "paid", "satisfaction": "medium"},
+      {"solution": "K Health", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Teladoc", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Viz.ai", "type": "paid", "satisfaction": "high"},
+      {"solution": "Aidoc", "type": "paid", "satisfaction": "high"},
+      {"solution": "HeartFlow", "type": "paid", "satisfaction": "high"},
+      {"solution": "IDx-DR (Digital Diagnostics)", "type": "paid", "satisfaction": "high"},
+      {"solution": "Tempus", "type": "paid", "satisfaction": "high"},
+      {"solution": "ChatGPT/AI chatbot self-diagnosis", "type": "workaround", "satisfaction": "low"},
+      {"solution": "Emergency room visits instead of waiting", "type": "workaround", "satisfaction": "low"}
+    ],
+    "evidence_summary": "25-30 unique complaint threads found across NPR, STAT News, AAFP, patient forums, medical journals, Boston Globe, and health tech publications. Pattern: patients are deeply frustrated by specialist wait times and diagnosis delays, with 20% changing doctors and 65% visiting ERs rather than waiting. However, the complaint pattern overwhelmingly favors AI-ASSISTED diagnosis with physician oversight, not autonomous AI replacing physicians. The only FDA-approved autonomous AI diagnostic (IDx-DR) is limited to diabetic retinopathy screening. All major AI diagnostic companies (Viz.ai, Aidoc, PathAI, Tempus) operate as physician decision-support tools. Babylon Health, which most aggressively pursued direct-to-patient AI diagnosis, collapsed in 2023 after $2B+ losses and safety concerns. Navigating the AI diagnostic dilemma was named the No. 1 patient safety concern for 2026 by ECRI.",
+    "search_queries_used": [
+      "AI medical diagnosis without doctor dangerous risks patients 2025 2026",
+      "\"AI diagnosis\" patients \"without physician\" risks concerns regulatory",
+      "autonomous AI medical diagnosis regulation FDA banned illegal",
+      "\"medical diagnosis\" \"access to specialists\" frustrating waiting time patients reddit",
+      "AI health diagnosis app review complaint site:reddit.com",
+      "\"delayed diagnosis\" cancer cardiac \"couldn't see specialist\" frustrated patients",
+      "AI diagnosis app patients using ChatGPT symptom checker misdiagnosis complaint",
+      "\"symptom checker\" app review complaint inaccurate wrong diagnosis",
+      "patients self-diagnosing AI \"without doctor\" workaround telemedicine frustration",
+      "AI medical diagnosis software tool paid alternative G2 Capterra healthcare",
+      "\"would pay\" \"AI doctor\" OR \"AI diagnosis\" patients willing medical",
+      "waiting specialist appointment \"months\" frustrated cancer diagnosis delay reddit forum",
+      "Ada Health app pricing subscription paid symptom checker competitor review",
+      "AI diagnosis healthcare regulation Europe UK MHRA CE marking medical device globally",
+      "FDA approved AI diagnostic device autonomous without physician oversight cleared"
+    ],
+    "sub_scores": {
+      "complaint_volume": 12,
+      "complaint_recency": 17,
+      "pain_signals": 11,
+      "workaround_evidence": 16,
+      "paid_alternatives": 17
+    },
+    "problem_score": 73
+  },
+  "evidence": [
+    {
+      "source": "https://www.npr.org/2026/01/30/nx-s1-5693219/chatgpt-chatbot-ai-health-medical-advice",
+      "quote": "Patients like Bethany Crystal credit ChatGPT with saving her life by identifying immune thrombocytopenic purpura, but documented risks include ChatGPT recommending ivermectin for testicular cancer and a patient experiencing hallucinations after following AI salt-reduction advice with sodium bromide.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://radiologybusiness.com/topics/artificial-intelligence/navigating-ai-diagnostic-dilemma-healthcares-no-1-patient-safety-concern-2026",
+      "quote": "Navigating the AI diagnostic dilemma was named the No. 1 threat to patient safety in 2026 by ECRI. ML models tested failed to recognize 66% of critical or deteriorating health conditions.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.aafp.org/pubs/fpm/blogs/inpractice/entry/wait-times.html",
+      "quote": "Average wait time for a new patient appointment is 31 days, a 19% increase since 2022 and a 48% jump since 2004. Wait times range from 20 days (orthopedic surgery) to 68 days (rheumatology).",
+      "reliability": "high"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "problem-analysis",
+      "store": "engram",
+      "ref": "validation/ai-medical-diagnosis/problem"
+    }
+  ],
+  "flags": [],
+  "next_recommended": ["market", "competitive"]
+}

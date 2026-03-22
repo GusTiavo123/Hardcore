@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "status": "warning",
+  "department": "synthesis",
+  "executive_summary": "NO-GO (weighted score 45.0/100). Autonomous AI diagnosis for serious conditions without physician oversight triggers three knockout rules: Market 36 (near-zero SOM due to global regulatory prohibition), Risk 12 (catastrophic unmitigable risks), and three departments below 45 (multi-weakness).",
+  "score": 45,
+  "score_reasoning": "Weighted Score: 45.0/100\nVerdict: NO-GO\n\nScore Breakdown:\n- Problem: 73/100 × 0.30 = 21.9 — Real pain validated: 31-day avg specialist wait, 86K physician shortage by 2036, 7 distinct workarounds, 8-10 paid alternatives — but ALL alternatives operate WITH physician oversight\n- Market: 36/100 × 0.25 = 9.0 — Parent AI diagnostics market $1.94B/21.7% CAGR but autonomous no-oversight SOM ~$1.2M; zero identifiable early adopter segments for autonomous diagnosis\n- Competitive: 59/100 × 0.15 = 8.85 — 17+ competitors validate active market but heavily dominated by Tempus ($12.8B), Aidoc ($420M+), Viz.ai ($1.2B); ALL use physician oversight; 4 failures with detailed post-mortems\n- BizModel: 20/100 × 0.20 = 4.0 — LTV/CAC ratio 1.06x, all 3 sensitivity scenarios fail, Babylon Health $4B collapse is closest precedent, zero pricing power\n- Risk: 12/100 × 0.10 = 1.2 — Global regulatory prohibition, AI accuracy 50-62% (fatal for cancer/cardiac), 3+ critical dependencies with no fallback, catastrophic failure pattern in healthcare AI startups\n\nKnockouts: Market < 40 (36), Risk < 30 (12), Multi-weakness (Market 36, BizModel 20, Risk 12 — three departments < 45)\nGO Conditions: NOT met — weighted 45.0 < 70, Market 36 < 45, BizModel 20 < 45, Risk 12 < 45\nConfidence: high — all 5 departments completed successfully with extensive evidence; verdict is conclusive across multiple independent knockout triggers",
+  "data": {
+    "verdict": "NO-GO",
+    "confidence": "high",
+    "weighted_score": 45.0,
+    "score_breakdown": {
+      "problem": {"score": 73, "weight": 0.30, "contribution": 21.9},
+      "market": {"score": 36, "weight": 0.25, "contribution": 9.0},
+      "competitive": {"score": 59, "weight": 0.15, "contribution": 8.85},
+      "bizmodel": {"score": 20, "weight": 0.20, "contribution": 4.0},
+      "risk": {"score": 12, "weight": 0.10, "contribution": 1.2}
+    },
+    "knockouts_triggered": [
+      {"rule": "Market knockout", "value": 36, "threshold": 40, "department": "market"},
+      {"rule": "Risk knockout", "value": 12, "threshold": 30, "department": "risk"},
+      {"rule": "Multi-weakness knockout", "value": 3, "threshold": 2, "department": "market, bizmodel, risk"}
+    ],
+    "executive_summary": "NO-GO (weighted score 45.0/100). Autonomous AI diagnosis for serious conditions without physician oversight triggers three knockout rules: the addressable market is near-zero due to global regulatory prohibition (Market 36), risk is catastrophic with no mitigation path (Risk 12), and unit economics are fundamentally broken (BizModel 20). The underlying problem of delayed diagnosis is real and painful (Problem 73), but the solution must include physician oversight to be viable.",
+    "key_strengths": [
+      "Real, validated problem: patients face 31-day average wait times for specialist diagnosis, with 86K projected physician shortfall by 2036 (Problem 73/100, Complaint Recency 17/20)",
+      "Strong workaround evidence: 7 distinct workarounds including ChatGPT self-diagnosis, ER visits for non-emergencies, and medical tourism demonstrate genuine unmet need (Workaround Evidence 16/20)",
+      "Proven market demand for AI-ASSISTED diagnostics: $1.94B market growing at 21.7% CAGR with 9+ funded competitors validating the space (Market Data Availability 20/25)",
+      "Rich failure intelligence: 4 detailed post-mortems (Babylon Health $4B, Olive AI $4B, Kintsugi $30M, Cydoc 7yr) provide clear anti-patterns to avoid (Failure Intelligence 15/20)"
+    ],
+    "key_concerns": [
+      "Global regulatory prohibition: No regulatory pathway exists for autonomous AI diagnosis of cancer/cardiac without physician oversight in any major market. Only 1 autonomous AI diagnostic has ever been approved (IDx-DR), and it took 20+ years for a single non-serious condition (Risk Regulatory 1/25)",
+      "AI accuracy grossly insufficient: Symptom checkers achieve only 50-62% accuracy — a 38-50% error rate on cancer/cardiac diagnosis would cause patient deaths, massive liability, and immediate regulatory shutdown (Risk Execution 4/25)",
+      "Near-zero addressable market: The autonomous, no-physician-oversight, direct-to-patient segment for serious conditions has SOM of ~$1.2M with zero identifiable early adopter segments meeting all three criteria (Market SOM 2/25, Early Adopters 0/25)",
+      "Unit economics fundamentally broken: LTV/CAC ratio of only 1.06x, all three sensitivity scenarios fail, and the closest precedent (Babylon Health) collapsed from $4B valuation pursuing exactly this model (BizModel 20/100)",
+      "Catastrophic failure pattern: Babylon Health ($4B), Olive AI ($4B), Kintsugi ($30M), and Cydoc all failed — regulatory runway measured in years while financial runway measured in months (Competitive Failure Intelligence 15/20)"
+    ],
+    "critical_assumptions": [
+      "Regulatory frameworks will continue to prohibit autonomous diagnosis for serious conditions — this is current reality across all major markets, not an assumption, but any change would fundamentally alter the analysis",
+      "AI diagnostic accuracy would need to exceed 95% for autonomous cancer/cardiac diagnosis — current state-of-the-art is 50-62% for general symptom checking",
+      "ARPU $39/mo based on mid-range DTC health AI pricing (Ada $9.99, K Health $29-49), but no precedent exists for autonomous diagnosis DTC subscription",
+      "Monthly churn 7.5% from healthcare SaaS benchmark (wearefounders.uk 2026) may underestimate DTC consumer churn which is typically higher",
+      "CAC $320 from Medtech Consumer benchmark (First Page Sage Aug 2025) may underestimate actual CAC given regulatory constraints on healthcare marketing claims",
+      "Gross margin 65% reduced from SaaS median 79% due to AI inference costs, regulatory compliance, and clinical validation overhead — could be even lower for medical-grade autonomous AI"
+    ],
+    "pivot_suggestions": [],
+    "next_steps": [
+      {"action": "Pivot to AI-assisted physician decision support tool for diagnostic imaging (radiology, pathology, cardiology) using the established FDA 510(k) pathway — this addresses the same underlying problem while operating within legal and market reality", "priority": "high", "timeframe": "immediate", "rationale": "The problem is real (73/100) and the market for physician-assisted AI diagnostics is $1.94B growing at 21.7% CAGR. There are 295 FDA clearances for AI medical devices in 2025 alone, proving the pathway works. All 9 successful direct competitors operate this way."},
+      {"action": "Study the 4 healthcare AI failure post-mortems in detail (Babylon Health, Olive AI, Kintsugi, Cydoc) to extract specific anti-patterns before designing any new approach", "priority": "high", "timeframe": "1-2 weeks", "rationale": "These failures collectively destroyed $8B+ in value pursuing variations of autonomous/aggressive healthcare AI. Their mistakes are well-documented and directly applicable to avoiding the same fate."},
+      {"action": "Validate B2B enterprise pricing model with 5 hospital radiology departments to confirm willingness-to-pay for AI-assisted diagnostic tools before building", "priority": "high", "timeframe": "1 month", "rationale": "All successful healthcare AI diagnostics companies (Aidoc, Viz.ai, Tempus, HeartFlow, PathAI) sell B2B to hospitals, not DTC to patients. Unit economics are fundamentally different and proven viable in this model."},
+      {"action": "Re-evaluate in 3-5 years if FDA creates a new regulatory pathway for autonomous AI diagnosis of serious conditions — monitor FDA guidance, EU AI Act implementation, and state legislation trends", "priority": "low", "timeframe": "3-5 years", "rationale": "If regulatory frameworks evolve to permit autonomous diagnosis (unlikely given current legislative trend toward MORE restriction with 250+ AI bills in 34+ states), the autonomous model could be revisited. Track IDx-DR expansion as a leading indicator."}
+    ],
+    "validation_experiments": [],
+    "department_flags": {
+      "problem": [],
+      "market": [],
+      "competitive": [],
+      "bizmodel": [],
+      "risk": ["knockout-risk"]
+    }
+  },
+  "evidence": [],
+  "artifacts": [
+    {"name": "synthesis-verdict", "store": "engram", "ref": "validation/ai-medical-diagnosis/synthesis"},
+    {"name": "validation-report", "store": "engram", "ref": "validation/ai-medical-diagnosis/report"}
+  ],
+  "flags": ["knockout-triggered"],
+  "next_recommended": []
+}

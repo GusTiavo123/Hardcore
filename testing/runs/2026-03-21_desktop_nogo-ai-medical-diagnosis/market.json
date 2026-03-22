@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "status": "warning",
+  "department": "market",
+  "executive_summary": "The parent AI diagnostics market is real and fast-growing ($1.94B in 2025, ~21.7% CAGR), but the specific segment of autonomous AI diagnosis for serious conditions WITHOUT physician oversight has a near-zero serviceable market (~$1.2M SOM) due to global regulatory prohibitions, zero qualifying early adopter segments, and patient preference for physician-supervised AI tools.",
+  "score": 36,
+  "score_reasoning": "Score: 36/100\n- Data Availability: 20/25 (6+ estimates from 3 institutional sources — Grand View Research Jan 2026, Precedence Research Oct 2025, MarketsandMarkets 2024 — all published within last 2 years; estimates converge within 2x at $1.59-1.94B for 2024-2025)\n- Market Scale (SOM): 2/25 (SOM ~$1.2M. The autonomous, no-physician-oversight, direct-to-patient segment for serious conditions like cancer/cardiac is effectively regulatory-blocked globally. Only 1 FDA-approved autonomous AI diagnostic exists — IDx-DR for diabetic retinopathy, a non-serious screening condition. SAM of ~$58M derived from cardiology+oncology share of TAM × 10% direct-to-patient fraction, then SOM at 2% of SAM. Actual obtainable market is arguably near zero given no legal pathway in any major jurisdiction.)\n- Growth Trajectory: 14/25 (Median CAGR ~21.7% from 3 institutional sources for the parent AI diagnostics market — solidly in the 10-24% tier. However, this growth is entirely in physician-supervised decision-support tools, not autonomous diagnosis. The specific autonomous segment has no measurable growth trend.)\n- Early Adopter Identifiability: 0/25 (0 segments meeting all 3 criteria. While communities exist for health IT professionals — r/healthIT 51k members, HIMSS 25k+ attendees — and patient self-diagnosers — r/AskDocs 1M+ members — none meet the three-criteria test for THIS specific product: autonomous AI diagnosis of serious conditions without physician oversight. Health IT buyers purchase physician-supervised tools. Patients express lower willingness to pay for AI-only diagnosis. No identifiable group that both wants AND can legally access this specific product.)\nTotal: 20 + 2 + 14 + 0 = 36",
+  "data": {
+    "tam": {
+      "value": 1940000000,
+      "currency": "USD",
+      "source": "Precedence Research (Oct 2025), corroborated by Grand View Research ($1.59B in 2024, $9.68B by 2033, Jan 2026) and MarketsandMarkets ($1.71B in 2024)",
+      "methodology": "top-down-institutional"
+    },
+    "sam": {
+      "value": 58000000,
+      "currency": "USD",
+      "source": "Calculated: TAM × 30% (cardiology+oncology segments per Grand View Research diagnosis segmentation) × 10% (direct-to-patient/consumer fraction vs. B2B hospital purchasing, which dominates 90%+ of current AI diagnostics spend)",
+      "methodology": "top-down-estimated"
+    },
+    "som": {
+      "value": 1160000,
+      "currency": "USD",
+      "source": "SAM × 2% (conservative capture rate for $1B-$10B parent TAM). Actual SOM likely near zero: (1) no regulatory pathway for autonomous diagnosis of serious conditions in any major market, (2) only 1 FDA-approved autonomous AI diagnostic exists globally (IDx-DR for diabetic retinopathy only), (3) patients express significantly lower willingness to pay for AI-only vs physician-supervised diagnosis, (4) Babylon Health, the most aggressive direct-to-patient AI diagnostics company, collapsed in 2023 after $2B+ losses",
+      "methodology": "top-down-estimated"
+    },
+    "growth_rate": "21.7% CAGR (2025-2033)",
+    "growth_source": "Median of Grand View Research (21.74% CAGR 2026-2033), Precedence Research (20.37% CAGR 2025-2034), MarketsandMarkets (22.5% CAGR 2024-2029)",
+    "market_stage": "growing",
+    "early_adopters": [],
+    "search_queries_used": [
+      "AI medical diagnosis market size 2024 2025 2026 TAM",
+      "artificial intelligence diagnostics market report statista grand view research fortune business insights",
+      "AI clinical diagnostics CAGR forecast 2025 2030",
+      "AI healthcare diagnostics market growth rate 2024 2025",
+      "healthcare AI diagnostics early adopters hospitals clinics community conference 2025 2026",
+      "AI medical diagnosis direct to patient consumer health app spending willingness to pay",
+      "r/healthIT r/medicine AI diagnostics subreddit community members",
+      "HIMSS conference AI diagnostics health IT community telehealth adoption 2025 2026",
+      "autonomous AI diagnosis without physician FDA approved devices market 2025 2026",
+      "digital health consumer spending telehealth symptom checker app market size 2024 2025"
+    ],
+    "sub_scores": {
+      "data_availability": 20,
+      "market_scale": 2,
+      "growth_trajectory": 14,
+      "early_adopter_identifiability": 0
+    },
+    "market_score": 36
+  },
+  "evidence": [
+    {
+      "source": "https://www.grandviewresearch.com/press-release/global-artificial-intelligence-diagnostics-market",
+      "quote": "The global artificial intelligence in diagnostics market size is expected to reach USD 9.68 billion by 2033, registering a CAGR of 21.74% from 2026 to 2033. Market was estimated at USD 1.59 billion in 2024.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.precedenceresearch.com/artificial-intelligence-diagnostics-market",
+      "quote": "The global artificial intelligence in diagnostics market size was estimated at USD 1.94 billion in 2025 and is anticipated to reach around USD 10.28 billion by 2034, expanding at a CAGR of 20.37% from 2025 to 2034.",
+      "reliability": "high"
+    },
+    {
+      "source": "https://www.marketsandmarkets.com/Market-Reports/artificial-intelligence-medical-diagnostics-market-22519734.html",
+      "quote": "The global AI in medical diagnostics market, valued at US$1.33 billion in 2023, stood at US$1.71 billion in 2024 and is projected to advance at a resilient CAGR of 22.5% from 2024 to 2029, culminating in a forecasted valuation of US$4.72 billion.",
+      "reliability": "high"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "market-analysis",
+      "store": "engram",
+      "ref": "validation/ai-medical-diagnosis/market"
+    }
+  ],
+  "flags": [
+    "som-is-estimate",
+    "no-early-adopters-identified",
+    "score-below-threshold"
+  ],
+  "next_recommended": ["bizmodel"]
+}
