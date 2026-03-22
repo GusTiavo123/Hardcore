@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "department": "synthesis",
+  "executive_summary": "GO — Restaurant food waste prediction SaaS scores 72.9/100 weighted, passing all GO conditions with no knockouts; strong unit economics (LTV/CAC 8.97x) and validated problem (75/100) support market entry, though competitive incumbency (Restaurant365 $283M) and POS integration gatekeeping require careful execution.",
+  "score": 72.9,
+  "score_reasoning": "Weighted score 72.9/100 — Problem: 75/100 x 0.30 = 22.5 (well-documented pain with 22 complaint threads, 7 workarounds, 14 paid alternatives). Market: 72/100 x 0.25 = 18.0 ($3.1B TAM, $24M SOM, 11.1% CAGR, 3+ early adopter segments with 1.87M+ reachable members). Competitive: 62/100 x 0.15 = 9.3 (16+ competitors validate market but R365 $283M and Winnow $36.6M create moderate incumbency; clear gaps in predictive AI + supplier integration for SMBs). BizModel: 82/100 x 0.20 = 16.4 (LTV/CAC 8.97x, 2.23-month payback, subscription model validated by 6+ funded restaurant SaaS companies). Risk: 67/100 x 0.10 = 6.7 (moderate risk; technically feasible, light regulation, good timing, but POS gatekeeping and incumbent expansion are top threats). Knockouts: None.",
+  "data": {
+    "verdict": "GO",
+    "confidence": "high",
+    "weighted_score": 72.9,
+    "score_breakdown": {
+      "problem": {"score": 75, "weight": 0.30, "contribution": 22.5},
+      "market": {"score": 72, "weight": 0.25, "contribution": 18.0},
+      "competitive": {"score": 62, "weight": 0.15, "contribution": 9.3},
+      "bizmodel": {"score": 82, "weight": 0.20, "contribution": 16.4},
+      "risk": {"score": 67, "weight": 0.10, "contribution": 6.7}
+    },
+    "knockouts_triggered": [],
+    "executive_summary": "GO with 72.9/100 weighted score. Strong unit economics (LTV/CAC 8.97x, 2.23-month payback) and a well-validated pain point (75/100) support market entry into restaurant food waste prediction SaaS, though the competitive landscape requires differentiation through predictive AI and supplier integration for SMB restaurants.",
+    "key_strengths": [
+      "Unit economics are excellent: LTV/CAC of 8.97x with 2.23-month payback at $299/mo, resilient across all sensitivity scenarios (CAC+20%, churn+20%, price-20% all remain viable)",
+      "Problem is real and well-documented: 22 unique complaint threads, 7 distinct workarounds, 14 paid alternatives — restaurant operators actively spend on this problem",
+      "Subscription model thoroughly validated: 6+ funded restaurant SaaS companies (Restaurant365 $1B valuation, Toast public, MarketMan, Apicbase, ClearCOGS, Owner.com) prove the model works in this segment",
+      "Clear market gaps align with the idea: predictive AI forecasting for SMBs, supplier integration, and affordable pricing are the top 3 unmet needs across competitor reviews",
+      "Strong early adopter identifiability: 3+ segments with concrete reach channels (r/KitchenConfidential 1.8M, NRA Show 57K, r/restaurantowners 52K)"
+    ],
+    "key_concerns": [
+      "Dominant incumbent threat: Restaurant365 ($283M funding, $1B valuation, 318 G2 reviews) already has Smart Prep/Smart Ordering AI features — could expand to cover predictive waste + supplier integration",
+      "POS integration gatekeeping: Toast requires partner agreement vetting across compliance, privacy, security, and legal teams before granting write API access — rejection or delay blocks go-to-market for a large customer segment",
+      "ML cold-start problem: predictive forecasting requires sufficient historical data per restaurant — early predictions may be inaccurate, causing churn in a community where word-of-mouth reputation matters",
+      "Competitive opportunity score is lowest sub-dimension (6/20) due to Restaurant365 and Winnow entrenchment — market is validated but not wide open",
+      "Restaurant thin margins (3-9% net profit) create price sensitivity — must demonstrate clear ROI to justify $299/mo spend"
+    ],
+    "critical_assumptions": [
+      "Monthly churn rate of 5% based on B2B SaaS SMB benchmarks (UserMotion 2024: 4.2% avg) — adjusted for restaurant SMB segment with moderate switching costs",
+      "CAC of $500 blended (FirstPageSage Hospitality SMB: $907, ClickStrike: $280-$600) — assumes content marketing + paid search mix",
+      "Gross margin of 75% for pure SaaS without hardware (industry standard 70-85%)",
+      "SOM of $24M based on 3% of $806M SAM — top-down estimate, not bottom-up validated",
+      "Price point of $299/mo based on competitive benchmark positioning, not direct customer willingness-to-pay testing"
+    ],
+    "pivot_suggestions": [],
+    "next_steps": [
+      {
+        "action": "Secure Toast POS partner application and begin API integration approval process immediately — this is the critical path dependency with longest lead time",
+        "priority": "high",
+        "timeframe": "1-2 weeks to apply, 2-3 months for approval",
+        "rationale": "Toast is the dominant US restaurant POS; without integration, a large portion of the addressable market is unreachable. Read-only access is sufficient for MVP (historical sales data for predictions)."
+      },
+      {
+        "action": "Build a landing page targeting r/KitchenConfidential (1.8M members) and r/restaurantowners (52K members) with a waitlist, measuring conversion rate and signup volume",
+        "priority": "high",
+        "timeframe": "1-2 weeks",
+        "rationale": "Validates willingness-to-pay and demand intensity at the $299/mo price point with the largest reachable early adopter community. Target: 200+ signups in 14 days."
+      },
+      {
+        "action": "Run 10-15 customer discovery interviews with multi-location restaurant operators (5-50 units) to validate the $299/mo price point and prioritize features (predictive forecasting vs. supplier integration)",
+        "priority": "high",
+        "timeframe": "2-3 weeks",
+        "rationale": "Price point is based on competitive benchmark, not direct customer input. Multi-location operators are the highest-value early adopter segment with clearest pain."
+      },
+      {
+        "action": "Prototype a demand forecasting model using publicly available restaurant transaction datasets to establish baseline prediction accuracy before customer onboarding",
+        "priority": "medium",
+        "timeframe": "1 month",
+        "rationale": "Addresses the ML cold-start risk — demonstrating minimum viable accuracy (e.g., within 15% of actual demand) before first pilot reduces early churn risk."
+      },
+      {
+        "action": "Monitor Restaurant365 product announcements and acquisition activity — if R365 announces predictive waste or supplier integration features, accelerate go-to-market or consider partnership",
+        "priority": "medium",
+        "timeframe": "Ongoing",
+        "rationale": "R365 is the dominant incumbent threat. Early warning signals from competitive intelligence should trigger strategic response."
+      }
+    ],
+    "validation_experiments": [
+      {
+        "experiment": "Landing page + waitlist targeting restaurant communities (r/KitchenConfidential, r/restaurantowners, RestaurantOwner.com forum) with clear value prop: 'Predict food waste before it happens — save $333/day'",
+        "success_metric": "200+ email signups in 14 days with >3% visitor-to-signup conversion rate",
+        "effort": "low",
+        "what_it_validates": "Demand intensity and willingness to engage at the proposed price point ($299/mo shown on page)"
+      },
+      {
+        "experiment": "Pre-sale interviews with 10 multi-location restaurant operators offering 50% founding member discount ($149/mo for first year) in exchange for early access and data sharing",
+        "success_metric": "3+ operators sign LOI or pre-pay at $149/mo; 7+ express strong interest with specific pain points matching the value prop",
+        "effort": "medium",
+        "what_it_validates": "Willingness to pay, priority feature set (prediction vs. supplier integration), and data access feasibility (POS type, data quality, history length)"
+      },
+      {
+        "experiment": "Cold-start prediction accuracy test: build baseline demand forecasting model using open restaurant datasets (e.g., Kaggle restaurant revenue prediction, NYC restaurant inspection data + weather data) and measure prediction accuracy",
+        "success_metric": "Mean Absolute Percentage Error (MAPE) < 20% on held-out test data using only historical sales + weather + day-of-week features",
+        "effort": "medium",
+        "what_it_validates": "Technical feasibility of the core ML prediction engine; addresses the cold-start risk identified by Risk department"
+      },
+      {
+        "experiment": "Toast API partner application submission and integration prototype with read-only access to validate data extraction pipeline",
+        "success_metric": "Partner application accepted within 90 days; successful extraction of historical sales data from 1+ test restaurant via API",
+        "effort": "medium",
+        "what_it_validates": "POS integration feasibility — the #2 killer risk; validates that data access is achievable without write permissions"
+      }
+    ],
+    "department_flags": {
+      "problem": [],
+      "market": [],
+      "competitive": [],
+      "bizmodel": [],
+      "risk": []
+    }
+  },
+  "evidence": [
+    "Weighted score calculation: (75x0.30)+(72x0.25)+(62x0.15)+(82x0.20)+(67x0.10) = 22.5+18.0+9.3+16.4+6.7 = 72.9",
+    "No knockout conditions triggered: Problem 75 >= 40, Market 72 >= 40, Risk 67 >= 30, no two departments below 45",
+    "6+ funded restaurant SaaS precedents validate the subscription model: Restaurant365 ($1B), Toast (public), MarketMan, Apicbase, ClearCOGS, Owner.com"
+  ],
+  "artifacts": [
+    {
+      "name": "synthesis-analysis",
+      "store": "engram",
+      "ref": "validation/restaurant-waste/synthesis"
+    }
+  ],
+  "flags": [],
+  "next_recommended": []
+}

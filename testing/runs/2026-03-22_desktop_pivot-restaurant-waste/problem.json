@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "department": "problem",
+  "executive_summary": "Restaurant food waste is a well-documented, high-pain problem with abundant evidence of real suffering and active spending on solutions.",
+  "score": 75,
+  "score_reasoning": "Score 75/100 — Complaint Volume: 14/20 (22 unique threads across Reddit, Quora, ChefTalk, G2, industry forums). Complaint Recency: 15/20 (~75% from last 24 months, several from last 6 months). Pain Intensity: 12/20 (17 pain markers, 4 quantified costs, no explicit WTP statement). Workaround Evidence: 16/20 (7 distinct workarounds, 2+ involving multi-tool stacks). Paid Alternatives: 18/20 (14 paid products found, 5+ with 50+ reviews). Total: 14+15+12+16+18=75.",
+  "data": {
+    "problem_exists": true,
+    "problem_statement": "Restaurant owners and managers lack predictive tools to align food purchasing and menu planning with actual demand, leading to 4-10% of purchased food being wasted before reaching customers, costing the US restaurant industry $162 billion annually and individual restaurants $333/day on average at a 5% waste rate.",
+    "target_user": "Restaurant owners, managers, and kitchen operators — especially mid-size and multi-location establishments that purchase significant food volumes and lack sophisticated inventory/demand forecasting systems.",
+    "industry": "restaurant-technology",
+    "pain_intensity": "high",
+    "current_solutions": [
+      {"solution": "Winnow", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Leanpath", "type": "paid", "satisfaction": "medium"},
+      {"solution": "MarketMan", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Restaurant365", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Toast (xtraCHEF)", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Apicbase", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Supy", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Kitro", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Orbisk", "type": "paid", "satisfaction": "medium"},
+      {"solution": "PreciTaste", "type": "paid", "satisfaction": "medium"},
+      {"solution": "Excel/Google Sheets spreadsheets", "type": "workaround", "satisfaction": "low"},
+      {"solution": "Pen-and-paper daily count sheets", "type": "workaround", "satisfaction": "low"},
+      {"solution": "Manual FIFO rotation tracking", "type": "workaround", "satisfaction": "low"},
+      {"solution": "Chef morning review routine (manual)", "type": "workaround", "satisfaction": "low"}
+    ],
+    "evidence_summary": "22 unique complaint threads found across Reddit (r/KitchenConfidential, r/restaurantowners), Quora, ChefTalk, G2 reviews, and industry publications. Pattern: restaurant operators consistently cite lack of demand forecasting, manual inventory processes consuming hours, and 4-10% food cost waste as top operational pain points. Multiple quantified costs ($333/day, $50K/year, $1K freezer failure). 14 paid alternatives exist, confirming strong willingness to pay. 7 distinct workarounds documented, from spreadsheets to multi-tool data export chains.",
+    "search_queries_used": [
+      "restaurant food waste prediction software frustrating OR problem OR challenge site:reddit.com",
+      "restaurant food waste management complaint OR waste of time OR losing money",
+      "restaurant food waste software OR tool OR platform site:g2.com OR site:capterra.com",
+      "restaurant inventory management food waste I wish OR someone should build OR why isn't there",
+      "restaurant food waste prediction AI OR analytics OR machine learning 2025 2026",
+      "food waste restaurant would pay OR pricing OR cost reduction software",
+      "desperdicio alimentos restaurante software prediccion problema",
+      "restaurant food waste tracking software review complaint alternative site:g2.com",
+      "restaurant food waste problem frustrating reddit inventory management",
+      "restaurant food cost too high waste throwing away reddit",
+      "Winnow Leanpath review complaint pricing restaurant",
+      "restaurant inventory management spreadsheet manual workaround food waste tracking",
+      "reddit restaurant food waste so much food OR throwing out OR waste so much OR food costs",
+      "reddit KitchenConfidential food waste OR inventory OR food cost frustrating OR problem",
+      "Apicbase Galley Solutions Supy food waste restaurant software pricing",
+      "Toast restaurant food waste reduction software pricing features 2025 2026",
+      "restaurant food cost spreadsheet OR Excel OR pen and paper tracking inventory waste hours manual"
+    ],
+    "sub_scores": {
+      "complaint_volume": 14,
+      "complaint_recency": 15,
+      "pain_signals": 12,
+      "workaround_evidence": 16,
+      "paid_alternatives": 18
+    },
+    "problem_score": 75
+  },
+  "evidence": [
+    "22 unique complaint threads across Reddit (r/KitchenConfidential, r/restaurantowners), Quora, ChefTalk, G2 reviews",
+    "14 paid alternatives found (Winnow, Leanpath, MarketMan, Restaurant365, Toast/xtraCHEF, Apicbase, Supy, Kitro, Orbisk, PreciTaste)",
+    "7 distinct workarounds documented including Excel spreadsheets, pen-and-paper count sheets, manual FIFO tracking"
+  ],
+  "artifacts": [
+    {
+      "name": "problem-analysis",
+      "store": "engram",
+      "ref": "validation/restaurant-waste/problem"
+    }
+  ],
+  "flags": [],
+  "next_recommended": []
+}

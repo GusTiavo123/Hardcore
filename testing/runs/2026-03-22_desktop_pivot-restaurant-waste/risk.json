@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "department": "risk",
+  "executive_summary": "Restaurant food waste SaaS faces moderate overall risk (67/100): technically feasible with abundant APIs/OSS, light regulatory burden (food waste laws create demand), strong market timing with 4+ new entrants and 3+ funding rounds in 18 months, but dominant incumbents (Restaurant365 $283M, PreciTaste $53.3M) and POS integration gatekeeping pose concentration risks.",
+  "score": 67,
+  "score_reasoning": "Score 67/100 (INVERTED: 100 = lowest risk) — Execution Feasibility: 18/25 (AWS restaurant forecasting solution documented, multiple OSS ML projects, Toast/Square/Lightspeed APIs available, 2800+ ML engineer job postings, infra ~$50-150K dev cost). Regulatory & Legal: 16/25 (adjusted framework count ~1.0: CCPA/GDPR navigable + SOC 2 navigable; no enforcement actions; food waste legislation creates demand not restriction; commercial compliance tools available). Market Timing: 17/25 (market growing 5.5-11.1% CAGR; 4+ new entrants in 18mo: ClearCOGS $3.8M, Metafoodx $9.4M, Foodforecast €8M, Positive Carbon $2.4M; 3+ funding rounds 2024-2026; NRA Innovation Award 2025). Dependency & Concentration: 16/25 (POS integration critical but multiple vendors available; Toast API requires partner vetting but no restriction history; 2+ distribution channels; broad customer segment 1M+ US restaurants). Total: 18+16+17+16=67.",
+  "data": {
+    "risks": [
+      {
+        "category": "dependency",
+        "risk": "POS API integration gatekeeping — Toast requires partner agreement vetting by compliance, privacy, security, and legal teams before granting write API access; standard access is read-only",
+        "probability": "medium",
+        "impact": "high",
+        "mitigation": "Start with read-only integration (sufficient for pulling historical sales data); pursue partner status in parallel; support multiple POS systems (Square, Lightspeed, Clover) from launch to reduce single-vendor dependency",
+        "evidence": "Toast developer docs: Standard API access does not include write access. Partner integration requires approval from Toast compliance, privacy, security, and legal teams.",
+        "source_department": "own-research"
+      },
+      {
+        "category": "market",
+        "risk": "Dominant incumbent entrenchment — Restaurant365 ($283M funding, $1B valuation, 318 G2 reviews) and PreciTaste ($53.3M, 40+ patents) could expand features to cover predictive waste + supplier integration, eliminating the differentiation gap",
+        "probability": "medium",
+        "impact": "critical",
+        "mitigation": "Focus on SMB segment underserved by enterprise players; build supplier integration as defensible moat; achieve network effects through local supplier partnerships before incumbents can replicate",
+        "evidence": "Competitive analysis: Restaurant365 $283M funding, 318 G2 reviews; already has Smart Prep/Smart Ordering AI features. PreciTaste $53.3M with 40+ patents.",
+        "source_department": "competitive"
+      },
+      {
+        "category": "execution",
+        "risk": "ML model cold-start problem — predictive demand forecasting requires sufficient historical sales data per restaurant; new customers may not have enough data for accurate predictions initially",
+        "probability": "medium",
+        "impact": "medium",
+        "mitigation": "Use aggregate/industry baseline models for initial predictions; require minimum 3-6 months POS data history for onboarding; supplement with external signals (weather, events, seasonality) to bootstrap predictions",
+        "evidence": "ClearCOGS uses 100M+ data points including both historical and real-time data. Syntora analyzes sales history, weather, and local events.",
+        "source_department": "own-research"
+      },
+      {
+        "category": "financial",
+        "risk": "Price ceiling from established competitors — MarketMan at $199-249/mo and Restaurant365 at $469-689/mo set market pricing expectations; SMB restaurants have thin margins (3-9% net profit) limiting willingness to pay",
+        "probability": "medium",
+        "impact": "medium",
+        "mitigation": "Price below MarketMan ($99-149/mo range) for SMBs; demonstrate ROI through food cost savings (2-8% reduction typical per Winnow benchmarks); offer freemium tier for single-location restaurants",
+        "evidence": "Competitive pricing: MarketMan $199-249/mo, Restaurant365 $469-689/mo. Industry benchmark: restaurants waste 4-10% of purchased food, best-in-class under 4%.",
+        "source_department": "competitive"
+      },
+      {
+        "category": "timing",
+        "risk": "Funding environment cooling for food tech — AgriFoodTech funding dropped 37% from H1 2024 ($6.5B) to H1 2025 ($4.1B) with 40% fewer deals, though food waste remains a favored category",
+        "probability": "low",
+        "impact": "medium",
+        "mitigation": "Bootstrap or seek smaller seed rounds; leverage regulatory tailwinds (state food waste bans) as growth catalysts; focus on revenue generation over fundraising",
+        "evidence": "Forward Fooding report: AgriFoodTech funding dropped from $6.5B/514 deals in H1 2024 to $4.1B/308 deals in H1 2025. However, waste-to-value saw fewer but larger checks ($406M across 27 deals vs $246M across 41 deals).",
+        "source_department": "own-research"
+      },
+      {
+        "category": "regulatory",
+        "risk": "Expanding state food waste bans increase compliance burden on restaurants but benefit the SaaS platform — however, regulations could mandate specific tracking methodologies that constrain product design",
+        "probability": "low",
+        "impact": "low",
+        "mitigation": "Monitor state-level legislation proactively; design flexible tracking/reporting to accommodate different regulatory frameworks; position platform as compliance tool",
+        "evidence": "NY food waste ban effective Jan 2027 for 1+ ton/week generators. Maine ban by 2030. California AB660 date labeling overhaul effective July 2026.",
+        "source_department": "own-research"
+      },
+      {
+        "category": "execution",
+        "risk": "Supplier integration complexity — building integrations with fragmented local supplier ecosystems is operationally intensive; no standard API exists for small food distributors",
+        "probability": "medium",
+        "impact": "medium",
+        "mitigation": "Start with major broadline distributors (Sysco, US Foods) who have digital ordering APIs; expand to local suppliers via a lightweight ordering portal rather than full API integration",
+        "evidence": "Competitive gap analysis: no existing competitor has supplier integration. Choco ($300M funding) focuses on digitizing supplier-chef ordering, indicating both opportunity and complexity.",
+        "source_department": "competitive"
+      },
+      {
+        "category": "dependency",
+        "risk": "Customer data quality dependency — restaurants with poor POS hygiene (inconsistent item naming, missing modifiers, manual voids) degrade prediction accuracy",
+        "probability": "medium",
+        "impact": "medium",
+        "mitigation": "Build data normalization layer with fuzzy matching; provide onboarding data audit; create standardized menu item mapping during setup",
+        "evidence": "Multiple Reddit threads in r/KitchenConfidential discuss inconsistent POS usage and manual workarounds. ClearCOGS positions its value partly on working with messy restaurant data.",
+        "source_department": "problem"
+      }
+    ],
+    "dependencies": [
+      {
+        "dependency": "POS system APIs (Toast, Square, Lightspeed, Clover)",
+        "type": "platform",
+        "criticality": "high",
+        "fallback": "Multiple POS vendors available; can also accept CSV uploads as fallback for unsupported POS systems",
+        "history": "Toast requires partner vetting but no history of mass API restriction. Square has open developer program. No major POS vendor has restricted food waste software access."
+      },
+      {
+        "dependency": "Cloud infrastructure (AWS/GCP/Azure)",
+        "type": "technology",
+        "criticality": "high",
+        "fallback": "Multiple interchangeable providers; AWS, GCP, Azure all offer equivalent ML/compute services",
+        "history": "No restrictions on restaurant SaaS workloads. AWS has documented restaurant demand forecasting solution architecture."
+      },
+      {
+        "dependency": "Historical sales data from restaurants",
+        "type": "customer",
+        "criticality": "high",
+        "fallback": "Can bootstrap with industry baseline models + external signals (weather, events); degrade gracefully with less data",
+        "history": "N/A — customer-provided data, not a platform dependency"
+      },
+      {
+        "dependency": "Local supplier ecosystem for ordering integration",
+        "type": "channel",
+        "criticality": "medium",
+        "fallback": "Start without supplier integration (waste tracking + menu optimization only); add supplier ordering as phase 2 feature",
+        "history": "Choco ($300M funded) has built supplier network of 10K+ suppliers, suggesting fragmentation is solvable but requires investment"
+      }
+    ],
+    "overall_risk_level": "medium",
+    "top_3_killers": [
+      {
+        "risk": "Dominant incumbent feature expansion — Restaurant365 ($283M, $1B valuation) already has Smart Prep/Ordering AI and could add predictive waste + supplier integration, eliminating differentiation",
+        "why_killer": "R365 has the funding, customer base (318 G2 reviews), and product breadth to build this feature natively. If they execute, the SMB market could default to their all-in-one platform, leaving no room for a specialized entrant.",
+        "mitigation_feasible": true,
+        "early_warning_signal": "Restaurant365 announces predictive food waste or supplier integration features; R365 acquires a food waste startup (like ClearCOGS or Metafoodx)"
+      },
+      {
+        "risk": "POS integration gatekeeping blocks data access — Toast (dominant US restaurant POS) requires rigorous partner vetting and limits standard API to read-only; rejection or slow approval delays go-to-market",
+        "why_killer": "Without POS data, the predictive engine has no fuel. If the dominant POS vendor blocks or delays integration, the product cannot deliver its core value proposition to a large segment of the addressable market.",
+        "mitigation_feasible": true,
+        "early_warning_signal": "Toast partner application rejected or delayed >6 months; Toast announces competing native forecasting feature; Toast acquires ClearCOGS (already integrated)"
+      },
+      {
+        "risk": "ML cold-start + data quality issues create poor early predictions, causing churn before the model matures",
+        "why_killer": "Restaurant operators have low patience for tools that don't deliver immediate ROI. If early predictions are inaccurate due to insufficient data, word-of-mouth in the tight-knit restaurant community could brand the product as unreliable, creating a reputation barrier.",
+        "mitigation_feasible": true,
+        "early_warning_signal": "Pilot customer churn rate >30% in first 3 months; customer complaints about prediction accuracy in onboarding period; NPS scores below 20 in first 90 days"
+      }
+    ],
+    "search_queries_used": [
+      "food waste prediction API machine learning restaurant open source SDK",
+      "restaurant demand forecasting AI technical architecture tech stack",
+      "restaurant SaaS infrastructure cost hosting cloud AWS food waste",
+      "machine learning engineer restaurant technology job postings 2025 2026",
+      "restaurant food safety regulation compliance FDA FSMA requirements",
+      "food waste regulation legislation enforcement action restaurant 2024 2025 2026",
+      "restaurant data privacy GDPR CCPA POS data compliance requirements",
+      "food waste restaurant compliance cost compliance as a service software",
+      "restaurant food waste technology startup launch funding 2024 2025 2026",
+      "food waste management technology trend growth Google Trends 2024 2025",
+      "restaurant POS API integration platform risk Toast Square restriction",
+      "ClearCOGS Foodforecast Metafoodx restaurant AI food waste startup funding 2025 2026",
+      "Toast POS market share restaurant API partner restrictions developer program changes"
+    ],
+    "sub_scores": {
+      "execution_feasibility": 18,
+      "regulatory_legal": 16,
+      "market_timing": 17,
+      "dependency_concentration": 16
+    },
+    "risk_score": 67
+  },
+  "evidence": [
+    "Toast developer docs: Standard API access is read-only, partner integration requires compliance/privacy/security/legal team approval",
+    "Restaurant365: $283M funding, $1B valuation, Smart Prep/Smart Ordering AI features already overlap with predictive waste reduction",
+    "Forward Fooding report: AgriFoodTech funding dropped 37% from H1 2024 ($6.5B) to H1 2025 ($4.1B) but food waste category saw larger average checks"
+  ],
+  "artifacts": [
+    {
+      "name": "risk-analysis",
+      "store": "engram",
+      "ref": "validation/restaurant-waste/risk"
+    }
+  ],
+  "flags": [],
+  "next_recommended": []
+}
