@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "department": "risk",
+  "executive_summary": "Crypto remittance idea faces medium overall risk (56/100): excellent market timing and strong technical feasibility are offset by severe regulatory complexity (state-by-state MTL licensing $1-3M, active enforcement $4.68B in fines 2024, fragmented Central America regulation) and moderate dependency concentration on banking partners and regulatory status quo.",
+  "score": 56,
+  "score_reasoning": "Score 56/100 (INVERTED: 100 = lowest risk) — Execution Feasibility: 20/25 (Multiple APIs/SDKs: Circle, Stellar, Bridge, BTCPay; redundant blockchains: Solana, Polygon, Stellar, Ethereum; 42,240+ blockchain jobs; similar architectures: Bitso, MoneyGram, Remitly+Bridge; infra cost sub-cent per tx on high-throughput chains). Regulatory & Legal: 5/25 (Adjusted framework count 3.5: FinCEN MSB 0.5, State MTL 1.0, GENIUS Act 0.5, Central America regulation 1.0, NY BitLicense 0.5; active enforcement: $4.68B SEC fines 2024, OKX $504M, BitMEX $100M; State MTL costs $1-3M, timeline 6-14 months). Market Timing: 21/25 (Stablecoin volumes +85% YoY to $11.1T; 5+ new entrants 18mo: Circle network, Remitly stablecoin, PEXX, Bridge/Stripe $1.1B, MoneyGram stablecoin; 3+ funding rounds; McKinsey/Stripe/Visa coverage). Dependency & Concentration: 10/25 (2 critical dependencies: banking/fiat partner with de-risking history but Bridge/Stripe fallback; regulatory status quo with GENIUS Act but amendment risk). Total: 20 + 5 + 21 + 10 = 56.",
+  "data": {
+    "risks": [
+      {"category": "regulatory", "risk": "US state-by-state money transmitter licensing requires $1-3M in first year and 6-14 months per state, creating massive barrier to national coverage", "probability": "high", "impact": "critical", "mitigation": "Phase licensing by top remittance corridors (CA, TX, FL, NY) first; use compliance-as-a-service (Brico.ai, Cornerstone Licensing); partner with licensed MTL holder initially", "evidence": "Brico.ai 2025 MTL Cost Guide: $250K-$350K in fees alone, $1-3M total first year; 49 states require separate licenses", "source_department": "own-research"},
+      {"category": "regulatory", "risk": "Active enforcement against crypto companies: SEC fines hit $4.68B in 2024 (3,018% surge), OKX $504M penalty, BitMEX $100M for AML violations", "probability": "medium", "impact": "critical", "mitigation": "Implement Chainalysis for transaction monitoring, Sumsub/Jumio for KYC from day 1; hire Chief Compliance Officer pre-launch; file SARs and CTRs proactively", "evidence": "SEC enforcement data 2024, CoinTelegraph reporting, OKX guilty plea 2025", "source_department": "own-research"},
+      {"category": "regulatory", "risk": "Central America recipient-side regulation is fragmented: Guatemala has only a draft bill, Honduras has no crypto framework, El Salvador rescinded Bitcoin legal tender status in Jan 2025", "probability": "medium", "impact": "high", "mitigation": "Start with El Salvador (established dual BSP/DASP framework) and Guatemala (pending bill supports financial inclusion); use stablecoin-to-local-fiat off-ramp to avoid requiring recipients to hold crypto", "evidence": "CoinTelegraph LATAM regulation overview 2025, MEXC Central America analysis", "source_department": "own-research"},
+      {"category": "execution", "risk": "Last-mile cash-out infrastructure in rural Central America is limited — low banking penetration and few ATMs outside major cities", "probability": "medium", "impact": "high", "mitigation": "Partner with existing agent networks (MoneyGram 500K+ locations, local tiendas); integrate with mobile money where available; focus initially on urban corridors", "evidence": "IMF Central America fintech paper, competitive department gap analysis — 5+ sources mention last-mile cash-out gap", "source_department": "competitive"},
+      {"category": "dependency", "risk": "Banking partner de-risking: US banks have history of cutting off crypto companies (Operation Choke Point legacy), could lose fiat on-ramp access", "probability": "medium", "impact": "critical", "mitigation": "Use Stripe/Bridge infrastructure (Stripe acquired Bridge for $1.1B in 2025 specifically for stablecoin payments); maintain relationships with 2+ banking partners; consider neo-bank partnerships", "evidence": "History of bank de-risking of crypto companies; Stripe $1.1B Bridge acquisition validates infrastructure path", "source_department": "own-research"},
+      {"category": "market", "risk": "Dominant incumbents could crush new entrant: Bitso ($331M funding, $2.2B valuation, $3.3B US-Mexico crypto remittances) and traditional players (Remitly $1.6B revenue, Western Union $4.05B revenue) are integrating stablecoins", "probability": "high", "impact": "high", "mitigation": "Focus on Central America corridor specifically (Bitso is Mexico-focused); differentiate on zero-crypto-knowledge UX for recipients; target gap Bitso doesn't serve well", "evidence": "Competitive department: Bitso 4/20 competitive opportunity score; Remitly launched stablecoin wallet Sept 2025; Western Union piloting stablecoin settlements", "source_department": "competitive"},
+      {"category": "financial", "risk": "Race to zero fees: Strike charges 0.99%, PayPal/Xoom offering zero-fee PYUSD remittances, Wise at 0.33-2% — pricing pressure may make unit economics unsustainable", "probability": "medium", "impact": "high", "mitigation": "Differentiate on value-added services (recipient-side cash-out, multi-currency wallet, bill payment); charge for convenience/speed premium rather than transfer fee alone", "evidence": "Competitive pricing benchmark: Strike 0.99%, traditional MTOs 3-10%, free alternatives emerging (PayPal PYUSD)", "source_department": "competitive"},
+      {"category": "timing", "risk": "Market may be approaching late-stage for pure crypto-remittance play as incumbents integrate stablecoins (Remitly, Western Union, MoneyGram all added stablecoin rails in 2025)", "probability": "low", "impact": "medium", "mitigation": "Enter as Central America specialist with superior last-mile and recipient UX rather than generic crypto remittance; timing window still open for corridor-specific solutions", "evidence": "Remitly+Bridge Sept 2025, Circle network April 2025, MoneyGram stablecoin app Colombia Sept 2025, Western Union stablecoin pilot", "source_department": "own-research"},
+      {"category": "execution", "risk": "Crypto literacy barrier among target users: Chivo Wallet in El Salvador showed 80% non-usage despite government push; migrant workers may distrust crypto", "probability": "medium", "impact": "medium", "mitigation": "Abstract crypto completely — user never sees blockchain; use stablecoins as rails only; brand as 'cheaper way to send money' not 'crypto remittance'; Spanish-language UX", "evidence": "Competitive department: Chivo 80% non-adoption, cited crypto literacy gap mentioned by 10+ sources", "source_department": "competitive"}
+    ],
+    "dependencies": [
+      {"dependency": "US banking/fiat on-ramp partner", "type": "platform", "criticality": "high", "fallback": "Stripe/Bridge infrastructure, multiple neo-bank partners, Circle USDC direct integration", "history": "Operation Choke Point (2013-2017) targeted crypto companies; multiple crypto firms lost banking access 2022-2023; improving post-GENIUS Act"},
+      {"dependency": "Blockchain infrastructure (Stellar/Solana/Polygon)", "type": "technology", "criticality": "medium", "fallback": "Multiple interchangeable L1/L2 chains available; can deploy on 2+ simultaneously; BTCPay Server as OSS fallback", "history": "Individual chain outages occur (Solana had outages 2022-2023) but no systemic blockchain unavailability; multi-chain approach mitigates"},
+      {"dependency": "Stablecoin issuer (Circle/USDC)", "type": "technology", "criticality": "medium", "fallback": "USDT (Tether) as alternative stablecoin; PYUSD (PayPal); DAI (decentralized); multi-stablecoin support", "history": "USDC briefly de-pegged to $0.87 during SVB collapse March 2023; recovered within days; Tether has faced regulatory scrutiny but maintained peg"},
+      {"dependency": "Regulatory status quo (GENIUS Act, pro-crypto US administration)", "type": "regulatory", "criticality": "high", "fallback": "No direct fallback — regulatory reversal would affect entire industry; diversify to traditional MTL path as hedge", "history": "US crypto policy has swung between administrations; SEC enforcement-first approach 2022-2024 shifted to legislative clarity 2025; Central America regulation evolving"},
+      {"dependency": "Central America fiat off-ramp partners (local banks, agent networks)", "type": "channel", "criticality": "high", "fallback": "MoneyGram agent network (500K+ locations), local mobile money operators, partnership with existing remittance agents", "history": "Agent networks in Central America are established but concentration among few providers; MoneyGram/WU have extensive networks"}
+    ],
+    "overall_risk_level": "medium",
+    "top_3_killers": [
+      {"risk": "Regulatory complexity: 49-state MTL licensing at $1-3M cost plus 6-14 month timeline creates a massive capital and time barrier before the first legal transfer", "why_killer": "Without proper licensing, operating is a federal crime (up to $250K fine + 5 years prison per 18 USC 1960). Competitors like OKX paid $504M for violations. This isn't a slowdown — it's a legal prerequisite that could consume all seed funding before product launch.", "mitigation_feasible": true, "early_warning_signal": "License application rejections, compliance cost overruns exceeding budget, states introducing new crypto-specific requirements"},
+      {"risk": "Incumbent stablecoin integration: Remitly ($1.6B revenue), Western Union ($4.05B revenue), and Stripe ($1.1B Bridge acquisition) are all adding stablecoin rails in 2025, potentially eliminating the cost advantage before a startup can scale", "why_killer": "If incumbents offer stablecoin-powered remittances at comparable fees with their existing trust, brand, and distribution, a startup's only differentiator (lower fees via crypto) evaporates. The window to build scale before incumbents catch up may be 12-18 months.", "mitigation_feasible": true, "early_warning_signal": "Remitly or Western Union launching stablecoin-powered transfers to Central America at sub-2% fees; rapid adoption of incumbent stablecoin features"},
+      {"risk": "Banking partner de-risking: Loss of fiat on-ramp access could shut down operations overnight, and crypto companies have repeatedly lost banking relationships", "why_killer": "Without a banking partner, users cannot convert USD to stablecoins or recipients cannot convert to local fiat. This is an existential dependency — no bank = no business. History shows this happens with little warning.", "mitigation_feasible": true, "early_warning_signal": "Banking partner requesting additional compliance documentation, reducing transaction limits, or indicating strategic review of crypto relationships"}
+    ],
+    "search_queries_used": [
+      "cryptocurrency remittance API SDK blockchain open source cross-border payments",
+      "blockchain remittance developer engineer job postings 2025 2026",
+      "crypto remittance infrastructure cost hosting stablecoin payment rails",
+      "cryptocurrency remittance regulation compliance legal requirements US money transmitter",
+      "crypto remittance enforcement action fine penalty 2024 2025 2026",
+      "cryptocurrency cross-border payments legislation bill regulation pending proposed 2025 2026",
+      "money transmitter license cost per state startup timeline how long 2025",
+      "Central America cryptocurrency regulation Guatemala Honduras El Salvador 2025 2026",
+      "blockchain platform dependency risk API restriction cryptocurrency ban history",
+      "KYC AML compliance tools fintech startup Sumsub Jumio Chainalysis cost pricing",
+      "stablecoin remittance startup new launch 2024 2025 crypto cross-border",
+      "cryptocurrency remittance technical architecture tech stack stablecoin USDC case study",
+      "fintech compliance cost compliance as a service money transmitter license cost startup",
+      "crypto remittance Google Trends 2024 2025 2026 growth trend",
+      "crypto remittance startup funding investment 2024 2025 2026 Latin America"
+    ],
+    "sub_scores": {
+      "execution_feasibility": 20,
+      "regulatory_legal": 5,
+      "market_timing": 21,
+      "dependency_concentration": 10
+    },
+    "risk_score": 56
+  },
+  "evidence": [
+    "Brico.ai 2025 MTL Cost Guide — $250K-$350K fees, $1-3M total first year, 49 states require separate licenses",
+    "SEC enforcement data 2024 — $4.68B in fines (3,018% surge), OKX $504M, BitMEX $100M",
+    "Stripe acquired Bridge for $1.1B in 2025 for stablecoin payment infrastructure"
+  ],
+  "artifacts": [
+    {
+      "name": "risk-analysis",
+      "store": "engram",
+      "ref": "validation/crypto-remittances/risk"
+    }
+  ],
+  "flags": [],
+  "next_recommended": []
+}

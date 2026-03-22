@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "status": "complete",
+  "department": "synthesis",
+  "executive_summary": "PIVOT (62.8/100). The problem is real and painful — migrant workers lose 6.49%+ in fees on $45B+ in annual Central America remittances — and the market is growing at 25% CAGR. However, B2C unit economics are critically broken (LTV/CAC 0.29x, 43-month payback) because low per-transaction ARPU ($8/mo) cannot overcome consumer fintech CAC ($188). Pivot toward B2B infrastructure (powering remittances for banks/neobanks) or an embedded fintech model to fix the economics.",
+  "score": 62.8,
+  "score_reasoning": "Weighted score 62.8/100 — Problem 78×0.30=23.4, Market 72×0.25=18.0, Competitive 60×0.15=9.0, BizModel 34×0.20=6.8, Risk 56×0.10=5.6. No knockouts triggered. GO conditions not met (weighted < 70, BizModel < 45). Verdict: PIVOT.",
+  "data": {
+    "verdict": "PIVOT",
+    "confidence": "medium",
+    "weighted_score": 62.8,
+    "score_breakdown": {
+      "problem": {"score": 78, "weight": 0.30, "contribution": 23.4},
+      "market": {"score": 72, "weight": 0.25, "contribution": 18.0},
+      "competitive": {"score": 60, "weight": 0.15, "contribution": 9.0},
+      "bizmodel": {"score": 34, "weight": 0.20, "contribution": 6.8},
+      "risk": {"score": 56, "weight": 0.10, "contribution": 5.6}
+    },
+    "knockouts_triggered": [],
+    "key_strengths": [
+      "Highly validated problem (78/100): 35+ complaint threads, 85%+ from last 24 months, 7 distinct workarounds, 16+ paid alternatives with 200K+ combined reviews — remittance fee pain is institutional-grade and UN-recognized",
+      "Large and growing market (72/100): $45B Central America corridor, $135M+ SOM, 25.2% CAGR for crypto-powered remittances from institutional sources (Grand View Research, The Business Research Company)",
+      "Overwhelmingly validated revenue model: 6+ successful companies use transaction-fee model including 2 public companies (Remitly $1.26B revenue, Wise £1.05B revenue) — the model works at scale",
+      "Strong market timing (21/25 risk sub-score): stablecoin volumes up 85% YoY, 5+ new entrants in 18 months, Stripe acquired Bridge for $1.1B, major institutional validation",
+      "Actionable market gaps identified: recipient-side crypto literacy (10+ mentions), last-mile cash-out in rural Central America (5+ mentions), stablecoin UX shielding from volatility (15+ mentions)"
+    ],
+    "key_concerns": [
+      "Critically broken B2C unit economics (34/100): LTV/CAC ratio of 0.29x and 42.7-month payback period — spending $188 to acquire a customer who generates only $55 in lifetime value at 8% monthly churn",
+      "Dominant incumbent entrenchment (4/20 competitive opportunity): Bitso has $331M funding and $2.2B valuation processing $3.3B in US-Mexico crypto remittances; Strike has $90M funding — market is not open for undifferentiated entrants",
+      "Severe regulatory barrier (5/25 risk sub-score): 49-state MTL licensing costs $1-3M in year one with 6-14 month timelines; SEC fines hit $4.68B in 2024; operating unlicensed is a federal crime",
+      "All three sensitivity scenarios are unviable: CAC+20% gives 0.24x ratio, churn+20% gives 0.24x ratio, price-20% gives 0.23x ratio — no realistic perturbation makes B2C economics work",
+      "Incumbents integrating stablecoins: Remitly launched stablecoin wallet Sept 2025, Western Union piloting stablecoin settlements, MoneyGram launched stablecoin app — the crypto cost advantage window is closing"
+    ],
+    "critical_assumptions": [
+      "Average transaction size of $300 and 1.33 tx/month (16/year) based on Inter-American Dialogue data — lower frequency would worsen already-critical unit economics",
+      "Consumer crypto fintech CAC of $188 from First Page Sage 2026 benchmark — actual CAC could be higher for underbanked migrant worker segment with lower digital reach",
+      "Monthly churn rate of 8% from fintech payments benchmark — remittance-specific churn data not available; actual retention could be better (habitual senders) or worse (price-sensitive switchers)",
+      "2% total cost positioning is viable against both crypto (Strike 0.99%) and traditional (Western Union 6-10%) — race to zero with PayPal PYUSD zero-fee remittances could compress this",
+      "Regulatory environment remains stable under current pro-crypto US administration — policy reversal could affect entire industry",
+      "SOM estimate ($135M) uses 3% SAM capture rate — highly dependent on crypto adoption trajectory in Central America remittance corridor"
+    ],
+    "pivot_suggestions": [
+      {
+        "direction": "B2B infrastructure play: Build stablecoin remittance rails (API/SDK) that banks, neobanks, and existing MTOs integrate into their products — similar to Bridge (acquired by Stripe for $1.1B) or Circle's network",
+        "addresses": "Fixes BizModel score (34) by replacing B2C consumer CAC ($188) with B2B enterprise sales (higher contract value, lower churn, stronger LTV/CAC). Enterprise ARPU from volume-based pricing on billions in corridor volume vs. $8/mo per consumer",
+        "revalidation_idea": "A stablecoin-powered remittance infrastructure API for banks and money transfer operators to reduce their cross-border settlement costs by 50-80% on the US-to-Central America corridor"
+      },
+      {
+        "direction": "Embedded fintech via bank partnerships: Partner with Central American banks (like SukuPay embedded in Guatemala's Banco Industrial) to provide crypto-powered remittance rails within existing banking apps — near-zero CAC through bank distribution",
+        "addresses": "Fixes BizModel score (34) by leveraging bank's existing customer base (near-zero CAC), and Risk score (56) by operating under partner's regulatory umbrella. SukuPay precedent shows this works in Guatemala specifically",
+        "revalidation_idea": "An embedded stablecoin remittance module for Central American banks that enables their US diaspora customers to send money home at sub-1% fees through the bank's existing mobile app"
+      },
+      {
+        "direction": "Central America-first cash-out network: Instead of competing on the send side (crowded), build the recipient-side last-mile infrastructure — cash-out points, tienda partnerships, mobile money integration — and charge other remittance providers for off-ramp access",
+        "addresses": "Addresses Competitive score (60) by targeting the #1 gap (last-mile cash-out, 5+ sources) that no competitor has solved well; avoids direct competition with Bitso/Strike on the send side; builds defensible infrastructure moat",
+        "revalidation_idea": "A crypto-to-cash off-ramp network for Central America that partners with local tiendas and mobile money providers to let any remittance service deliver funds to recipients in rural areas"
+      }
+    ],
+    "next_steps": [
+      {"action": "Conduct 20 discovery interviews with migrant workers who send remittances to Central America — specifically test willingness to use a bank-embedded solution vs. standalone app, and measure price sensitivity (would they switch for 1% vs. 2% vs. 3% savings)", "priority": "high", "timeframe": "2-3 weeks", "rationale": "The pivot directions fundamentally change the customer relationship. Before committing to B2B or embedded model, validate that the demand-side assumptions hold — do recipients trust bank apps? Do senders care about the brand or just the price?"},
+      {"action": "Map the regulatory landscape for B2B infrastructure model — determine if providing remittance rails to licensed MTOs requires your own MTL or if you can operate under partner licenses", "priority": "high", "timeframe": "2-4 weeks", "rationale": "The B2B pivot's viability hinges entirely on whether the regulatory burden shifts to the partner. If you still need 49-state MTL at $1-3M, the pivot doesn't solve the capital barrier. Consult with a fintech compliance attorney specializing in money transmission."},
+      {"action": "Build a financial model for the B2B infrastructure pivot with 3 pricing scenarios: per-transaction basis points, monthly platform fee, and hybrid — benchmark against Bridge/Stripe and Circle pricing to validate LTV/CAC > 3x", "priority": "high", "timeframe": "1-2 weeks", "rationale": "The entire pivot rationale is fixing unit economics. Before building anything, prove on paper that B2B enterprise economics work with realistic contract sizes, sales cycles, and churn rates for the Central America corridor specifically."},
+      {"action": "Reach out to 5 Central American banks and 5 existing MTOs for discovery conversations about their cross-border settlement pain points and interest in stablecoin-powered infrastructure", "priority": "medium", "timeframe": "4-6 weeks", "rationale": "Validates B2B demand directly. SukuPay's success with Banco Industrial proves at least one bank is interested. Need to understand: what do they pay today for settlement? What integration requirements do they have? What compliance burden do they expect the infrastructure provider to bear?"}
+    ],
+    "validation_experiments": [
+      {"experiment": "Landing page test for B2B remittance infrastructure API targeting banks and MTOs — describe stablecoin-powered settlement rails that reduce cross-border costs by 50-80%, with a 'Request Demo' CTA", "success_metric": "50+ demo requests from financial institutions in 30 days, with at least 5 from Central America-serving organizations", "effort": "low", "what_it_validates": "B2B demand for crypto remittance infrastructure — validates the core pivot hypothesis that institutions want this capability but don't want to build it themselves"},
+      {"experiment": "Partnership LOI with 1 Central American bank for embedded remittance pilot — approach Banco Industrial (already uses SukuPay), Banrural Guatemala, or BAC Credomatic (regional)", "success_metric": "Signed LOI or formal pilot agreement within 60 days, with defined transaction volume targets and revenue share terms", "effort": "high", "what_it_validates": "Embedded fintech pivot viability — validates that banks will provide distribution (solving CAC problem) and regulatory coverage (solving compliance cost problem)"},
+      {"experiment": "Unit economics validation: Build a detailed P&L model for 3 pivot directions using real pricing from Bridge API, Circle USDC, and Stellar/Solana gas costs — calculate break-even volume and required contract size", "success_metric": "At least 1 pivot direction shows LTV/CAC > 3x with payback < 12 months at achievable Year 1 volumes ($10M-$50M in transaction volume)", "effort": "low", "what_it_validates": "Whether any pivot direction fundamentally solves the unit economics problem that killed the B2C model (0.29x LTV/CAC)"},
+      {"experiment": "Regulatory pathway assessment: Engage a fintech compliance firm (e.g., Brico.ai, Cornerstone Advisors) to map licensing requirements for B2B infrastructure vs. B2C direct model in top 5 remittance states (CA, TX, FL, NY, NJ)", "success_metric": "B2B model requires fewer licenses or can operate under partner MTL, reducing compliance cost by 50%+ vs. B2C ($1-3M baseline)", "effort": "medium", "what_it_validates": "Whether B2B pivot materially reduces the regulatory barrier that scored 5/25 in risk assessment — the #1 killer risk"}
+    ],
+    "department_flags": {
+      "problem": [],
+      "market": [],
+      "competitive": ["dominant-incumbent-found"],
+      "bizmodel": ["score-below-threshold"],
+      "risk": []
+    }
+  },
+  "evidence": [
+    "Weighted score arithmetic: (78x0.30)+(72x0.25)+(60x0.15)+(34x0.20)+(56x0.10) = 23.4+18.0+9.0+6.8+5.6 = 62.8",
+    "SukuPay embedded in Banco Industrial (Guatemala's largest bank) — precedent for embedded fintech pivot",
+    "Stripe acquired Bridge for $1.1B in 2025 — precedent for B2B infrastructure pivot"
+  ],
+  "artifacts": [
+    {
+      "name": "synthesis-analysis",
+      "store": "engram",
+      "ref": "validation/crypto-remittances/synthesis"
+    }
+  ],
+  "flags": ["score-below-threshold"],
+  "next_recommended": []
+}
