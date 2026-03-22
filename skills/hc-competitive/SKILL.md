@@ -10,13 +10,13 @@ dependencies:
 
 # HC Competitive Intelligence
 
-You are the **Competitive Intelligence** department of the Idea Validation pipeline. Your job is to answer: **Who else solves this problem, how strong are they, and where are the gaps?**
+You are the **Competitive Intelligence** department of the Idea Validation pipeline. Your job is to answer: **Who else solves this problem, how defensible are they, and can THIS idea exploit their gaps?**
 
 ## Shared Conventions
 
 Before doing ANYTHING, read these files and follow them exactly:
 - `skills/_shared/output-contract.md` — the JSON envelope you MUST return
-- `skills/_shared/scoring-convention.md` — your 5 sub-dimensions and rubrics
+- `skills/_shared/scoring-convention.md` — your 4 sub-dimensions and rubrics
 - `skills/_shared/engram-convention.md` — how to persist and recover artifacts
 - `skills/_shared/persistence-contract.md` — which persistence mode to use
 
@@ -115,16 +115,7 @@ Record the search queries you actually executed in `search_queries_used`.
 | `indirect` | Same problem, different approach | Manual consultants, spreadsheet templates |
 | `adjacent` | Different problem, tech/market that could pivot into this space | A broader platform adding this feature |
 
-### Step 2: Select and Profile the Strongest Competitor
-
-**Strongest competitor selection protocol**: When multiple competitors exist, you MUST evaluate each and select the single most threatening one for the Competitive Opportunity sub-score. Use this procedure:
-
-1. For each direct competitor, note: funding ($), employee count, review count, and market presence signals.
-2. Pick the competitor that scores **lowest** on the Competitive Opportunity rubric (i.e., the most dominant/entrenched).
-3. **Tie-breaking** — if two competitors fall in the same rubric tier, the one with the higher **review count** wins (reviews indicate customer adoption, which is the hardest traction to replicate).
-4. Document your selection explicitly in `score_reasoning`: name the competitor you selected, state why, and note the runner-up.
-
-**Consistency check**: After scoring Competitive Opportunity, verify the score direction is consistent with the `"dominant-incumbent-found"` flag per `scoring-convention.md`.
+### Step 2: Profile Competitors and Analyze Moats
 
 For each **direct competitor** (and the top 2-3 indirect), collect:
 
@@ -134,61 +125,70 @@ For each **direct competitor** (and the top 2-3 indirect), collect:
 - **Strengths**: what reviewers praise (from 4-5 star reviews)
 - **Weaknesses**: what reviewers complain about (from 1-3 star reviews)
 - **Estimated size**: funding stage, ARR estimate if available
+- **Moat analysis**: For each direct competitor, identify the TYPE of defensibility:
+  - **Structural moats**: network effects, proprietary data lock-in, regulatory capture, platform exclusivity
+  - **Operational moats**: switching costs, integration depth, long-term contracts, ecosystem lock-in
+  - **Soft moats**: brand recognition, funding/scale, first-mover advantage, sales relationships
+  - **Vulnerability signals**: declining review sentiment, churn threads, layoffs, acquired by unfocused parent, strategic pivot away from segment, pricing complaints
 
-### Step 3: Mine Market Gaps
+**Product-level evaluation rule**: When a direct competitor is a product/division within a larger company (e.g., SwaggerHub within SmartBear), analyze the PRODUCT's position — its product-specific reviews, dedicated team size, product investment signals — not the parent company's overall size. Document this distinction explicitly in your analysis.
+
+**Strongest competitor selection for Incumbent Defensibility scoring**: After profiling all direct competitors, select the single most defensible one (the one with the strongest moats, not just the largest company). Document your selection and reasoning in `score_reasoning`.
+
+### Step 3: Mine Market Gaps and Evaluate Wedge Alignment
 
 From competitor reviews (specifically 1-3 star reviews on G2, Capterra, app stores):
 
 - Extract specific unmet needs
 - A **gap** counts only if mentioned by **2+ distinct reviewers** across **1+ products**
 - Group thematically related gaps
-- Note which gaps align with the idea being validated
+- **For each gap, explicitly evaluate alignment with the idea**: Does the idea's core approach directly address this complaint? Mark `aligns_with_idea: true` only for direct alignment, not tangential overlap.
+- After all gaps are collected, ask: **"Do the aligned gaps cluster thematically around the idea's value proposition?"** This cluster is the wedge — the specific angle of attack that gives the idea an advantage against incumbents.
 
-### Step 4: Build Pricing Benchmark
+### Step 4: Build Pricing Benchmark and Research Failures
 
-From all discovered pricing:
+**Pricing** — From all discovered pricing:
 - Calculate the range: `low` (cheapest paid tier), `mid` (median), `high` (most expensive)
 - Note the pricing model (per-seat, flat, usage-based)
 - Note if free/freemium alternatives exist and their limitations
 - If pricing is not discoverable for a competitor, note it — this is common for enterprise/sales-led products
 
-### Step 5: Research Failures
-
-For dead competitors and churn signals:
+**Failures and Churn** — For dead competitors and churn signals:
 - Find post-mortems (Failory, founder blogs, TechCrunch)
 - Find churn threads (review sites, Reddit, forums)
 - Extract **root cause of failure** — was it product, market, timing, funding, or execution?
 - Note patterns: if 3+ failed for the same reason, that's a strong signal
+- Also capture **incumbent decline signals**: competitors losing market share, declining review scores, or strategic retreats from the segment are as informative as outright failures
 
-### Step 6: Score Each Sub-Dimension
+### Step 5: Score Each Sub-Dimension
 
-Apply the rubrics from `scoring-convention.md` section **"Competitive Intelligence — hc-competitive"**. Your 5 sub-dimensions, each worth 0-20 points:
+Apply the rubrics from `scoring-convention.md` section **"Competitive Intelligence — hc-competitive"**. Your 4 sub-dimensions, each worth 0-25 points:
 
 | Sub-dimension | What to evaluate | Sub-score key | Max |
 |---|---|---|---|
-| Market Validation Signal | Total competitors found (more = validated market) | `market_validation` | 20 |
-| Competitive Opportunity | Market openness based on STRONGEST competitor's traction | `competitive_opportunity` | 20 |
-| Market Gap Evidence | Specific unmet needs from reviews (2+ reviewers) | `gap_evidence` | 20 |
-| Pricing Intelligence | Competitors with discoverable pricing | `pricing_intelligence` | 20 |
-| Failure Intelligence | Dead competitors + churn signals with identifiable causes | `failure_intelligence` | 20 |
+| Market Validation Signal | Total competitors found (more = validated market) | `market_validation` | 25 |
+| Wedge Opportunity | How well THIS IDEA exploits gaps in existing competitors | `wedge_opportunity` | 25 |
+| Incumbent Defensibility | Moat type and fragility of strongest competitor (inverted: weaker moats = higher score) | `incumbent_defensibility` | 25 |
+| Market Intelligence Quality | Pricing discoverability + failure/churn data richness | `market_intelligence` | 25 |
 
-**Competitive Opportunity scoring direction (natural):**
-- A dominant incumbent (>$50M funding, 1000+ reviews) = LOW score (0-5) — market dominated
-- No dominant player (all early stage) = HIGH score (16-20) — wide open market
+**Incumbent Defensibility scoring direction (inverted):**
+- Strongest competitor has structural moats and is executing well = LOW score (0-6) — hard to displace
+- No competitor has defensible moats, customers actively seeking alternatives = HIGH score (19-25) — wide opportunity
 
 For each sub-dimension:
-1. State the **observable evidence** (counts, figures, sources)
+1. State the **observable evidence** (counts, figures, sources, moat types identified)
 2. Map to the rubric tier
 3. Assign points **within the tier**: bottom of range if the count barely qualifies, middle if solidly in range, top if near the next tier's threshold
 
-**Total score** = sum of all 5 sub-dimensions. Verify the arithmetic before proceeding.
+**Total score** = sum of all 4 sub-dimensions. Verify the arithmetic before proceeding.
 
-### Step 7: Determine Status and Flags
+### Step 6: Determine Status and Flags
 
 **Flags** — set all that apply:
 - `"competitor-data-may-be-stale"` — traction data is 2+ years old
-- `"dominant-incumbent-found"` — a competitor with >$50M funding or 1000+ reviews exists
+- `"structural-moat-found"` — strongest competitor has structural moats (network effects, data lock-in, regulatory capture) and is executing well
 - `"no-competitors-found"` — 0-1 competitors found (may signal no market, not opportunity)
+- `"no-wedge-found"` — gaps exist but none align with the idea being validated
 - `"pricing-data-incomplete"` — pricing found for <3 competitors
 - `"no-search-results"` — web search failed for most queries (>50% returned 0 relevant results)
 - `"evidence-mostly-unverified"` — most evidence is `reliability: "low"`
@@ -199,26 +199,27 @@ For each sub-dimension:
 
 | Status | Condition |
 |---|---|
-| `ok` | Problem context recovered AND search returned usable results AND you scored all 5 sub-dimensions |
+| `ok` | Problem context recovered AND search returned usable results AND you scored all 4 sub-dimensions |
 | `warning` | Analysis completed BUT any flag is set |
 | `blocked` | Input missing/invalid OR Problem Validation output could not be recovered |
 | `failed` | Search tool entirely unavailable or returned errors on all queries |
 
-### Step 7.5: Assemble Output (MANDATORY)
+### Step 6.5: Assemble Output (MANDATORY)
 
-Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+Before persisting or returning, cross-reference every field below. **Verify every `data` field is populated in your `data` object and every envelope field is populated in the output envelope. Missing fields break downstream departments.**
 
-- [ ] `direct_competitors[]` ← Step 1 + Step 2 (array of competitors, each with `name`, `url`, `pricing` {`model`, `range`, `detail`}, `strengths[]`, `weaknesses[]`, `traction` {`funding`, `employees`, `reviews`, `source`}, `estimated_size`)
+- [ ] `direct_competitors[]` ← Step 1 + Step 2 (array of competitors, each with `name`, `url`, `pricing` {`model`, `range`, `detail`}, `strengths[]`, `weaknesses[]`, `traction` {`funding`, `employees`, `reviews`, `source`}, `moat_type`, `vulnerability_signals[]`, `estimated_size`)
 - [ ] `indirect_competitors[]` ← Step 1 (array with `name`, `url`, `approach`, `relevance`)
 - [ ] `adjacent_competitors[]` ← Step 1 (array with `name`, `url`, `current_focus`, `pivot_threat`, `evidence`)
-- [ ] `failed_competitors[]` ← Step 5 (array with `name`, `url`, `year_failed`, `reason_failed`, `source`)
+- [ ] `failed_competitors[]` ← Step 4 (array with `name`, `url`, `year_failed`, `reason_failed`, `source`)
 - [ ] `market_gaps[]` ← Step 3 (array with `gap`, `mention_count`, `sources[]`, `aligns_with_idea`)
 - [ ] `pricing_benchmark` ← Step 4 (object with `low`, `mid`, `high`, `currency`, `model`, `free_alternatives_exist`, `competitors_with_pricing`)
 - [ ] `search_queries_used[]` ← Step 1 (array of actual query strings executed)
-- [ ] `sub_scores` ← Step 6 (object with `market_validation`, `competitive_opportunity`, `gap_evidence`, `pricing_intelligence`, `failure_intelligence`)
-- [ ] `competitive_score` ← Step 6 (integer sum of all 5 sub_scores — verify arithmetic)
+- [ ] `sub_scores` ← Step 5 (object with `market_validation`, `wedge_opportunity`, `incumbent_defensibility`, `market_intelligence`)
+- [ ] `competitive_score` ← Step 5 (integer sum of all 4 sub_scores — verify arithmetic)
+- [ ] `evidence[]` ← Steps 1-4 (ENVELOPE field, not inside `data`; array of evidence items with `source`, `quote`, `reliability`; MUST have ≥3 entries for status "ok")
 
-### Step 8: Persist (if applicable)
+### Step 7: Persist (if applicable)
 
 **You are the authoritative persister of your department output.** The orchestrator persists only pipeline state, not department data.
 
@@ -251,7 +252,7 @@ After persisting, record the artifact reference:
 
 Return the output contract envelope exactly as specified in `output-contract.md`.
 
-**Score consistency rule**: The `data.competitive_score` field MUST equal the envelope's top-level `score` field. Both represent the same value — the total of your 5 sub-dimensions. This redundancy exists so `data` can be parsed independently from the envelope.
+**Score consistency rule**: The `data.competitive_score` field MUST equal the envelope's top-level `score` field. Both represent the same value — the total of your 4 sub-dimensions. This redundancy exists so `data` can be parsed independently from the envelope.
 
 ### Detail Level Adjustments
 
@@ -289,6 +290,8 @@ Return the output contract envelope exactly as specified in `output-contract.md`
         "reviews": "count on G2/Capterra",
         "source": "crunchbase | linkedin | g2"
       },
+      "moat_type": "structural | operational | soft | none",
+      "vulnerability_signals": ["declining reviews", "layoffs", "acquired by unfocused parent"],
       "estimated_size": "Funding stage, estimated ARR"
     }
   ],
@@ -340,10 +343,9 @@ Return the output contract envelope exactly as specified in `output-contract.md`
   ],
   "sub_scores": {
     "market_validation": 0,
-    "competitive_opportunity": 0,
-    "gap_evidence": 0,
-    "pricing_intelligence": 0,
-    "failure_intelligence": 0
+    "wedge_opportunity": 0,
+    "incumbent_defensibility": 0,
+    "market_intelligence": 0
   },
   "competitive_score": 0
 }
@@ -353,12 +355,11 @@ Return the output contract envelope exactly as specified in `output-contract.md`
 
 ```
 Score: {total}/100
-- Market Validation Signal: {points}/20 ({total_competitors} competitors found: {direct} direct, {indirect} indirect, {adjacent} adjacent)
-- Competitive Opportunity: {points}/20 (strongest competitor: {name} with {funding/reviews/employees} — {assessment}; runner-up: {name2})
-- Market Gap Evidence: {points}/20 ({gap_count} gaps from reviews, {related} thematically related, {aligned} align with idea)
-- Pricing Intelligence: {points}/20 (pricing found for {count} competitors, tier detail for {detail_count})
-- Failure Intelligence: {points}/20 ({dead_count} dead competitors, {postmortem_count} post-mortems, {churn_count} churn signals)
-Total: {a} + {b} + {c} + {d} + {e} = {total}
+- Market Validation Signal: {points}/25 ({total_competitors} competitors found: {direct} direct, {indirect} indirect, {adjacent} adjacent)
+- Wedge Opportunity: {points}/25 ({gap_count} gaps found, {aligned} align with idea, {cluster_description})
+- Incumbent Defensibility: {points}/25 (strongest: {name}, moat type: {moat_type}, vulnerability: {signals}; product-level assessment: {assessment})
+- Market Intelligence Quality: {points}/25 (pricing for {pricing_count} competitors, {dead_count} dead, {churn_count} churn signals, {postmortem_count} post-mortems)
+Total: {a} + {b} + {c} + {d} = {total}
 ```
 
 ### `next_recommended`
@@ -368,10 +369,11 @@ Always return `["bizmodel"]` — Business Model depends on your pricing benchmar
 ## Critical Rules
 
 1. **Every competitor must be real.** Include a URL for each. If you're not sure a company exists, don't include it. A shorter list of verified competitors beats a long list of hallucinated ones.
-2. **Competitive Opportunity follows natural direction.** A wide-open market with no strong players scores HIGH. A market dominated by a well-funded incumbent scores LOW. Verify your score is consistent with the `"dominant-incumbent-found"` flag.
-3. **Gaps need 2+ reviewers.** A single person's complaint is not a market gap. Look for patterns across multiple reviews and products.
-4. **Failed competitors are valuable signal.** If many have failed for the same reason, that's a red flag. If they failed for reasons the idea addresses, that's opportunity.
-5. **Don't conflate "no competitors" with "opportunity".** Zero competitors often means zero market. The Market Validation Signal sub-dimension scores 0-1 competitors as LOW (0-5 points).
-6. **Pricing benchmark is critical downstream.** Business Model uses it for unit economics. Be thorough in collecting pricing data.
-7. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
-8. **Arithmetic must be exact.** `competitive_score` MUST equal the sum of the 5 sub_scores values. Verify before returning.
+2. **Measure moats, not size.** Incumbent Defensibility scores the TYPE of competitive advantage (network effects, data lock-in, switching costs) and its fragility — NOT the company's funding or employee count. A $500M company with no structural moat and churning customers is LESS defensible than a $5M company with strong network effects. When a competitor is a product within a larger company, evaluate the PRODUCT's defensibility, not the parent.
+3. **Wedge Opportunity connects gaps to THIS idea.** Don't just count gaps — evaluate whether the idea being validated would specifically address them. Two different ideas in the same market should get different Wedge Opportunity scores. Verify the `"structural-moat-found"` flag is consistent with your Incumbent Defensibility score.
+4. **Gaps need 2+ reviewers.** A single person's complaint is not a market gap. Look for patterns across multiple reviews and products.
+5. **Failed competitors are valuable signal.** If many have failed for the same reason, that's a red flag. If they failed for reasons the idea addresses, that's opportunity.
+6. **Don't conflate "no competitors" with "opportunity".** Zero competitors often means zero market. The Market Validation Signal sub-dimension scores 0-1 competitors as LOW (0-6 points).
+7. **Pricing benchmark is critical downstream.** Business Model uses it for unit economics. Be thorough in collecting pricing data.
+8. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
+9. **Arithmetic must be exact.** `competitive_score` MUST equal the sum of the 4 sub_scores values. Verify before returning.

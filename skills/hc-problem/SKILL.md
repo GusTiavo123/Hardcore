@@ -9,13 +9,13 @@ dependencies: []
 
 # HC Problem Validation
 
-You are the **Problem Validation** department of the Idea Validation pipeline. Your job is to answer one question: **Does this problem exist in the real world, and is it painful enough that someone would pay to solve it?**
+You are the **Problem Validation** department of the Idea Validation pipeline. Your job is to answer one question: **Does this problem exist at the level of specificity the idea claims, and is it painful enough that someone would pay to solve it this way?**
 
 ## Shared Conventions
 
 Before doing ANYTHING, read these files and follow them exactly:
 - `skills/_shared/output-contract.md` — the JSON envelope you MUST return
-- `skills/_shared/scoring-convention.md` — your 5 sub-dimensions and rubrics
+- `skills/_shared/scoring-convention.md` — your 6 sub-dimensions and rubrics
 - `skills/_shared/engram-convention.md` — how to persist your output
 - `skills/_shared/persistence-contract.md` — which persistence mode to use
 
@@ -35,12 +35,27 @@ If `idea` or `slug` are missing, return `status: "blocked"` with `flags: ["inval
 
 ## Process
 
-### Step 1: Extract the Problem
+### Step 1: Extract the Demand Stack
 
-Read the idea description and extract:
-- The **core problem** it claims to solve (1-2 sentences)
+Read the idea description and extract a **multi-layered demand hypothesis**. The demand stack prevents premature abstraction — it ensures you validate the problem at the specificity level the idea actually operates at, not at a generic level where almost anything scores well.
+
+```yaml
+demand_stack:
+  abstract_need: "The broad human need (e.g., 'reducing elderly loneliness')"
+  specific_context: "How the target user experiences the problem (e.g., 'elderly people wanting companion-like interactions to reduce isolation')"
+  solution_category: "The TYPE of solution the idea proposes (e.g., 'VR-based AI virtual pet companions')"
+  key_constraints: ["specific constraints the idea imposes (e.g., 'exclusively elderly', 'immersive 3D', 'AI-generated')"]
+```
+
+Also extract:
 - The **target user** who suffers this problem
 - The **industry/domain** (used for search queries and Engram keywords)
+
+**Extraction rules:**
+- `abstract_need` = the broadest, most charitable interpretation of the problem
+- `specific_context` = how the target user actually experiences or describes the problem — what would they search for, complain about?
+- `solution_category` = the category of intervention the idea proposes (NOT the specific product, but the TYPE — "VR companion", "SaaS analytics", "marketplace connecting X and Y")
+- `key_constraints` = specific limitations or choices the idea imposes that narrow the addressable space (e.g., "only for goat cheese", "exclusively elderly", "blockchain-based")
 
 If the idea description is vague about the problem, infer the most likely interpretation and state your assumption explicitly. Set the `"problem-is-assumption"` flag.
 
@@ -48,28 +63,31 @@ If the idea does not describe a product or service (e.g., it's a question, a ran
 
 ### Step 2: Formulate Search Queries
 
-Generate **5-8 search queries** designed to find evidence of real pain. Vary the sources and angles.
+Generate **8-12 search queries** designed to find evidence of real pain **at each layer of the demand stack**. The key insight: you must validate not just "does the abstract problem exist?" but "is there demand for this TYPE of solution to this problem?"
 
 **Language strategy**: Always formulate queries in **English** (largest corpus of complaint/review data). If the idea was described in a different language, add **2-3 additional queries in that language** targeting region-specific forums and reviews.
 
-**Complaint mining:**
-- `"{problem keyword}" frustrating OR annoying OR broken site:reddit.com`
-- `"{problem keyword}" complaint OR "waste of time" site:reddit.com OR site:news.ycombinator.com`
+**Layer 1 — Abstract need & specific context** (3-4 queries):
+- `"{specific_context keywords}" frustrating OR annoying OR broken site:reddit.com`
+- `"{specific_context keywords}" complaint OR "waste of time" site:reddit.com OR site:news.ycombinator.com`
+- `"{specific_context keywords}" "I wish" OR "someone should build" OR "why isn't there"`
 
-**Paid alternative discovery:**
-- `"{problem keyword}" software OR tool OR app site:g2.com OR site:capterra.com`
-- `"{problem keyword}" alternative OR "better than" site:g2.com`
+**Layer 2 — Solution category demand** (3-4 queries):
+- `"{solution_category keywords}" want OR need OR looking for OR interested in`
+- `"{target_user}" "{solution_category}" review OR experience OR tried`
+- `"{solution_category keywords}" site:g2.com OR site:capterra.com OR site:producthunt.com`
+- `"{target_user}" "{solution_category}" OR "{key_constraint}" adoption OR barrier OR challenge`
 
-**General pain signals:**
-- `"{problem keyword}" "I wish" OR "someone should build" OR "why isn't there"`
-- `"{problem keyword}" review OR complaint OR "hate"`
-
-**Willingness to pay:**
-- `"{problem keyword}" "would pay" OR "shut up and take my money" OR pricing`
+**Layer 3 — Paid alternatives & workarounds** (2-4 queries):
+- `"{specific_context keywords}" software OR tool OR app site:g2.com OR site:capterra.com`
+- `"{specific_context keywords}" alternative OR "better than" site:g2.com`
+- `"{specific_context keywords}" "would pay" OR "shut up and take my money" OR pricing`
 
 Adapt query terms to the specific domain. Use the target user's language, not technical jargon.
 
 **If your search tool does not support `site:` operators**, reformulate without them (e.g., `"invoice management" reddit frustrating`).
+
+**Critical**: Layer 2 queries are what distinguish a well-scoped validation from a generic one. If you skip them, you'll validate the abstract need but miss whether the proposed solution type has any organic pull.
 
 ### Step 3: Execute Searches and Collect Evidence
 
@@ -109,26 +127,39 @@ Track these counts across ALL results:
 - **Distinct workarounds**: Each unique method people describe = 1. Multiple people describing the same workaround = 1. A workaround = multi-step manual process, cobbled tool stack, spreadsheet/script, misusing an adjacent tool.
 - **Paid alternatives**: Products people currently pay for to address this problem. Must have visible pricing (free-only tools don't count). Found via G2/Capterra listings, product websites with paid tiers, mentions in complaint threads.
 
+#### C. Solution category demand signals (from Layer 2 queries)
+
+Track signals that indicate organic pull toward the TYPE of solution the idea proposes:
+
+- **Positive demand signals**: People asking for, describing wanting, or expressing interest in a solution of this TYPE (e.g., "I wish there was a VR way to...", products on G2/ProductHunt in this category with users, communities discussing this approach)
+- **Negative demand signals / adoption barriers**: Evidence that the target user actively resists or cannot use this type of solution (e.g., "elderly people find VR disorienting", "crypto too complex for remittance users", "restaurants don't adopt SaaS")
+- **Existing attempts**: Products or projects that tried this specific approach — whether successful, struggling, or dead
+
+Count and categorize these signals. They feed the new **Solution Category Demand** sub-dimension.
+
 Record the search queries you actually executed in `search_queries_used`.
 
 ### Step 4: Score Each Sub-Dimension
 
-Apply the rubrics from `scoring-convention.md` section **"Problem Validation — hc-problem"**. Your 5 sub-dimensions, each worth 0-20 points:
+Apply the rubrics from `scoring-convention.md` section **"Problem Validation — hc-problem"**. You have 6 sub-dimensions:
 
 | Sub-dimension | What to count | Sub-score key | Max |
 |---|---|---|---|
-| Complaint Volume | Unique complaint threads across all sources | `complaint_volume` | 20 |
-| Complaint Recency | % of dated complaints from last 24 months | `complaint_recency` | 20 |
-| Pain Intensity Signals | Urgency markers, quantified costs, WTP statements | `pain_signals` | 20 |
-| Workaround Evidence | Distinct workarounds described | `workaround_evidence` | 20 |
-| Existing Paid Alternatives | Products with visible pricing addressing this problem | `paid_alternatives` | 20 |
+| Complaint Volume | Unique complaint threads across all sources | `complaint_volume` | 15 |
+| Complaint Recency | % of dated complaints from last 24 months | `complaint_recency` | 15 |
+| Pain Intensity Signals | Urgency markers, quantified costs, WTP statements | `pain_signals` | 15 |
+| Workaround Evidence | Distinct workarounds described | `workaround_evidence` | 15 |
+| Existing Paid Alternatives | Products with visible pricing addressing this problem | `paid_alternatives` | 15 |
+| Solution Category Demand | Organic demand signals for the proposed solution TYPE | `solution_category_demand` | 25 |
 
 For each sub-dimension:
 1. State the **raw count** you observed
 2. Map it to the rubric tier (see `scoring-convention.md` for exact thresholds)
 3. Assign points **within the tier**: bottom of range if the count barely qualifies, middle if solidly in range, top if near the next tier's threshold
 
-**Total score** = sum of all 5 sub-dimensions. Verify the arithmetic before proceeding.
+**Total score** = sum of all 6 sub-dimensions. Verify the arithmetic before proceeding.
+
+**Anchoring rule**: Solution Category Demand carries disproportionate weight (25 points) because it validates specificity. An idea where the abstract problem scores 15/15 on all traditional sub-dimensions but the solution category has zero organic demand should score in the 60-75 range (moderate), not 80+ (strong). The 25-point allocation ensures that a zero on solution category demand caps the maximum possible score at 75.
 
 ### Step 5: Classify Pain Level
 
@@ -141,7 +172,7 @@ Based on the **total score**, assign an overall label for the `pain_intensity` f
 | `medium` | Score 40-59 |
 | `low` | Score < 40 |
 
-**Note**: This is the **overall assessment** of the problem. It is different from the `pain_signals` sub-score (which counts individual pain markers, worth 0-20 points).
+**Note**: This is the **overall assessment** of the problem at the idea's level of specificity. It is different from the `pain_signals` sub-score (which counts individual pain markers, worth 0-15 points).
 
 ### Step 6: Compile Current Solutions
 
@@ -160,30 +191,33 @@ Include every paid alternative found. Cap at **10 entries** — if you found mor
 - `"score-below-threshold"` — score < 40 (knockout threshold for Problem)
 - `"problem-is-assumption"` — the problem had to be heavily inferred from a vague idea description
 - `"limited-search-depth"` — could not fetch full page content, scored from snippets only
+- `"solution-category-no-demand"` — solution_category_demand scored 0-6 (zero organic pull toward this type of solution)
 
 **Status** — based on your analysis:
 
 | Status | Condition |
 |---|---|
-| `ok` | Search returned usable results AND you scored all 5 sub-dimensions with evidence |
+| `ok` | Search returned usable results AND you scored all 6 sub-dimensions with evidence |
 | `warning` | Analysis completed BUT any flag is set |
 | `blocked` | Input was missing or invalid |
-| `failed` | Search tool entirely unavailable or returned errors on all queries |
+| `failed` | Search tool entirely unavailable OR >50% of queries returned 0 relevant results |
 
 ### Step 7.5: Assemble Output (MANDATORY)
 
-Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+Before persisting or returning, cross-reference every field below. **Verify every `data` field is populated in your `data` object and every envelope field is populated in the output envelope. Missing fields break downstream departments.**
 
-- [ ] `problem_exists` ← Step 6 (compiled from complaint count + alternatives/workarounds criteria)
-- [ ] `problem_statement` ← Step 1 (refined 1-2 sentence description of the problem)
+- [ ] `problem_exists` ← Steps 3-4 (compiled from complaint count + alternatives/workarounds criteria — see `problem_exists` Criteria below)
+- [ ] `demand_stack` ← Step 1 (object with `abstract_need`, `specific_context`, `solution_category`, `key_constraints[]`)
+- [ ] `problem_statement` ← Step 1 (refined 1-2 sentence description of the problem AT the specific_context level, not the abstract_need level)
 - [ ] `target_user` ← Step 1 (specific description of who suffers this problem)
 - [ ] `industry` ← Step 1 (industry/domain keyword)
 - [ ] `pain_intensity` ← Step 5 (classified as `critical | high | medium | low`)
 - [ ] `current_solutions[]` ← Step 6 (array of solutions with `solution`, `type`, `satisfaction`)
-- [ ] `evidence_summary` ← Step 3 (summary of complaint counts, sources, and pattern)
+- [ ] `evidence_summary` ← Step 3 (summary of complaint counts, sources, and pattern — must mention solution category demand signals)
 - [ ] `search_queries_used[]` ← Step 3 (array of actual query strings executed)
-- [ ] `sub_scores` ← Step 4 (object with `complaint_volume`, `complaint_recency`, `pain_signals`, `workaround_evidence`, `paid_alternatives`)
-- [ ] `problem_score` ← Step 4 (integer sum of all 5 sub_scores — verify arithmetic)
+- [ ] `sub_scores` ← Step 4 (object with `complaint_volume`, `complaint_recency`, `pain_signals`, `workaround_evidence`, `paid_alternatives`, `solution_category_demand`)
+- [ ] `problem_score` ← Step 4 (integer sum of all 6 sub_scores — verify arithmetic)
+- [ ] `evidence[]` ← Step 3 (ENVELOPE field, not inside `data`; array of evidence items with `source`, `quote`, `reliability`; MUST have ≥3 entries for status "ok")
 
 ### Step 8: Persist (if applicable)
 
@@ -238,7 +272,13 @@ Return the output contract envelope exactly as specified in `output-contract.md`
 ```json
 {
   "problem_exists": true,
-  "problem_statement": "Refined 1-2 sentence description of the problem based on evidence found",
+  "demand_stack": {
+    "abstract_need": "The broad human need being addressed",
+    "specific_context": "How the target user experiences the problem",
+    "solution_category": "The TYPE of solution the idea proposes",
+    "key_constraints": ["specific constraints the idea imposes"]
+  },
+  "problem_statement": "Refined 1-2 sentence description of the problem AT the specific_context level (not the abstract_need level)",
   "target_user": "Specific description of who suffers this problem (from Step 1 extraction)",
   "industry": "Industry/domain keyword extracted in Step 1 (e.g., 'contract management', 'freelance invoicing')",
   "pain_intensity": "critical | high | medium | low",
@@ -249,7 +289,7 @@ Return the output contract envelope exactly as specified in `output-contract.md`
       "satisfaction": "high | medium | low"
     }
   ],
-  "evidence_summary": "X unique complaints found across Y sources. Pattern: ...",
+  "evidence_summary": "X unique complaints found across Y sources. Solution category demand: {summary of Layer 2 findings}. Pattern: ...",
   "search_queries_used": [
     "actual query string executed"
   ],
@@ -258,7 +298,8 @@ Return the output contract envelope exactly as specified in `output-contract.md`
     "complaint_recency": 0,
     "pain_signals": 0,
     "workaround_evidence": 0,
-    "paid_alternatives": 0
+    "paid_alternatives": 0,
+    "solution_category_demand": 0
   },
   "problem_score": 0
 }
@@ -279,12 +320,13 @@ MUST be a structured breakdown, not prose:
 
 ```
 Score: {total}/100
-- Complaint Volume: {points}/20 ({count} unique threads found across {sources})
-- Complaint Recency: {points}/20 ({percentage}% from last 24 months, {undated} undated excluded)
-- Pain Intensity Signals: {points}/20 ({count} pain markers, {quantified_costs} quantified costs, {wtp} WTP statements)
-- Workaround Evidence: {points}/20 ({count} distinct workarounds, {multi_tool_count} involving multi-tool stacks)
-- Paid Alternatives: {points}/20 ({count} paid products found, price range ${low}-${high}/mo)
-Total: {a} + {b} + {c} + {d} + {e} = {total}
+- Complaint Volume: {points}/15 ({count} unique threads found across {sources})
+- Complaint Recency: {points}/15 ({percentage}% from last 24 months, {undated} undated excluded)
+- Pain Intensity Signals: {points}/15 ({count} pain markers, {quantified_costs} quantified costs, {wtp} WTP statements)
+- Workaround Evidence: {points}/15 ({count} distinct workarounds, {multi_tool_count} involving multi-tool stacks)
+- Paid Alternatives: {points}/15 ({count} paid products found, price range ${low}-${high}/mo)
+- Solution Category Demand: {points}/25 ({positive_signals} positive demand signals, {negative_signals} adoption barriers, {existing_attempts} existing attempts in this category)
+Total: {a} + {b} + {c} + {d} + {e} + {f} = {total}
 ```
 
 ### `next_recommended`
@@ -298,4 +340,5 @@ Always return `["market", "competitive"]` — these are next in the DAG and can 
 3. **Count conservatively.** When in doubt whether two threads are the same complaint, count them as 1.
 4. **Separate searching from judging.** First collect ALL evidence (Steps 2-3), then score (Step 4). Don't let a desired score influence what you search for or how you count.
 5. **If web search fails entirely** (>50% of queries return 0 relevant results), return `status: "failed"` with `flags: ["no-search-results"]` and an `executive_summary` explaining which queries were attempted. Do NOT fall back to LLM knowledge — the pipeline requires real evidence.
-6. **Arithmetic must be exact.** `problem_score` MUST equal the sum of the 5 sub_scores values. Verify before returning.
+6. **Arithmetic must be exact.** `problem_score` MUST equal the sum of the 6 sub_scores values. Verify before returning.
+7. **Validate at the idea's specificity level.** The demand stack prevents abstracting "VR pets for elderly" into "elderly loneliness." If the abstract need is real but the solution category has zero demand, that MUST be reflected in the score through the Solution Category Demand sub-dimension. Do NOT inflate scores by validating a broader problem than the idea actually proposes.

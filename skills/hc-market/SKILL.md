@@ -209,7 +209,7 @@ For each sub-dimension:
 
 ### Step 8.5: Assemble Output (MANDATORY)
 
-Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+Before persisting or returning, cross-reference every field below. **Verify every `data` field is populated in your `data` object and every envelope field is populated in the output envelope. Missing fields break downstream departments.**
 
 - [ ] `tam` ← Step 3 (object with `value`, `currency`, `source`, `methodology`)
 - [ ] `tam.value` ← Step 3 (numeric TAM value)
@@ -233,6 +233,7 @@ Before persisting or returning, cross-reference every field in the `data` schema
 - [ ] `search_queries_used[]` ← Step 2 (array of actual query strings executed)
 - [ ] `sub_scores` ← Step 7 (object with `data_availability`, `market_scale`, `growth_trajectory`, `early_adopter_identifiability`)
 - [ ] `market_score` ← Step 7 (integer sum of all 4 sub_scores — verify arithmetic)
+- [ ] `evidence[]` ← (ENVELOPE field, not inside `data`; array of evidence items with `source`, `quote`, `reliability`; MUST have ≥3 entries for status "ok" — DO NOT leave empty)
 
 ### Step 9: Persist (if applicable)
 

@@ -425,12 +425,11 @@ Pesos validados con simulación de 13 escenarios: 84.6% accuracy (vs 61.5% con p
   "search_queries_used": ["query 1", "query 2"],
   "sub_scores": {
     "market_validation": 14,
-    "incumbent_weakness": 11,
-    "gap_evidence": 15,
-    "pricing_intelligence": 13,
-    "failure_intelligence": 12
+    "wedge_opportunity": 15,
+    "incumbent_defensibility": 11,
+    "market_intelligence": 13
   },
-  "competitive_score": 65
+  "competitive_score": 53
 }
 ```
 

@@ -71,7 +71,7 @@ Unlike other departments, Risk has **no hard dependencies** — you can always p
 |---|---|---|
 | **Problem** | `data.pain_intensity`, `data.evidence_summary`, `data.sub_scores` | Evidence quality assessment, problem-assumption risk |
 | **Market** | `data.market_stage`, `data.growth_rate`, `data.som.value`, `data.som.methodology`, `flags` | Market timing, scale risk, data quality |
-| **Competitive** | `data.direct_competitors[].traction`, `data.failed_competitors[]`, `data.market_gaps[]`, `flags` (especially `dominant-incumbent-found`) | Incumbent risk, failure patterns, entry barriers |
+| **Competitive** | `data.direct_competitors[].traction`, `data.direct_competitors[].moat_type`, `data.direct_competitors[].vulnerability_signals`, `data.failed_competitors[]`, `data.market_gaps[]`, `flags` (especially `structural-moat-found`, `no-wedge-found`) | Incumbent risk, moat analysis, failure patterns, entry barriers |
 
 **Extract industry/domain** from Problem's `data.industry` field — this becomes your search keyword for Steps 1-4. If the field is missing (legacy output), infer from `problem_statement` and the idea text.
 
@@ -245,7 +245,7 @@ For each sub-dimension:
 
 ### Step 8.5: Assemble Output (MANDATORY)
 
-Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+Before persisting or returning, cross-reference every field below. **Verify every `data` field is populated in your `data` object and every envelope field is populated in the output envelope. Missing fields break downstream departments.**
 
 - [ ] `risks[]` ← Step 5 (array of risk objects, each with `category`, `risk`, `probability`, `impact`, `mitigation`, `evidence`, `source_department` — this is the full risk register, NOT just top killers)
 - [ ] `dependencies[]` ← Step 4 (array of dependency objects, each with `dependency`, `type`, `criticality`, `fallback`, `history`)
@@ -254,6 +254,7 @@ Before persisting or returning, cross-reference every field in the `data` schema
 - [ ] `search_queries_used[]` ← Steps 1-4 (array of ALL actual query strings executed across all steps)
 - [ ] `sub_scores` ← Step 7 (object with `execution_feasibility`, `regulatory_legal`, `market_timing`, `dependency_concentration`)
 - [ ] `risk_score` ← Step 7 (integer sum of all 4 sub_scores — verify arithmetic)
+- [ ] `evidence[]` ← (ENVELOPE field, not inside `data`; array of evidence items with `source`, `quote`, `reliability`; MUST have ≥3 entries for status "ok" — DO NOT leave empty)
 
 ### Step 9: Persist (if applicable)
 

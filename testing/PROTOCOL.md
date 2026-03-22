@@ -106,8 +106,10 @@ knockout_match: true                      # actual == expected
 # Quality checks
 all_departments_completed: true           # All 6 returned status ok/warning
 schema_complete: true                     # All data fields present per SKILL.md
+envelope_valid: true                      # All 10 envelope fields present, status enum valid
 arithmetic_verified: true                 # Sub-scores sum correctly
-evidence_has_urls: true                   # No source: "llm-knowledge"
+evidence_populated: true                  # Every dept evidence[] has ≥3 entries (not empty)
+evidence_has_urls: true                   # No source: "llm-knowledge", all sources are real URLs
 engram_persisted: true                    # mem_search finds all 6 dept artifacts
 
 # Overall
@@ -125,12 +127,18 @@ After each run, verify these before committing:
 - [ ] Pipeline completed end-to-end (Synthesis produced a verdict)
 
 ### Schema Completeness
-- [ ] `problem.json` → `data` has all 10 fields from hc-problem/SKILL.md
+- [ ] `problem.json` → `data` has all 11 fields from hc-problem/SKILL.md (including `demand_stack` and `solution_category_demand` in sub_scores)
 - [ ] `market.json` → `data` has all 10 fields (tam, sam, som objects + 7 others)
-- [ ] `competitive.json` → `data` has all 9 fields (3 competitor arrays + gaps + benchmark + scores)
+- [ ] `competitive.json` → `data` has all 9 fields (3 competitor arrays + failed + gaps + benchmark + queries + sub_scores + competitive_score); direct_competitors include `moat_type` and `vulnerability_signals`
 - [ ] `bizmodel.json` → `data` has all 10 fields (model + pricing + unit_economics + sensitivity + precedents + assumptions + scores)
 - [ ] `risk.json` → `data` has all 7 fields (risks array + dependencies + overall + killers + queries + scores)
 - [ ] `synthesis.json` → `data` has all 13 fields (verdict through department_flags)
+
+### Envelope Integrity
+- [ ] Every department JSON has ALL 11 required envelope fields: `schema_version`, `status`, `department`, `executive_summary`, `score`, `score_reasoning`, `data`, `evidence`, `artifacts`, `flags`, `next_recommended`
+- [ ] Every `status` value is one of: `ok | warning | blocked | failed` (not "complete" or other non-standard values)
+- [ ] Every `score` is an integer 0-100
+- [ ] Every `score_reasoning` is a non-empty structured breakdown (not prose)
 
 ### Scoring
 - [ ] Each department's `data.{dept}_score` == envelope `score`
@@ -140,10 +148,11 @@ After each run, verify these before committing:
 - [ ] Verdict follows GO/PIVOT/NO-GO decision tree exactly
 
 ### Evidence Quality
+- [ ] Every department's `evidence[]` array has ≥3 entries (not empty)
 - [ ] No evidence item has `source: "llm-knowledge"`
+- [ ] Every evidence item has a non-empty `source` URL
 - [ ] Every competitor in `direct_competitors[]` has a real URL
 - [ ] Market data cites institutional sources with years
-- [ ] At least 3 evidence items per department
 
 ### Persistence
 - [ ] Engram: `mem_search("validation/{slug}/problem")` returns the artifact

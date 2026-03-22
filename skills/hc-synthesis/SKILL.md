@@ -69,9 +69,9 @@ You MUST attempt to read all 5 department outputs before starting synthesis.
 
 | Source | Key fields | Used for |
 |---|---|---|
-| **Problem** | `score`, `executive_summary`, `flags`, `data.problem_exists`, `data.pain_intensity`, `data.target_user`, `data.industry`, `data.current_solutions`, `data.sub_scores` | Knockout check, pain assessment, strengths/concerns |
+| **Problem** | `score`, `executive_summary`, `flags` (especially `"solution-category-no-demand"`), `data.problem_exists`, `data.demand_stack`, `data.pain_intensity`, `data.target_user`, `data.industry`, `data.current_solutions`, `data.sub_scores` (especially `solution_category_demand`) | Knockout check, pain assessment, demand stack coherence, strengths/concerns |
 | **Market** | `score`, `executive_summary`, `flags`, `data.som`, `data.market_stage`, `data.growth_rate`, `data.early_adopters` | Knockout check, opportunity sizing, early adopter channels for experiments |
-| **Competitive** | `score`, `executive_summary`, `flags`, `data.market_gaps[].aligns_with_idea`, `data.pricing_benchmark`, `data.failed_competitors`, `data.direct_competitors` | Multi-weakness check, gaps for pivot suggestions, failure patterns |
+| **Competitive** | `score`, `executive_summary`, `flags` (especially `"structural-moat-found"`, `"no-wedge-found"`), `data.market_gaps[].aligns_with_idea`, `data.pricing_benchmark`, `data.failed_competitors`, `data.direct_competitors[].moat_type`, `data.direct_competitors[].vulnerability_signals` | Multi-weakness check, wedge assessment, gaps for pivot suggestions, failure patterns |
 | **BizModel** | `score`, `executive_summary`, `flags`, `data.unit_economics.ltv_cac_ratio`, `data.sensitivity_analysis` (check `viable` fields), `data.assumptions` | Multi-weakness check, financial strength/concern, assumption extraction |
 | **Risk** | `score`, `executive_summary`, `flags` (especially `"knockout-risk"`), `data.overall_risk_level`, `data.top_3_killers`, `data.risks` | Knockout check, top killers become concerns, early_warning_signals feed experiments |
 
@@ -279,6 +279,7 @@ Before persisting or returning, cross-reference every field in the `data` schema
 - [ ] `next_steps[]` ← Step 9 (array with `action`, `priority`, `timeframe`, `rationale`)
 - [ ] `validation_experiments[]` ← Step 10 (array with `experiment`, `success_metric`, `effort`, `what_it_validates` — empty `[]` for NO-GO)
 - [ ] `department_flags` ← Step 11 (object with `problem`, `market`, `competitive`, `bizmodel`, `risk` — each an array of flag strings from that department)
+- [ ] `evidence[]` ← (ENVELOPE field; Synthesis does not do its own research, so this may be an empty array `[]` — unlike other departments, Synthesis is exempt from the ≥3 evidence requirement)
 
 ### Step 12: Persist (if applicable)
 

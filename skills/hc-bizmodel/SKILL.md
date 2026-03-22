@@ -235,7 +235,7 @@ For each sub-dimension:
 
 ### Step 8.5: Assemble Output (MANDATORY)
 
-Before persisting or returning, cross-reference every field in the `data` schema against the analysis you completed above. **Verify every field in this checklist is populated in your `data` object before proceeding to persist. Missing fields break downstream departments.**
+Before persisting or returning, cross-reference every field below. **Verify every `data` field is populated in your `data` object and every envelope field is populated in the output envelope. Missing fields break downstream departments.**
 
 **CRITICAL NESTING RULES**: `sensitivity_analysis` and `assumptions[]` are **TOP-LEVEL keys** in `data`, NOT nested inside `unit_economics`. Use **exact field names**: `estimated_ltv` not `ltv`, `churn_rate_monthly` not `monthly_churn_rate`, `estimated_cac` not `cac`.
 
@@ -262,6 +262,7 @@ Before persisting or returning, cross-reference every field in the `data` schema
 - [ ] `search_queries_used[]` ← Step 3 (array of actual query strings executed)
 - [ ] `sub_scores` ← Step 7 (object with `ltv_cac_ratio`, `revenue_model_validation`, `payback_period`, `pricing_power`)
 - [ ] `model_score` ← Step 7 (integer sum of all 4 sub_scores — verify arithmetic)
+- [ ] `evidence[]` ← (ENVELOPE field, not inside `data`; array of evidence items with `source`, `quote`, `reliability`; MUST have ≥3 entries for status "ok" — DO NOT leave empty)
 
 ### Step 9: Persist (if applicable)
 
@@ -395,7 +396,7 @@ Total: {a} + {b} + {c} + {d} = {total}
 
 ### `next_recommended`
 
-Always return `["risk"]` — Risk Assessment is the next department in the DAG.
+Always return `["synthesis"]` — Synthesis is next after the BizModel+Risk parallel phase completes. BizModel and Risk run in parallel; neither feeds into the other.
 
 ## Critical Rules
 

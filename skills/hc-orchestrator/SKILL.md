@@ -219,6 +219,21 @@ Execute the full process defined in the SKILL.md and return the output envelope.
 
 Each department needs **web search** capabilities. The sub-agent must use WebSearch and WebFetch tools to find real evidence.
 
+## Envelope Validation (after each department)
+
+After receiving output from each sub-agent, verify the envelope before accepting it. Log violations as warnings but do NOT block the pipeline — the goal is visibility, not fragility.
+
+**Required checks:**
+1. `status` is one of: `ok | warning | blocked | failed` (reject non-standard values like "complete")
+2. `schema_version` is present and equals `"1.0"`
+3. `score` is an integer 0-100
+4. `score_reasoning` is a non-empty string
+5. `evidence` array has ≥3 entries when `status` is `ok`
+6. `department` matches the expected department name
+7. All top-level envelope fields are present: `schema_version`, `status`, `department`, `executive_summary`, `score`, `score_reasoning`, `data`, `evidence`, `artifacts`, `flags`, `next_recommended`
+
+If any check fails, add a note to the user summary: "⚠️ {department} output has schema violations: {list}". The pipeline continues — downstream departments and Synthesis should still function with partial data.
+
 ## Persistence Responsibility
 
 Each department is the **authoritative persister** of its own output. The orchestrator does NOT duplicate department persistence. This prevents double-writes to Engram (which would upsert and waste calls).
