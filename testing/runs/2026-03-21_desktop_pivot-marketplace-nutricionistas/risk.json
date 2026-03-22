@@ -1,0 +1,161 @@
+{
+  "department": "risk",
+  "slug": "marketplace-nutricionistas",
+  "score": 66,
+  "sub_scores": {
+    "execution_feasibility": 19,
+    "regulatory_legal": 12,
+    "market_timing": 19,
+    "dependency_concentration": 16
+  },
+  "risks": [
+    {
+      "category": "regulatory",
+      "risk": "Multi-country regulatory fragmentation across LATAM — each country (Mexico, Colombia, Argentina, Brazil, Chile) has different telehealth legislation, data protection laws, and nutritionist licensing requirements, requiring separate compliance paths per market",
+      "probability": "high",
+      "impact": "high",
+      "mitigation": "Launch in a single country first (Mexico or Colombia) with established telehealth frameworks, then expand country-by-country with local legal counsel. Budget $5K-$15K per country for regulatory compliance setup.",
+      "evidence": "PMC study (2024) found 19/21 LATAM countries have telehealth legislation but with heterogeneous requirements. Mexico has LFPDPPP for data protection, Colombia has Law 1581/2018, Brazil has LGPD.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "regulatory",
+      "risk": "Health data classified as sensitive personal data across all LATAM jurisdictions, requiring explicit consent, encryption, and specific handling procedures that vary by country",
+      "probability": "high",
+      "impact": "medium",
+      "mitigation": "Implement privacy-by-design architecture with country-specific consent flows. Use encryption at rest and in transit from day one. Engage LATAM-focused data protection consultancy.",
+      "evidence": "EY LATAM data protection guide (2023) and Future of Privacy Forum report (2024) confirm health data is sensitive category across all LATAM data protection frameworks.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "execution",
+      "risk": "LATAM-specific food database gap — most nutrition APIs (Spoonacular, Edamam, Nutritionix) are heavily US/EU-focused and may lack comprehensive coverage of Latin American foods, recipes, and local ingredients",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Supplement global APIs (Spoonacular, USDA) with custom LATAM food database built from local nutrition tables (e.g., Mexican SMAE food exchange system, Brazilian TACO table). Budget 3-6 months of data curation.",
+      "evidence": "Competitive analysis found Nutrium has localized food databases for some regions but even it has gaps. No API found with comprehensive LATAM food coverage.",
+      "source_department": "competitive"
+    },
+    {
+      "category": "market",
+      "risk": "Marketplace cold-start problem — need to simultaneously attract nutritionists (supply) and patients (demand) in each LATAM city/country, which is especially challenging in fragmented Latin American markets",
+      "probability": "high",
+      "impact": "high",
+      "mitigation": "Start supply-side first by offering free/discounted practice management tools to nutritionists (SaaS-first, marketplace-second strategy). Target one metro area (e.g., Mexico City or São Paulo) for density.",
+      "evidence": "Upstream competitive analysis shows Nourish, Fay, Berry Street all started US-only before scaling. Doctoralia took years to build LATAM supply. Two-sided marketplace cold-start is well-documented challenge.",
+      "source_department": "competitive"
+    },
+    {
+      "category": "dependency",
+      "risk": "LLM API dependency for AI-generated diet plans — core value proposition relies on third-party AI providers (OpenAI, Anthropic, Google) whose pricing, availability, and policies could change",
+      "probability": "low",
+      "impact": "medium",
+      "mitigation": "Abstract LLM layer behind internal API to enable provider switching. Evaluate open-source alternatives (Llama, Mistral) as fallback. Cache common meal plan templates to reduce API dependency.",
+      "evidence": "Multiple LLM providers available: OpenAI, Anthropic, Google Gemini, Mistral, Meta Llama (open-source). GitHub shows multiple open-source meal plan generators.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "financial",
+      "risk": "Dominant US incumbents (Nourish $115M funding, Fay $75M, Berry Street $50M) could expand into LATAM, leveraging superior capital and technology to capture the market before a new entrant scales",
+      "probability": "medium",
+      "impact": "critical",
+      "mitigation": "Build LATAM-specific moats: localized food databases, Spanish/Portuguese language optimization, local payment integration, regulatory compliance per country. These are hard for US incumbents to replicate quickly.",
+      "evidence": "Competitive data shows Nourish, Fay, Berry Street are US-only and insurance-model-dependent (not portable to LATAM). However, Nutrium (Portugal, $19.8M funding) already has some LATAM presence.",
+      "source_department": "competitive"
+    },
+    {
+      "category": "execution",
+      "risk": "Nutritionist professional licensing varies across LATAM countries — verification of credentials at scale is operationally complex",
+      "probability": "medium",
+      "impact": "medium",
+      "mitigation": "Partner with national nutritionist associations (Colegio de Nutriólogos in Mexico, CRN in Brazil) for credential verification. Implement manual review initially, automate later.",
+      "evidence": "Each LATAM country has different professional licensing bodies and requirements for nutritionists/dietitians. No centralized verification system exists across LATAM.",
+      "source_department": "own-research"
+    },
+    {
+      "category": "timing",
+      "risk": "AI regulation in LATAM is evolving — Brazil's AI Bill and Mexico's AI governance discussions could impose new requirements on AI-generated health recommendations",
+      "probability": "medium",
+      "impact": "medium",
+      "mitigation": "Design AI meal plans as 'suggestions reviewed by the nutritionist' rather than autonomous recommendations. This positions the platform as a professional tool, not a medical device.",
+      "evidence": "LATAM regulatory bulletin 2025 notes evolving digital transformation regulations across the region. Brazil and Mexico are leading AI governance discussions.",
+      "source_department": "own-research"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependency": "LLM API providers (OpenAI, Anthropic, Google) for AI meal plan generation",
+      "type": "technology",
+      "criticality": "high",
+      "fallback": "Multiple providers available (OpenAI GPT-4, Anthropic Claude, Google Gemini, Meta Llama open-source). Can abstract behind internal API layer for easy switching.",
+      "history": "OpenAI has changed pricing and rate limits multiple times. No history of restricting health/nutrition use cases specifically."
+    },
+    {
+      "dependency": "Food/nutrition database APIs (Spoonacular, Edamam, Nutritionix, USDA)",
+      "type": "technology",
+      "criticality": "medium",
+      "fallback": "8+ API providers plus USDA FoodData Central (free, government). Can build custom LATAM food database as ultimate fallback.",
+      "history": "Spoonacular and Edamam have been stable APIs for years. USDA is government-maintained and free."
+    },
+    {
+      "dependency": "Video/telehealth infrastructure (WebRTC, Twilio, Agora)",
+      "type": "technology",
+      "criticality": "medium",
+      "fallback": "Multiple providers: Twilio, Agora, Vonage, Daily.co, WebRTC (open standard). Easy to switch between providers.",
+      "history": "Twilio is stable enterprise platform. WebRTC is open standard maintained by Google/Mozilla/Apple."
+    },
+    {
+      "dependency": "Cloud hosting (AWS, GCP, Azure) with LATAM regions",
+      "type": "technology",
+      "criticality": "medium",
+      "fallback": "All three major cloud providers have LATAM regions (AWS São Paulo, Azure Brazil South/Mexico, GCP Santiago). Multiple options.",
+      "history": "No history of restricting healthcare workloads. All offer HIPAA/health compliance options."
+    },
+    {
+      "dependency": "Professional nutritionist associations for supply-side acquisition and credential verification",
+      "type": "channel",
+      "criticality": "medium",
+      "fallback": "Alternative channels: Doctoralia professional network, Facebook groups (5000+ members identified), nutrition conferences, university nutrition programs, Instagram influencer communities.",
+      "history": "Professional associations are generally stable institutions. Doctoralia is the dominant professional platform in LATAM healthcare."
+    }
+  ],
+  "overall_risk_level": "medium",
+  "top_3_killers": [
+    {
+      "risk": "Multi-country LATAM regulatory fragmentation requiring separate compliance per jurisdiction",
+      "why_killer": "Unlike US-focused competitors that operate under one federal framework (HIPAA), LATAM marketplace must navigate 5-10 different regulatory regimes simultaneously. Each country expansion requires new legal work, delaying time-to-scale and consuming capital that should go to product and growth. Could make unit economics unviable if expansion is too slow.",
+      "mitigation_feasible": true,
+      "early_warning_signal": "Legal costs exceeding 15% of operating budget per new country; time-to-launch in second country exceeding 6 months; regulatory requirements forcing significant product changes per market."
+    },
+    {
+      "risk": "Marketplace cold-start failure — inability to achieve sufficient nutritionist-patient density in any single LATAM market",
+      "why_killer": "Two-sided marketplaces fail when they cannot reach liquidity (enough supply and demand in one geography to create a self-sustaining flywheel). LATAM markets are fragmented by country and city. If supply acquisition is too slow or patients don't convert, the marketplace never reaches critical mass and burns through capital. Babylon Health ($2B valuation, bankrupt 2023) and Forward Health ($400M burned, shut down 2024) demonstrate telehealth scale failures.",
+      "mitigation_feasible": true,
+      "early_warning_signal": "Nutritionist sign-up rate below 50/month in target city after 3 months; patient booking rate below 2 per nutritionist per month; nutritionist churn exceeding 10% monthly."
+    },
+    {
+      "risk": "Well-funded US incumbents (Nourish $115M, Fay $75M) or regional player Nutrium ($19.8M) expanding into LATAM before new entrant achieves critical mass",
+      "why_killer": "Incumbents have 10-50x more capital, established technology platforms, and growing AI capabilities. If Nourish or Fay decide to expand internationally (as their US market saturates), they could capture LATAM with superior product and aggressive pricing. Nutrium is already Portugal-based with some LATAM presence and could accelerate.",
+      "mitigation_feasible": true,
+      "early_warning_signal": "Nourish/Fay announcing international expansion plans; Nutrium launching LATAM-specific marketplace features; new well-funded competitor specifically targeting LATAM nutrition marketplace."
+    }
+  ],
+  "search_queries_used": [
+    "nutrition AI diet plan API SDK open source",
+    "nutritionist telehealth platform infrastructure cost hosting AWS healthcare",
+    "nutrition AI developer engineer job postings 2025",
+    "telehealth nutrition marketplace technical architecture tech stack",
+    "nutrition AI diet plan API SDK open source",
+    "telehealth platform infrastructure cost AWS healthcare startup",
+    "digital health nutrition regulation compliance LATAM",
+    "nutrition app startup funding investment 2024 2025",
+    "telehealth regulation LATAM Mexico Colombia data protection health",
+    "telemedicina regulacion ley datos personales salud LATAM Mexico",
+    "digital nutrition platform Google Trends growth 2024 2025",
+    "nutrition marketplace startup new launch 2024 2025 dietitian",
+    "HIPAA compliance tools healthcare startup cost Vanta SOC 2",
+    "Spoonacular API Edamam API Nutritionix API food database pricing",
+    "OpenAI GPT API meal plan generation nutrition developer",
+    "nutrition telehealth platform dependency risk single point failure distribution channel"
+  ]
+}

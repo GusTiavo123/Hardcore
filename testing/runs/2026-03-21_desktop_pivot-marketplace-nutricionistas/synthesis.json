@@ -1,0 +1,108 @@
+{
+  "department": "synthesis",
+  "slug": "marketplace-nutricionistas",
+  "score": 64,
+  "weighted_score": 63.9,
+  "verdict": "PIVOT",
+  "confidence": "medium",
+  "score_breakdown": {
+    "problem": {"score": 68, "weight": 0.30, "contribution": 20.4},
+    "market": {"score": 68, "weight": 0.25, "contribution": 17.0},
+    "competitive": {"score": 58, "weight": 0.15, "contribution": 8.7},
+    "bizmodel": {"score": 56, "weight": 0.20, "contribution": 11.2},
+    "risk": {"score": 66, "weight": 0.10, "contribution": 6.6}
+  },
+  "knockouts_triggered": [],
+  "executive_summary": "PIVOT (63.9/100): El marketplace de nutricionistas en LATAM valida dolor real y mercado creciente ($1.5B, 15.2% CAGR), pero los unit economics son frágiles (LTV/CAC 1.70x, las 3 sensibilidades fallan) y competidores como Nourish ($115M) y Fay ($75M) dominan el espacio marketplace. Se recomienda pivotar a un modelo SaaS-first con AI para nutricionistas en un solo país LATAM antes de activar el lado marketplace.",
+  "key_strengths": [
+    "Mercado en fuerte crecimiento: digital dietitian market $1.5B con 15.2% CAGR; LATAM digital health a 20% CAGR; AI meal planning a 24-28% CAGR — timing excelente con 5+ rondas de funding masivas en 18 meses (Nourish $70M, Fay $50M, Berry Street $50M, Healthie $23M)",
+    "Ecosistema de alternativas pagas maduro: 12+ herramientas con pricing visible validan willingness-to-pay de nutricionistas ($15-$155/mo); Paid Alternatives sub-score 19/20",
+    "Gap LATAM claro y alineado con la idea: 5 market gaps identificados en reviews — falta de soporte español/LATAM, falta de AI en meal planning, falta de marketplace+practice management integrado — todos alinean directamente con la propuesta",
+    "Workarounds generalizados confirman dolor activo: 6 workarounds distintos incluyendo stacks multi-herramienta (EHR+telehealth+meal planner), Excel/WhatsApp como sustitutos, confirman que nutricionistas buscan activamente soluciones",
+    "Stack técnico altamente factible: 8+ APIs de nutrición, múltiples proveedores LLM, WebRTC para video, costos de infraestructura $1K-$5K/mo en MVP — Execution Feasibility 19/25"
+  ],
+  "key_concerns": [
+    "Unit economics frágiles: LTV/CAC 1.70x con payback de 11.8 meses; las 3 sensibilidades (CAC +20%, churn +20%, precio -20%) fallan el umbral de viabilidad — no hay margen de error",
+    "Incumbentes dominantes: Nourish ($115M funding, $1B+ valuación, 3000+ dietistas) y Fay ($75M, $500M valuación) controlan el espacio marketplace; Competitive Opportunity score 5/20 — mercado entrincherad",
+    "Cold-start de marketplace en LATAM fragmentado: necesidad de densidad simultánea de oferta y demanda en cada ciudad/país; Babylon Health ($2B → quiebra) y Forward Health ($400M quemados → cierre) demuestran riesgo de escala en telehealth",
+    "Fragmentación regulatoria LATAM: cada país (México, Colombia, Brasil, Argentina, Chile) tiene legislación diferente de telemedicina, protección de datos y licenciamiento de nutricionistas — Regulatory score 12/25",
+    "Intensidad de dolor moderada sin WTP explícito: Pain Intensity 10/20 con costos cuantificados de tiempo pero sin declaraciones explícitas de willingness-to-pay — el dolor existe pero la disposición a pagar por una nueva solución no está demostrada"
+  ],
+  "critical_assumptions": [
+    "ARPU blended a $54/mo: $39 suscripción + $15 comisión marketplace promedio — basado en analogía con modelo Doctolib, no validado directamente en LATAM",
+    "Churn mensual al 5%: ajustado a la baja desde benchmark de 7.5% healthcare SaaS por switching costs esperados — si el churn real es 6%+, el modelo se rompe (LTV/CAC cae a 1.41x)",
+    "CAC a $350: ajustado a la baja desde $500-700 US benchmark para LATAM — depende de adquisición orgánica via comunidades; si se requiere paid acquisition, CAC sube significativamente",
+    "Gross margin al 55%: blend de SaaS (75%) y marketplace (25%), reducido 5pts por costos AI — los costos reales de compute para generación de dietas con LLM pueden ser mayores",
+    "Los incumbentes US (Nourish, Fay) no expandirán a LATAM en los próximos 18-24 meses — si lo hacen, la ventana competitiva se cierra"
+  ],
+  "pivot_suggestions": [
+    {
+      "direction": "SaaS-first para nutricionistas en México: herramienta de práctica con AI meal planning y base de datos de alimentos mexicanos, sin marketplace inicial. Monetización por suscripción pura $25-39/mo.",
+      "addresses": "Reduce riesgo de cold-start (elimina lado demanda), mejora unit economics (SaaS puro tiene ~75% gross margin vs 55% hybrid), simplifica regulación (un solo país). Ataca los scores bloqueantes: BizModel sube con mejores márgenes, Competitive Opportunity mejora al no competir directamente con marketplaces US.",
+      "revalidation_idea": "SaaS de gestión de práctica con AI meal planning y base de datos de alimentos locales para nutricionistas independientes en México"
+    },
+    {
+      "direction": "B2B white-label para clínicas de nutrición en LATAM: vender la plataforma de AI diet planning como infraestructura a clínicas establecidas que ya tienen pacientes.",
+      "addresses": "Elimina cold-start (clínicas ya tienen pacientes), reduce CAC dramáticamente (enterprise sales a clínicas vs adquisición individual), mejora LTV (contratos anuales enterprise). Ataca BizModel directamente — enterprise SaaS tiene LTV/CAC 3-5x.",
+      "revalidation_idea": "Plataforma B2B white-label de AI diet planning y seguimiento para clínicas de nutrición en LATAM"
+    },
+    {
+      "direction": "Herramienta AI de meal planning standalone con freemium para nutricionistas globales (no LATAM-only): capturar el gap de AI meal planning que Practice Better, Healthie, Nutrium no cubren.",
+      "addresses": "Elimina riesgo regulatorio LATAM (herramienta SaaS global, no marketplace de salud), ataca gap competitivo claro (AI meal planning scored 12 menciones como gap), modelo freemium reduce CAC. Ataca Risk (regulatory 12/25 → mejora sin regulación salud) y Competitive (gap evidence 14/20 directamente alineado).",
+      "revalidation_idea": "Herramienta AI freemium de generación de planes de dieta personalizados para nutricionistas independientes globalmente"
+    }
+  ],
+  "next_steps": [
+    {
+      "action": "Validar el pivot SaaS-first: crear landing page para herramienta de AI meal planning para nutricionistas en México, con waitlist, y distribuir en los grupos de Facebook identificados (Nutricionistas Latinoamericanos 5K miembros, Gremio LATAM 3K miembros) y Congreso Mexicano de Nutrición",
+      "priority": "high",
+      "timeframe": "2-3 semanas",
+      "rationale": "El gap de AI meal planning tiene 12 menciones en reviews de competidores y alinea directamente con la propuesta. Validar demanda antes de construir elimina el riesgo de building the wrong thing."
+    },
+    {
+      "action": "Entrevistar 15-20 nutricionistas independientes en México sobre willingness-to-pay por AI meal planning y pain points con herramientas actuales (Doctoralia, NutriAdmin, spreadsheets)",
+      "priority": "high",
+      "timeframe": "2-4 semanas",
+      "rationale": "Pain Intensity score solo 10/20 — falta evidencia directa de WTP. Las entrevistas validan si el dolor justifica cambio de herramienta y a qué precio."
+    },
+    {
+      "action": "Investigar costos reales de compliance regulatorio en México para plataforma de nutrición digital (LFPDPPP, telemedicina) con abogado local",
+      "priority": "medium",
+      "timeframe": "1 mes",
+      "rationale": "Regulatory score 12/25 y es el killer #1 identificado por Risk. Necesario cuantificar si el costo regulatorio es manejable (<$15K) o prohibitivo antes de comprometer recursos."
+    },
+    {
+      "action": "Construir prototipo de AI meal plan generator con base de datos de alimentos mexicanos y probar con 5-10 nutricionistas beta",
+      "priority": "medium",
+      "timeframe": "1-2 meses",
+      "rationale": "Execution Feasibility es alta (19/25) pero el gap de food database LATAM es un riesgo técnico. Un prototipo valida tanto la factibilidad técnica como el product-market fit."
+    }
+  ],
+  "validation_experiments": [
+    {
+      "experiment": "Landing page con waitlist para AI meal planning tool para nutricionistas en México, distribuida en grupos de Facebook de nutricionistas LATAM y via ads en Instagram targeting nutricionistas mexicanos",
+      "success_metric": "100+ signups de nutricionistas mexicanos en 14 días con >5% conversion rate de visita a signup",
+      "effort": "low",
+      "what_it_validates": "Demanda real por AI meal planning entre nutricionistas LATAM; valida que el gap competitivo identificado (12 menciones) se traduce en intención de adopción"
+    },
+    {
+      "experiment": "Encuesta de willingness-to-pay a nutricionistas que se registren en waitlist: ¿Cuánto pagan hoy? ¿Cuánto pagarían por AI meal planning? ¿Qué features son must-have?",
+      "success_metric": "80%+ de respondentes dispuestos a pagar >$20/mo por AI meal planning; >50% actualmente usan workarounds manuales (Excel/WhatsApp)",
+      "effort": "low",
+      "what_it_validates": "Assumption de ARPU $39/mo y pricing power; confirma o invalida la asunción de que nutricionistas LATAM pagarán precios similares a US-adjusted benchmarks"
+    },
+    {
+      "experiment": "Prototipo funcional de AI meal plan generator con 500+ alimentos mexicanos, probado con 10 nutricionistas beta en México City durante 2 semanas",
+      "success_metric": "NPS >40 entre beta testers; >70% generan al menos 5 planes de dieta en las 2 semanas; tiempo de creación de plan <10 minutos vs 4-6 horas manual",
+      "effort": "medium",
+      "what_it_validates": "Factibilidad técnica del AI meal planning con alimentos LATAM; product-market fit; valida assumption de que AI reduce suficientemente el dolor de creación manual de planes"
+    }
+  ],
+  "department_flags": {
+    "problem": [],
+    "market": [],
+    "competitive": ["dominant-incumbent-found"],
+    "bizmodel": [],
+    "risk": []
+  }
+}

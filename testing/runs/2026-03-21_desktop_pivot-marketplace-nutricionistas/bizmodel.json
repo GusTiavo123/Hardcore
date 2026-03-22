@@ -1,0 +1,117 @@
+{
+  "department": "bizmodel",
+  "slug": "marketplace-nutricionistas",
+  "score": 56,
+  "sub_scores": {
+    "ltv_cac_ratio": 11,
+    "revenue_model_validation": 17,
+    "payback_period": 13,
+    "pricing_power": 15
+  },
+  "recommended_model": "hybrid",
+  "model_justification": "Hybrid subscription+marketplace model recommended based on competitive evidence: (1) Practice Better, Healthie, Nutrium, NutriAdmin all validate subscription SaaS for nutritionist tools ($15-155/mo); (2) Nourish, Fay, Berry Street validate marketplace model for patient-nutritionist matching; (3) Doctolib (€5.8B valuation) proves hybrid subscription-from-providers + free-marketplace-for-patients works at scale in healthcare. The hybrid captures recurring SaaS revenue from nutritionists (AI diet plans, practice management) plus marketplace commission on patient-sourced sessions, diversifying revenue and aligning incentives.",
+  "pricing_suggestion": {
+    "price_point": 39,
+    "billing": "monthly",
+    "currency": "USD",
+    "justification": "Positioned at LATAM-adjusted mid-range of competitive benchmark ($15-$155 range). Pain intensity is 'high' (from Problem validation), justifying mid-to-high pricing, but LATAM purchasing power parity requires downward adjustment from US-centric $49 mid-point. $39/mo aligns with Nutrium ($25-49/mo) and below Practice Better ($69/mo Professional tier). Additional marketplace commission of ~15% on patient-sourced sessions supplements subscription revenue."
+  },
+  "unit_economics": {
+    "arpu_monthly": 54,
+    "churn_rate_monthly": 0.05,
+    "churn_source": "Healthcare SaaS SMB monthly churn benchmark of 7.5% (wearefounders.uk 2026 Benchmarks), adjusted to 5% for nutrition-specific SaaS tools with higher switching costs (meal plan libraries, patient data lock-in). SMB SaaS general range: 3-7% monthly (same source).",
+    "gross_margin": 0.55,
+    "margin_source": "Blended estimate: SaaS portion (~72% revenue) at 70-80% margin (cloudzero.com SaaS Gross Margin Benchmarks 2025), marketplace portion (~28% revenue) at 20-30% margin (industry standard for two-sided marketplaces). Weighted blend ~60%, reduced to 55% for AI compute costs (diet plan generation, NLP). AI-core SaaS runs ~5 points lower on gross margin per 2025 SaaS benchmarks report.",
+    "estimated_ltv": 594,
+    "estimated_cac": 350,
+    "cac_source": "Healthcare SMB SaaS CAC $500-$700 (wearefounders.uk 2026 Benchmarks). Adjusted to $350 for LATAM market: lower labor costs for content marketing team, social media acquisition via nutrition communities (Facebook groups, Instagram), lower CPMs in Spanish-language digital advertising. Primary channel: content marketing + community (lower CAC, longer payback).",
+    "ltv_cac_ratio": 1.7,
+    "payback_months": 11.8
+  },
+  "sensitivity_analysis": {
+    "cac_plus_20": {
+      "ltv_cac_ratio": 1.41,
+      "payback_months": 14.1,
+      "viable": false,
+      "assessment": "CAC increase to $420 pushes LTV/CAC below 1.5x and payback to 14+ months — model becomes unsustainable; must maintain acquisition efficiency through organic channels."
+    },
+    "churn_plus_20": {
+      "ltv_cac_ratio": 1.41,
+      "payback_months": 11.8,
+      "viable": false,
+      "assessment": "Churn increase to 6% monthly reduces LTV to $495 and ratio to 1.41x — confirms that retention is the critical lever; must invest heavily in switching costs (data lock-in, AI personalization)."
+    },
+    "price_minus_20": {
+      "ltv_cac_ratio": 1.36,
+      "payback_months": 14.7,
+      "viable": false,
+      "assessment": "Price reduction to $43.20 blended ARPU drops LTV to $475 and ratio to 1.36x with 14.7-month payback — limited room for price competition; must differentiate on AI features and LATAM localization rather than price."
+    }
+  },
+  "model_precedents": [
+    {
+      "company": "Doctolib",
+      "model": "hybrid (subscription from doctors + free marketplace for patients)",
+      "segment": "Healthcare providers (doctors, dentists, specialists) in Europe",
+      "evidence": "€5.8B valuation, 300,000+ paying medical professionals, €139/mo subscription, raised $815M+ total funding. Proved that provider-side subscription + patient-side free marketplace works at massive scale.",
+      "source": "https://research.contrary.com/company/doctolib"
+    },
+    {
+      "company": "Nourish",
+      "model": "marketplace (insurance-based, platform takes cut from reimbursements)",
+      "segment": "Registered dietitians and patients seeking nutrition care in US",
+      "evidence": "$115M total funding ($70M Series B), 3,000+ RD network, $1B+ valuation, AI-powered platform. Validates marketplace model for dietitian-patient matching at scale.",
+      "source": "https://www.usenourish.com/blog/nourish-announces-series-b"
+    },
+    {
+      "company": "Practice Better",
+      "model": "subscription SaaS",
+      "segment": "Health and wellness practitioners (nutritionists, dietitians, coaches)",
+      "evidence": "$13M funded, 296 G2 reviews at 4.8/5, acquired That Clean Life for meal planning. Validates subscription model for nutritionist practice management tools at $25-155/mo.",
+      "source": "https://practicebetter.io"
+    },
+    {
+      "company": "Healthie",
+      "model": "subscription SaaS (B2B infrastructure)",
+      "segment": "Nutrition and wellness practitioners, white-label for platforms like Nourish",
+      "evidence": "$40.3M total funding ($23M Series B Oct 2024), API-first platform, HIPAA/SOC2 compliant. Validates SaaS infrastructure play for nutrition marketplace backends.",
+      "source": "https://www.gethealthie.com"
+    },
+    {
+      "company": "Fay Nutrition",
+      "model": "marketplace (insurance-based)",
+      "segment": "Registered dietitians and patients (insurance-covered nutrition counseling)",
+      "evidence": "$75M total funding, $500M valuation, booming from Ozempic patient demand. Validates marketplace model for dietitian matching with insurance integration.",
+      "source": "https://techcrunch.com/2024/05/15/dietitian-startup-fay-insurance-ozempic-general-catalyst-forerunner/"
+    },
+    {
+      "company": "Doctoralia (DocPlanner)",
+      "model": "hybrid (subscription from doctors + free marketplace for patients)",
+      "segment": "Healthcare providers and patients in LATAM (Mexico, Colombia, Chile, Argentina, Brazil)",
+      "evidence": "Acquired by DocPlanner Group, dominant healthcare marketplace in LATAM with 330,000+ professionals in Mexico alone. Validates hybrid subscription+marketplace model specifically in LATAM healthcare.",
+      "source": "https://www.doctoralia.com.mx"
+    }
+  ],
+  "assumptions": [
+    "ARPU blended at $54/mo: $39 subscription + $15 avg marketplace commission (assumes ~2 marketplace-sourced sessions/mo at ~$40/session with 15% take rate) — estimate based on Doctolib model analogy",
+    "Monthly churn at 5%: adjusted downward from 7.5% healthcare SaaS benchmark due to expected switching costs (patient data, meal plan libraries, AI personalization history) — benchmark source: wearefounders.uk 2026",
+    "Gross margin at 55%: blended from SaaS (~75%) and marketplace (~25%) portions, reduced 5 points for AI compute costs — sources: cloudzero.com 2025 SaaS margins, industry marketplace benchmarks",
+    "CAC at $350: adjusted downward from $500-700 US healthcare SMB benchmark for LATAM market (lower CPMs, lower labor costs for content team) — benchmark source: wearefounders.uk 2026",
+    "Primary acquisition channel: content marketing + social media communities — lower CAC but longer ramp; LATAM nutrition Facebook groups and Instagram as primary channels",
+    "Marketplace take rate of 15%: positioned below Berry Street/Fay (estimated 20-30% based on dietitian compensation data) to attract supply side in competitive LATAM market",
+    "LATAM purchasing power parity adjustment: ~20% discount from US pricing benchmarks for subscription tier"
+  ],
+  "search_queries_used": [
+    "marketplace SaaS churn rate benchmark 2025 2026 healthtech nutrition",
+    "healthtech marketplace customer acquisition cost CAC benchmark 2025",
+    "marketplace gross margin benchmark two-sided platform health wellness 2025",
+    "SaaS SMB LTV CAC benchmark profitwell openview 2025 2026",
+    "marketplace take rate commission benchmark healthcare wellness nutrition platform 2024 2025",
+    "nutrition dietitian marketplace subscription platform success funding case study revenue model",
+    "two-sided marketplace gross margin take rate benchmark 20% 30% SaaS hybrid 2025",
+    "healthcare marketplace platform take rate 15% 20% 25% Nourish Fay commission dietitian",
+    "hybrid marketplace SaaS subscription nutrition wellness platform revenue model success Doctolib Zocdoc Doctoralia",
+    "Doctolib revenue model subscription marketplace doctors pricing €129 success case study funding",
+    "telehealth marketplace LATAM startup funding 2024 2025 hybrid subscription commission model success"
+  ]
+}

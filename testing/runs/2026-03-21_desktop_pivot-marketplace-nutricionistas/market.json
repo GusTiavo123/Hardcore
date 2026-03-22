@@ -1,0 +1,80 @@
+{
+  "department": "market",
+  "slug": "marketplace-nutricionistas",
+  "score": 68,
+  "sub_scores": {
+    "data_availability": 19,
+    "market_scale": 13,
+    "growth_trajectory": 19,
+    "early_adopter_identifiability": 17
+  },
+  "tam": {
+    "value": 1500000000,
+    "currency": "USD",
+    "source": "Grand View Research (2024) — Global Digital Dietitian Market valued at $1.49B in 2024; corroborated by Fundamental Business Insights ($1.67B in 2025) and MetaTech Insights ($1.61B in 2024)",
+    "methodology": "top-down-institutional"
+  },
+  "sam": {
+    "value": 300000000,
+    "currency": "USD",
+    "source": "LATAM represents ~5-7% of global digital health market (MarketDataForecast); LATAM telehealth at $5.05B (Grand View Research 2023); nutrition-specific segment estimated at ~6% of telehealth = ~$300M",
+    "methodology": "top-down-estimated"
+  },
+  "som": {
+    "value": 30000000,
+    "currency": "USD",
+    "source": "Conservative 2-3% of SAM for $1B-$10B range; adjusted to 2% given early-stage marketplace in fragmented LATAM market with regulatory complexity; SOM = $300M × 2% × 5-year ramp = ~$30M achievable in first 3 years",
+    "methodology": "top-down-estimated"
+  },
+  "growth_rate": "15.2% CAGR (2025-2030)",
+  "growth_source": "Grand View Research — Digital Dietitian Market Report 2024-2030; corroborated by LATAM digital health CAGR of 20.05% (MarketDataForecast 2024-2033) and AI meal planning CAGR of 24-28% (Market.us, TBRC)",
+  "market_stage": "growing",
+  "early_adopters": [
+    {
+      "segment": "Independent nutritionists/dietitians in LATAM using digital platforms (Doctoralia, AgendaPro)",
+      "estimated_size": 50000,
+      "evidence_of_spending": "Pay $25-69/month for Practice Better, Healthie, NutriAdmin, Nutrium; Doctoralia Pro subscription for patient acquisition; 12+ paid tools identified in problem validation",
+      "reachable_channels": [
+        {"name": "Nutricionistas Latinoamericanos (Facebook Group)", "type": "other", "members": 5000},
+        {"name": "Gremio LatinoAmericano de Nutricionistas-Dietistas (Facebook Group)", "type": "other", "members": 3000},
+        {"name": "Congreso Argentino de Nutrición 2025", "type": "conference", "members": 2000},
+        {"name": "Congreso Iberoamericano de Nutrición (Colegio Mexicano de Nutriólogos)", "type": "conference", "members": 3000},
+        {"name": "SLAN - Sociedad Latinoamericana de Nutrición", "type": "other", "members": 5000}
+      ]
+    },
+    {
+      "segment": "Health-conscious urban millennials in LATAM metros (Mexico City, São Paulo, Buenos Aires, Bogotá) seeking online nutrition consultations",
+      "estimated_size": 5000000,
+      "evidence_of_spending": "Doctoralia has 330,000+ professionals in Mexico alone; LATAM digital health market $12.82B (2024); nutrition app spending growing at 13-16% CAGR; consumers pay for Noom, MyFitnessPal premium, and similar apps",
+      "reachable_channels": [
+        {"name": "r/nutricion_mexico and similar Spanish-language health subreddits", "type": "subreddit", "members": 15000},
+        {"name": "Doctoralia patient platform (Mexico, Colombia, Argentina, Chile)", "type": "other", "members": 1000000},
+        {"name": "Instagram nutrition influencer communities LATAM", "type": "other", "members": 500000}
+      ]
+    },
+    {
+      "segment": "Fitness-focused consumers and gym-goers in Brazil and Mexico seeking personalized diet plans",
+      "estimated_size": 2000000,
+      "evidence_of_spending": "Brazil fitness market one of largest globally; consumers pay for MyFitnessPal, Yazio, HealthifyMe; gym membership rates high in urban LATAM; AI meal planning app market at $972M globally (2024)",
+      "reachable_channels": [
+        {"name": "r/dietetics (English-speaking, global reach)", "type": "subreddit", "members": 37000},
+        {"name": "Forodenutricion.com", "type": "other", "members": 5000},
+        {"name": "V Congreso Latinoamericano de Nutrición Funcional", "type": "conference", "members": 1500}
+      ]
+    }
+  ],
+  "search_queries_used": [
+    "digital health nutrition market size 2024 2025 2026 TAM",
+    "online nutrition consultation marketplace market size report statista grandviewresearch",
+    "telehealth nutrition dietitian market CAGR forecast 2025 2030",
+    "nutricion digital salud LATAM mercado tamaño crecimiento latinoamerica",
+    "AI diet planning meal plan software market size growth 2024 2025",
+    "nutritionist dietitian independent practitioner community subreddit conference association LATAM",
+    "nutrition wellness app market size billion 2025",
+    "nutricionista independiente comunidad asociacion latinoamerica foro grupo",
+    "r/dietetics r/nutrition subreddit members nutritionist community online",
+    "Practice Better Healthie Nutrium nutritionist software paying customers pricing plans",
+    "Doctoralia nutricionistas Mexico Colombia Argentina numero profesionales",
+    "dietitian nutritionist conference expo Latin America 2024 2025 congreso nutricion"
+  ]
+}

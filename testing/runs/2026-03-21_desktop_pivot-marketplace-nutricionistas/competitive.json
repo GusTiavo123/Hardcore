@@ -1,0 +1,357 @@
+{
+  "department": "competitive",
+  "slug": "marketplace-nutricionistas",
+  "score": 58,
+  "sub_scores": {
+    "market_validation": 15,
+    "competitive_opportunity": 5,
+    "gap_evidence": 14,
+    "pricing_intelligence": 14,
+    "failure_intelligence": 10
+  },
+  "direct_competitors": [
+    {
+      "name": "Nourish",
+      "url": "https://www.usenourish.com",
+      "pricing": {
+        "model": "freemium",
+        "range": "$0 (insurance-covered) for patients; platform takes fee from insurance reimbursements",
+        "detail": "Insurance-based model. Patients pay $0-copay. Nourish bills insurance directly. Dietitians are 1099 contractors."
+      },
+      "strengths": [
+        "Largest RD network in US (3000+ dietitians)",
+        "AI-powered platform with meal logging and symptom tracking",
+        "Insurance-covered sessions (most major insurers)",
+        "Strong brand recognition and media coverage (Forbes, TechCrunch)",
+        "$1B+ valuation signals investor confidence"
+      ],
+      "weaknesses": [
+        "US-only, no LATAM presence",
+        "Insurance-dependent model not portable to markets without coverage",
+        "BBB complaints about billing and cancellation",
+        "Provider complaints about platform control over patient relationships"
+      ],
+      "traction": {
+        "funding": "$115M total ($70M Series B, $35M Series A)",
+        "employees": "estimated 200-300",
+        "reviews": "8700+ on Trustpilot",
+        "source": "crunchbase, trustpilot, forbes"
+      },
+      "estimated_size": "Series B, $1B+ valuation, estimated $50M+ ARR"
+    },
+    {
+      "name": "Fay Nutrition",
+      "url": "https://www.faynutrition.com",
+      "pricing": {
+        "model": "freemium",
+        "range": "$0 (insurance-covered) for patients",
+        "detail": "Insurance-based model similar to Nourish. $50M Series B at $500M valuation."
+      },
+      "strengths": [
+        "Large RD network across all 50 US states",
+        "Insurance-covered sessions",
+        "AI integration for admin streamlining",
+        "Partnership with food service delivery platforms"
+      ],
+      "weaknesses": [
+        "US-only, no LATAM support",
+        "182 Trustpilot reviews suggest smaller scale than Nourish",
+        "BBB complaints about billing",
+        "Dietitians report high platform cut"
+      ],
+      "traction": {
+        "funding": "$75M total ($25M emerged from stealth + $50M Series B)",
+        "employees": "estimated 100-200",
+        "reviews": "182 on Trustpilot",
+        "source": "crunchbase, techcrunch, trustpilot"
+      },
+      "estimated_size": "Series B, $500M valuation"
+    },
+    {
+      "name": "Berry Street",
+      "url": "https://www.berrystreet.co",
+      "pricing": {
+        "model": "freemium",
+        "range": "$0 (insurance-covered) for patients",
+        "detail": "Insurance-based marketplace. 95% sessions insurance-covered. RDs are 1099 contractors."
+      },
+      "strengths": [
+        "1000+ registered dietitians",
+        "AI business-in-a-box platform for RDs",
+        "Insurance coverage across major plans",
+        "Growing rapidly with $50M funding"
+      ],
+      "weaknesses": [
+        "US-only",
+        "Reddit complaints about excessive cut from insurance payments",
+        "180-day non-solicitation clause criticized by dietitians",
+        "Smaller review base than Nourish"
+      ],
+      "traction": {
+        "funding": "$50M (Northzone, Sofina, FJ Labs)",
+        "employees": "estimated 50-100",
+        "reviews": "limited on Trustpilot",
+        "source": "techcrunch, northzone"
+      },
+      "estimated_size": "Late Series A/early B, growing rapidly"
+    },
+    {
+      "name": "Practice Better",
+      "url": "https://practicebetter.io",
+      "pricing": {
+        "model": "subscription",
+        "range": "$25-$155/mo",
+        "detail": "Starter $25/mo (10 clients), Professional $69/mo (300 clients), Plus $99/mo (unlimited), Team $155/mo (2+ practitioners)"
+      },
+      "strengths": [
+        "296 G2 reviews, 4.8/5 rating",
+        "96 Capterra reviews",
+        "Comprehensive practice management + EHR",
+        "Acquired That Clean Life for meal planning integration",
+        "Strong automation and workflow tools"
+      ],
+      "weaknesses": [
+        "Basic meal planning (no AI generation)",
+        "No marketplace/patient discovery features",
+        "Not focused on LATAM or Spanish language",
+        "Premium features locked behind higher tiers"
+      ],
+      "traction": {
+        "funding": "$13M total",
+        "employees": "~83",
+        "reviews": "296 on G2, 96 on Capterra",
+        "source": "g2, capterra, wellfound, growjo"
+      },
+      "estimated_size": "Series A, estimated $12.7M ARR"
+    },
+    {
+      "name": "Healthie",
+      "url": "https://www.gethealthie.com",
+      "pricing": {
+        "model": "subscription",
+        "range": "$19-$149+/mo",
+        "detail": "Core $19/mo (10 clients), Essentials $49/mo (250 clients), Plus $129/mo (unlimited), Group $149+/mo"
+      },
+      "strengths": [
+        "API-first platform enabling custom integrations",
+        "Strong telehealth and insurance billing features",
+        "Used by Nourish as infrastructure (white-label)",
+        "HIPAA and SOC 2 compliant"
+      ],
+      "weaknesses": [
+        "Basic meal planning capabilities",
+        "Higher price for clinical features many independents don't need",
+        "No AI meal plan generation",
+        "Complex for solo practitioners"
+      ],
+      "traction": {
+        "funding": "$40.3M total ($23M Series B Oct 2024)",
+        "employees": "estimated 50-100",
+        "reviews": "moderate on Capterra/G2",
+        "source": "tracxn, cbinsights, crunchbase"
+      },
+      "estimated_size": "Series B, infrastructure/B2B focus"
+    },
+    {
+      "name": "Nutrium",
+      "url": "https://nutrium.com",
+      "pricing": {
+        "model": "subscription",
+        "range": "$15-$49/mo",
+        "detail": "10 clients $15/mo (yearly) or $25/mo, Unlimited $25/mo (yearly) or $49/mo"
+      },
+      "strengths": [
+        "Strong in Europe and Latin America",
+        "Localized food databases for multiple regions",
+        "Portuguese-language support (Brazil market)",
+        "Clean interface, affordable pricing",
+        "296 employees, Series A funded ($19.8M)"
+      ],
+      "weaknesses": [
+        "No AI meal plan generation",
+        "No white-label branding (clients see Nutrium)",
+        "No marketplace/patient discovery features",
+        "Limited telehealth integration"
+      ],
+      "traction": {
+        "funding": "$19.8M (Series A)",
+        "employees": "296",
+        "reviews": "moderate on G2/Capterra",
+        "source": "tracxn, crunchbase"
+      },
+      "estimated_size": "Series A, Portugal-based, millions of patients worldwide"
+    },
+    {
+      "name": "NutriAdmin",
+      "url": "https://nutriadmin.com",
+      "pricing": {
+        "model": "subscription",
+        "range": "$35-$65/mo",
+        "detail": "Multiple tiers from $35/mo, UK-based"
+      },
+      "strengths": [
+        "Basic AI meal plan generation",
+        "100,000+ food database",
+        "Affordable mid-range pricing",
+        "Good for UK practitioners"
+      ],
+      "weaknesses": [
+        "Smaller food database than competitors",
+        "No white-label options",
+        "No marketplace features",
+        "Limited client-facing app"
+      ],
+      "traction": {
+        "funding": "No known funding",
+        "employees": "estimated <20",
+        "reviews": "moderate on Capterra/G2",
+        "source": "capterra, softwareadvice"
+      },
+      "estimated_size": "Bootstrapped, small team"
+    },
+    {
+      "name": "Foodzilla",
+      "url": "https://foodzilla.com",
+      "pricing": {
+        "model": "subscription",
+        "range": "$17-$149/mo",
+        "detail": "Lite $17/mo (yearly), Starter $29/mo (yearly), Professional $47/mo (yearly), HIPAA $149/mo"
+      },
+      "strengths": [
+        "AI-powered meal plan generation",
+        "White-label mobile app and web portal",
+        "Food AI Scan (camera-based food logging)",
+        "500K+ international food database",
+        "Competitive pricing"
+      ],
+      "weaknesses": [
+        "Newer platform, smaller user base",
+        "No marketplace/patient discovery features",
+        "No insurance billing integration",
+        "Limited brand recognition"
+      ],
+      "traction": {
+        "funding": "No known funding",
+        "employees": "estimated <20",
+        "reviews": "limited on G2/Capterra",
+        "source": "g2, capterra, f6s"
+      },
+      "estimated_size": "Early stage, bootstrapped or seed"
+    }
+  ],
+  "indirect_competitors": [
+    {
+      "name": "Doctoralia",
+      "url": "https://www.doctoralia.com.mx",
+      "approach": "General healthcare marketplace that includes nutritionists among many specialties. Patients find and book appointments with any type of doctor.",
+      "relevance": "Dominant healthcare marketplace in LATAM (Mexico, Colombia, Chile, Argentina). Already has nutritionists listed. Could be the default patient-discovery channel for nutritionists, but lacks nutrition-specific tools like meal planning or AI diet generation."
+    },
+    {
+      "name": "That Clean Life",
+      "url": "https://www.thatcleanlife.com",
+      "approach": "Recipe-focused meal planning software that generates beautiful PDF exports. Acquired by Practice Better.",
+      "relevance": "Strong in recipe-based meal planning but no client management, no marketplace, no AI. Now part of Practice Better ecosystem."
+    },
+    {
+      "name": "SimplePractice",
+      "url": "https://www.simplepractice.com",
+      "approach": "General practice management for therapists and health professionals. Not nutrition-specific.",
+      "relevance": "Some nutritionists use it for scheduling/billing but lack nutrition-specific features like meal planning or food databases."
+    }
+  ],
+  "adjacent_competitors": [
+    {
+      "name": "Noom",
+      "url": "https://www.noom.com",
+      "current_focus": "Consumer weight loss app using behavioral psychology and coaching. B2C model.",
+      "pivot_threat": "Could expand to B2B nutritionist tools or add professional-grade meal planning for RDs.",
+      "evidence": "Noom has pivoted multiple times (from fitness to weight loss to clinical weight management). Has GLP-1 companion programs."
+    },
+    {
+      "name": "Zoe",
+      "url": "https://www.joinzoe.com",
+      "current_focus": "Microbiome and personalized nutrition testing. Consumer subscription model. $118M total funding.",
+      "pivot_threat": "Could add professional dietitian tools or marketplace connecting consumers with RDs based on test results.",
+      "evidence": "Expanding from UK to US market. Raised $15M in 2024 for US expansion. Personalized nutrition data could feed into dietitian-patient matching."
+    }
+  ],
+  "failed_competitors": [
+    {
+      "name": "Babylon Health",
+      "url": "https://www.babylonhealth.com",
+      "year_failed": 2023,
+      "reason_failed": "Telehealth company valued at $2B went bankrupt. Overexpanded, couldn't achieve unit economics at scale. General telehealth, not nutrition-specific, but relevant to the telehealth marketplace model.",
+      "source": "https://techcrunch.com/2023/08/31/the-fall-of-babylon-failed-tele-health-startup-once-valued-at-nearly-2b-goes-bankrupt-and-sold-for-parts/"
+    },
+    {
+      "name": "Forward Health",
+      "url": "https://www.goforward.com",
+      "year_failed": 2024,
+      "reason_failed": "AI-powered healthcare startup burned through $400M. Doctor-in-a-box model couldn't scale. Relevant lesson: hardware+software healthcare plays are capital intensive.",
+      "source": "https://techstartups.com/2024/11/18/healthcare-startup-forward-shuts-down-after-burning-through-400-million-from-investors/"
+    }
+  ],
+  "market_gaps": [
+    {
+      "gap": "LATAM/Spanish-language nutrition software with localized food databases",
+      "mention_count": 8,
+      "sources": ["Problem validation finding", "Doctoralia LATAM complaints", "Reddit r/dietetics threads", "Nutrium limited LATAM coverage despite Portuguese support"],
+      "aligns_with_idea": true
+    },
+    {
+      "gap": "AI-powered meal plan generation missing from most practice management tools",
+      "mention_count": 12,
+      "sources": ["Foodzilla comparison page", "Practice Better reviews noting basic meal planning", "Healthie reviews noting basic nutrition tools", "Multiple comparison articles"],
+      "aligns_with_idea": true
+    },
+    {
+      "gap": "Marketplace for patient discovery combined with practice management tools",
+      "mention_count": 6,
+      "sources": ["Berry Street Reddit complaints about RD exploitation", "Fay Reddit dietitian feedback", "Practice Better lacks patient acquisition", "Nutrium lacks marketplace features"],
+      "aligns_with_idea": true
+    },
+    {
+      "gap": "High platform fees cutting into dietitian earnings in marketplace models",
+      "mention_count": 5,
+      "sources": ["Berry Street Reddit threads about excessive cut", "Fay BBB complaints", "Reddit r/dietetics discussions on marketplace economics"],
+      "aligns_with_idea": true
+    },
+    {
+      "gap": "Integrated follow-up and patient adherence tracking beyond basic food journals",
+      "mention_count": 4,
+      "sources": ["Practice Better reviews", "Healthie reviews", "Comparison articles noting basic food journal limitations"],
+      "aligns_with_idea": true
+    }
+  ],
+  "pricing_benchmark": {
+    "low": 15,
+    "mid": 49,
+    "high": 155,
+    "currency": "USD/mo",
+    "model": "per-seat",
+    "free_alternatives_exist": true,
+    "competitors_with_pricing": 7
+  },
+  "search_queries_used": [
+    "nutritionist practice management software G2 alternatives",
+    "nutritionist dietitian software Capterra marketplace platform",
+    "nutrition diet plan marketplace platform startup funding",
+    "nutritionist marketplace startup Crunchbase funding 2024 2025",
+    "Practice Better pricing reviews funding employees nutritionist software",
+    "Healthie nutritionist software pricing funding Crunchbase reviews",
+    "Nutrium pricing reviews dietitian software funding",
+    "Foodzilla nutritionist software pricing AI meal plan reviews",
+    "plataforma nutricionistas LATAM marketplace nutricion online startup",
+    "nutritionist software failed shut down pivoted post-mortem Failory",
+    "Nourish nutrition app reviews complaints negative switching cancel",
+    "Practice Better Healthie Nutrium negative reviews complaints problems dietitian switching",
+    "Fay nutrition marketplace dietitian pricing funding reviews",
+    "Doctoralia nutricionistas Mexico LATAM quejas nutricion plataforma marketplace",
+    "Berry Street nutrition dietitian marketplace funding reviews pricing",
+    "nutrition telehealth startup failed closed shutdown 2023 2024",
+    "Kalix health software shutdown closed discontinued nutritionist",
+    "Nutrium funding company employees Portugal startup Crunchbase",
+    "Healthie Crunchbase funding total raised Series employees",
+    "Practice Better funding Crunchbase company size employees acquired"
+  ]
+}
