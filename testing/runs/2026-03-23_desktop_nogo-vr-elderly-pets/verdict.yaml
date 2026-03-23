@@ -1,0 +1,43 @@
+idea_id: "nogo-vr-elderly-pets"
+machine: "desktop"
+date: "2026-03-23"
+mode: "fast"
+engram_session_id: "validation-vr-elderly-pets-2026-03-23"
+scoring_version: "v2"
+
+scores:
+  problem: 38
+  market: 0  # not executed — early abort
+  competitive: 0  # not executed — early abort
+  bizmodel: 0  # not executed — early abort
+  risk: 0  # not executed — early abort
+weighted: 11.4
+verdict: "NO-GO"
+
+expected_verdict: "NO-GO"
+verdict_match: true
+score_in_range: false  # no expected_score_range in suite for NO-GO
+expected_knockouts: ["problem"]
+actual_knockouts: ["problem"]
+knockout_match: true
+
+all_departments_completed: false  # early abort after Problem knockout
+schema_complete: true
+arithmetic_verified: true  # (38×0.30) = 11.4 (only Problem executed)
+evidence_has_urls: true
+engram_persisted: true
+
+pass: true  # Verdict matches, knockout matches
+notes: >
+  PASS — Problem knockout correctly triggered (38 < 40). This is the KEY test for the v2
+  Problem redesign. In v1, Problem scored 57 (no knockout) because the old rubric abstracted
+  "VR pets for elderly" to "elderly loneliness" and scored high. The new demand stack +
+  Solution Category Demand (3/25) correctly identifies that:
+  - Abstract need (elderly loneliness) is real (20-34% prevalence)
+  - But solution category (VR AI virtual pets) has ZERO organic demand
+  - 9 documented VR adoption barriers for elderly (cybersickness 11% dropout, staff
+    assistance required, hearing aid interference, glasses incompatibility, etc.)
+  - 0 products combining VR + AI pets + elderly ever attempted
+  Fast mode correctly triggered early abort → skipped 4 departments → direct to Synthesis.
+  v1 result: NO-GO via multi-weakness (BizModel 30 + Risk 44). v2 result: NO-GO via
+  Problem knockout (38). Same verdict, correct reasoning now.

@@ -1,0 +1,38 @@
+idea_id: "nogo-artisan-cheese-saas"
+machine: "desktop"
+date: "2026-03-23"
+mode: "fast"
+engram_session_id: "validation-artisan-cheese-saas-2026-03-23"
+scoring_version: "v2"
+
+scores:
+  problem: 48
+  market: 29
+  competitive: 64
+  bizmodel: 47
+  risk: 53
+weighted: 46.0
+verdict: "NO-GO"
+
+expected_verdict: "NO-GO"
+verdict_match: true
+score_in_range: false  # no expected_score_range in suite for NO-GO
+expected_knockouts: ["market"]
+actual_knockouts: ["market"]
+knockout_match: true
+
+all_departments_completed: true
+schema_complete: true
+arithmetic_verified: true  # (48×0.30)+(29×0.25)+(64×0.15)+(47×0.20)+(53×0.10) = 14.4+7.25+9.6+9.4+5.3 = 45.95 ≈ 46.0
+evidence_has_urls: true
+engram_persisted: true
+
+pass: true  # Verdict matches, expected knockout triggered
+notes: >
+  PASS — Regression test. Market knockout triggered (29 < 40), same as v1 (25 < 40).
+  Problem rose from 40→48 (+8) because Solution Category Demand gave 7/25 (the broader
+  food traceability SaaS market exists, even if the Patagonian goat cheese niche is absurd).
+  Competitive rose dramatically from 49→64 (+15) due to new Incumbent Defensibility scoring
+  (Craftybase 6 employees with no structural moats → 20/25). These changes did NOT affect
+  the verdict — Market knockout remains the dominant signal. SOM $300K (200-500 producers
+  at $24-50/mo) is genuinely too small. No regression detected.

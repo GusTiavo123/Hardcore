@@ -1,0 +1,55 @@
+idea_id: "stress-novel-solution-demand"
+machine: "desktop"
+date: "2026-03-23"
+mode: "fast"
+engram_session_id: "validation-drone-roof-inspection-2026-03-23"
+scoring_version: "v2"
+
+idea_text: "Servicio de suscripción B2B que usa drones autónomos con IA para inspeccionar techos de edificios comerciales, generando reportes automáticos de daño estructural y presupuestos de reparación — vendido a administradoras de edificios y compañías de seguros en Latinoamérica"
+
+scores:
+  problem: 68
+  market: 62
+  competitive: 74
+  bizmodel: 82
+  risk: 62
+weighted: 69.6
+verdict: "PIVOT"
+
+expected_verdict: "PIVOT"
+expected_score_range: [50, 65]
+verdict_match: true
+score_in_range: false  # 69.6 above expected range [50, 65]
+expected_knockouts: []
+actual_knockouts: []
+knockout_match: true
+
+all_departments_completed: true
+schema_complete: true
+arithmetic_verified: true  # (68×0.30)+(62×0.25)+(74×0.15)+(82×0.20)+(62×0.10) = 20.4+15.5+11.1+16.4+6.2 = 69.6
+evidence_has_urls: true
+engram_persisted: true
+
+pass: false  # Score above expected range (69.6 > 65)
+notes: >
+  Verdict match (PIVOT) but score 69.6 is above expected range [50, 65]. The idea scored
+  much stronger than anticipated for two reasons:
+
+  1. Solution Category Demand scored 19/25 (expected ~10-15). The drone roof inspection
+     market is more established than anticipated: $231.6M global market, 14.4% CAGR,
+     54% contractor adoption, 10+ paid alternatives. This is NOT a novel solution category —
+     it's an established category being localized to LATAM.
+
+  2. Competitive scored 74/100 — very high. Wedge Opportunity 20/25 because NO incumbent
+     operates in LATAM with an integrated solution. Incumbent Defensibility 16/25 —
+     EagleView has operational moats (patents, PE backing) but is US-only, so structurally
+     absent from the target market.
+
+  BizModel 82 driven by LTV/CAC 7.12x at $299/mo and strong pricing power (22/25) — no
+  free alternatives in this space, 100x pricing spread ($25 to $4,188/mo).
+
+  The test was designed to stress Solution Category Demand in the mid-range, but the idea
+  turned out to have strong demand signals. The suite expected_score_range should be updated
+  to [60, 72] to reflect that drone inspection is an established category, not a novel one.
+  The test still validates that Solution Category Demand DIFFERENTIATES — it scored 19/25
+  here vs 3/25 for vr-elderly-pets. The sub-dimension works; my prediction was wrong.

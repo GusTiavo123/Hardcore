@@ -1,0 +1,39 @@
+idea_id: "go-api-docs-devtools"
+machine: "desktop"
+date: "2026-03-23"
+mode: "fast"
+engram_session_id: "validation-cli-api-docs-typescript-2026-03-23"
+scoring_version: "v2"
+
+scores:
+  problem: 78
+  market: 61
+  competitive: 64
+  bizmodel: 72
+  risk: 66
+weighted: 69.3
+verdict: "PIVOT"
+
+expected_verdict: "GO"
+verdict_match: false
+score_in_range: true  # 69.3 within expected [68, 85]
+expected_knockouts: []
+actual_knockouts: []
+knockout_match: true
+
+all_departments_completed: true
+schema_complete: true
+arithmetic_verified: true  # (78×0.30)+(61×0.25)+(64×0.15)+(72×0.20)+(66×0.10) = 23.4+15.25+9.6+14.4+6.6 = 69.25 ≈ 69.3
+evidence_has_urls: true
+engram_persisted: true
+
+pass: false  # Verdict mismatch: expected GO, got PIVOT
+notes: >
+  Verdict mismatch: expected GO, got PIVOT (69.3 — misses GO threshold of 70 by 0.7 points).
+  v2 scoring changes: Competitive improved from 60→64 (+4) due to Incumbent Defensibility
+  redesign (Mintlify correctly scored as soft moat 14/25 vs old competitive_opportunity 3/20).
+  However, Market dropped 64→61 (-3) and Risk dropped 68→66 (-2), offsetting the Competitive gain.
+  Solution Category Demand scored 19/25 (strong demand for auto-generated docs from TypeScript).
+  The Competitive fix worked as designed — the remaining gap is in Market (SOM $24M moderate)
+  and the natural variance of web search results across runs.
+  This idea is genuinely borderline GO/PIVOT; the 0.7-point miss is within scoring variance.

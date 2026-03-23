@@ -1,0 +1,48 @@
+idea_id: "stress-structural-moats"
+machine: "desktop"
+date: "2026-03-23"
+mode: "fast"
+engram_session_id: "validation-latam-dev-networking-2026-03-23"
+scoring_version: "v2"
+
+idea_text: "A professional networking and job matching platform for Latin American software developers, featuring portfolio showcases, peer code reviews, and skill certifications — positioning as the LATAM-specific alternative to LinkedIn and GitHub for the remote tech talent market"
+
+scores:
+  problem: 66
+  market: 62
+  competitive: 58
+  bizmodel: 75
+  risk: 62
+weighted: 65.2
+verdict: "PIVOT"
+
+expected_verdict: "PIVOT"
+expected_score_range: [55, 68]
+verdict_match: true
+score_in_range: true  # 65.2 within expected [55, 68]
+expected_knockouts: []
+actual_knockouts: []
+knockout_match: true
+
+all_departments_completed: true
+schema_complete: true
+arithmetic_verified: true  # (66×0.30)+(62×0.25)+(58×0.15)+(75×0.20)+(62×0.10) = 19.8+15.5+8.7+15.0+6.2 = 65.2
+evidence_has_urls: true
+engram_persisted: true
+
+pass: true  # Verdict matches, score in range, knockouts match
+notes: >
+  PASS — NEW stress test for Incumbent Defensibility with structural moats. The KEY metric:
+  Incumbent Defensibility scored 10/25 with `structural-moat-found` flag correctly set.
+  LinkedIn (1B+ users, network effects, data lock-in) correctly identified as structural
+  moat. This validates that the new Competitive rubric penalizes REAL moats (structural)
+  while being fair to SOFT moats (as seen in api-docs-devtools where Mintlify scored 14/25).
+
+  Competitive sub-scores: market_validation 17, wedge_opportunity 15, incumbent_defensibility
+  10, market_intelligence 16. The low defensibility correctly dragged Competitive to 58
+  despite strong market validation. Polywork ($44M failure against LinkedIn) cited as
+  evidence of structural moat strength.
+
+  BizModel scored surprisingly high (75) due to validated freemium model precedents
+  (LinkedIn, GitHub, daily.dev, Get on Board, Torre.ai, Wellfound). This is plausible —
+  the business model works, but network effects make execution nearly impossible.
