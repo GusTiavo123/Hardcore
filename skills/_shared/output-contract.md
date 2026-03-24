@@ -18,7 +18,7 @@ The `data` schema defined in each department's SKILL.md is an **exact contract**
 
 ```json
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "status": "ok | warning | blocked | failed",
   "department": "problem | market | competitive | bizmodel | risk | synthesis",
   "executive_summary": "1-2 oraciones decision-grade para el orquestador",
@@ -37,12 +37,16 @@ The `data` schema defined in each department's SKILL.md is an **exact contract**
 
 ### `schema_version`
 
-String identifying the output contract version. Currently `"1.0"`. This enables cross-session compatibility detection — when Synthesis reads an upstream output from a previous run, it can check whether the schema matches the current version. If a field is missing from an older-version output, Synthesis knows to use defaults rather than treating it as an error.
+String identifying the output contract version. Currently `"1.1"`. This enables cross-session compatibility detection — when Synthesis reads an upstream output from a previous run, it can check whether the schema matches the current version. If a field is missing from an older-version output, Synthesis knows to use defaults rather than treating it as an error.
 
 Bump the version when:
 - A required `data` field is added or removed from any department's schema
 - The envelope structure itself changes (new top-level fields, renamed fields)
 - Scoring rubrics change in ways that affect score comparability
+
+**Changelog:**
+- `1.1`: Renamed `model_score` to `bizmodel_score` for consistent `{department}_score` naming. Added optional `alignment_strength` field to Competitive's `market_gaps[]`. Moved data schemas to `references/data-schema.md` per department. Extracted shared boilerplate to `department-protocol.md` and `glossary.md`.
+- `1.0`: Initial schema.
 
 ### `status`
 
@@ -144,7 +148,7 @@ Array of department names that should run next according to the DAG:
 
 ## Validation Rules
 
-1. `schema_version` MUST be present and set to `"1.0"`
+1. `schema_version` MUST be present and set to `"1.1"`
 2. `status` MUST be one of the four valid values
 3. `department` MUST match the department producing the output
 4. `score` MUST be integer 0-100
@@ -161,7 +165,7 @@ Every department MUST cross-reference its `data` object against the SKILL.md sch
 
 ### The Protocol (mandatory for every department)
 
-1. **After completing all analysis steps** and **before the Persist step**, execute the Output Assembly Checklist defined in your SKILL.md (Step X.5: "Assemble Output").
+1. **After completing all analysis steps** and **before the Persist step**, execute the Output Assembly Checklist defined in your department's `references/data-schema.md`.
 2. For each field listed in the checklist, verify it is **present** in your `data` object with the **exact key name** from the schema.
 3. Verify **nesting is correct** — fields defined at the top level of `data` MUST be at the top level, not nested inside another object. Fields defined inside a sub-object MUST be inside that sub-object.
 4. Verify **no field is silently dropped** — information that exists in your analysis (score_reasoning, executive_summary, evidence) but is missing from `data` is invisible to downstream departments.

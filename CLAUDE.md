@@ -13,6 +13,8 @@ Before starting, read ALL shared conventions:
 - `skills/_shared/scoring-convention.md`
 - `skills/_shared/engram-convention.md`
 - `skills/_shared/persistence-contract.md`
+- `skills/_shared/department-protocol.md`
+- `skills/_shared/glossary.md`
 
 ### Two Modes
 
@@ -54,7 +56,7 @@ Each department is a sub-agent. For each one:
 
 ### Sub-Agent Launch Pattern
 
-When launching each department as a sub-agent, include in the prompt:
+When launching each department as a sub-agent, use the template in `skills/hc-orchestrator/references/sub-agent-template.md`:
 
 ```
 Read and follow these files exactly:
@@ -62,7 +64,12 @@ Read and follow these files exactly:
 - skills/_shared/scoring-convention.md
 - skills/_shared/engram-convention.md
 - skills/_shared/persistence-contract.md
+- skills/_shared/department-protocol.md
+- skills/_shared/glossary.md
 - skills/hc-{department}/SKILL.md
+
+For the data schema and assembly checklist, read:
+- skills/hc-{department}/references/data-schema.md
 
 Input:
 {
@@ -71,6 +78,10 @@ Input:
   "persistence_mode": "{mode}",
   "detail_level": "{level}"
 }
+
+CRITICAL: Your `data` object must contain EVERY field from the data schema in your references/data-schema.md.
+Cross-reference the Assembly Checklist before returning.
+Missing fields break downstream departments.
 
 Execute the full process defined in the SKILL.md and return the output envelope.
 ```
@@ -130,21 +141,45 @@ Respond in the same language the user uses. The specs are in English but the use
 
 ```
 skills/
-├── _shared/                    # Shared conventions (read these first)
-│   ├── output-contract.md      # JSON envelope every dept returns
-│   ├── scoring-convention.md   # Sub-dimensions, rubrics, weights, knockouts
-│   ├── engram-convention.md    # Engram naming, recovery, session lifecycle
-│   └── persistence-contract.md # Mode resolution (engram/file)
-├── hc-orchestrator/SKILL.md    # Orchestrator (your primary instructions)
-├── hc-problem/SKILL.md         # Dept 1: Problem Validation
-├── hc-market/SKILL.md          # Dept 2: Market Sizing
-├── hc-competitive/SKILL.md     # Dept 3: Competitive Intelligence
-├── hc-bizmodel/SKILL.md        # Dept 4: Business Model
-├── hc-risk/SKILL.md            # Dept 5: Risk Assessment
-└── hc-synthesis/SKILL.md       # Dept 6: GO/NO-GO Synthesis
+├── _shared/                           # Shared conventions (read these first)
+│   ├── output-contract.md             # JSON envelope every dept returns
+│   ├── scoring-convention.md          # Sub-dimensions, rubrics, weights, knockouts
+│   ├── engram-convention.md           # Engram naming, recovery, session lifecycle
+│   ├── persistence-contract.md        # Mode resolution (engram/file)
+│   ├── department-protocol.md         # Common procedures for all departments
+│   └── glossary.md                    # Ambiguity resolutions and term definitions
+├── hc-orchestrator/
+│   ├── SKILL.md                       # Orchestrator (your primary instructions)
+│   └── references/
+│       └── sub-agent-template.md      # Launch template + envelope validation
+├── hc-problem/
+│   ├── SKILL.md                       # Dept 1: Problem Validation
+│   └── references/
+│       └── data-schema.md             # Data schema + assembly checklist
+├── hc-market/
+│   ├── SKILL.md                       # Dept 2: Market Sizing
+│   └── references/
+│       └── data-schema.md
+├── hc-competitive/
+│   ├── SKILL.md                       # Dept 3: Competitive Intelligence
+│   └── references/
+│       └── data-schema.md
+├── hc-bizmodel/
+│   ├── SKILL.md                       # Dept 4: Business Model
+│   └── references/
+│       └── data-schema.md
+├── hc-risk/
+│   ├── SKILL.md                       # Dept 5: Risk Assessment
+│   └── references/
+│       └── data-schema.md
+├── hc-synthesis/
+│   ├── SKILL.md                       # Dept 6: GO/NO-GO Synthesis
+│   └── references/
+│       ├── data-schema.md
+│       └── upstream-field-map.md      # Field source mapping for synthesis
 testing/
-├── PROTOCOL.md                 # Testing protocol, checklist, phase gates
-├── suite.yaml                  # 10 curated test ideas with expected outcomes
-├── runs/                       # Committed run results (per machine, per idea)
-└── analysis/                   # Cross-machine variance analysis
+├── PROTOCOL.md                        # Testing protocol, checklist, phase gates
+├── suite.yaml                         # 10 curated test ideas with expected outcomes
+├── runs/                              # Committed run results (per machine, per idea)
+└── analysis/                          # Cross-machine variance analysis
 ```
