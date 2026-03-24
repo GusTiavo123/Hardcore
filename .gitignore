@@ -1,12 +1,53 @@
-# Tools binaries and dependencies (each PC runs setup.sh to install locally)
+### IDE y Editores ###
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+### Sistema Operativo ###
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+### Variables de entorno y Configuración local ###
+.env
+.env.local
+.env.*.local
+# Ignoramos toda la configuración y herramientas locales de la IA
+*.local.json
+.claude/
+
+### Python (Scripts del proyecto) ###
+__pycache__/
+*.py[cod]
+*$py.class
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+# Caché de testing de Python
+.pytest_cache/
+.coverage
+htmlcov/
+
+### Ejecutables y binarios dependientes (Tools) ###
 tools/engram
 tools/engram.exe
 tools/engram.zip
+
+### Node.js / JavaScript (Tools) ###
 tools/node_modules/
 tools/package-lock.json
+# Si package.json es temporal o generado, se ignora. Si aporta la definición de dependencias del proyecto, deberías quitarlo de aquí.
 tools/package.json
 tools/LICENSE
 tools/README.md
 
-# Output from validation runs
+### Outputs del proyecto (Directorio de salida de la validación) ###
 output/
+*.log
+
+### Cachés e índices ###
+.cache/
