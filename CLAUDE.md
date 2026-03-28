@@ -1,8 +1,17 @@
-# Hardcore Idea Validation — Claude Code Integration
+# Hardcore — AI Agent Business Operating System
 
 ## What This Project Is
 
-A 6-department AI agent pipeline that validates startup ideas end-to-end and produces a **GO / NO-GO / PIVOT** verdict with real evidence, explicit scoring, and actionable next steps.
+**Hardcore** is a modular AI agent ecosystem where the user is the CEO and the agents are the departments. Each module covers a real business function — from validating an idea to giving a company its identity.
+
+**Current modules:**
+- **Idea Validation** (complete) — 6-department pipeline, GO/NO-GO/PIVOT verdicts with real evidence
+- **Founder Profile** (planned) — User context that personalizes everything downstream
+- **Brand & Identity** (planned) — Company identity generation for validated ideas
+
+See `ROADMAP.md` for the strategic plan.
+
+## How to Validate an Idea (Idea Validation Module)
 
 ## How to Validate an Idea
 
@@ -140,6 +149,8 @@ Respond in the same language the user uses. The specs are in English but the use
 ## Project Structure
 
 ```
+ROADMAP.md                             # Strategic roadmap (start here for context)
+CLAUDE.md                              # This file — Claude Code integration instructions
 skills/
 ├── _shared/                           # Shared conventions (read these first)
 │   ├── output-contract.md             # JSON envelope every dept returns
@@ -177,9 +188,13 @@ skills/
 │   └── references/
 │       ├── data-schema.md
 │       └── upstream-field-map.md      # Field source mapping for synthesis
-testing/
+testing/                               # Quality assurance
 ├── PROTOCOL.md                        # Testing protocol, checklist, phase gates
 ├── suite.yaml                         # 10 curated test ideas with expected outcomes
 ├── runs/                              # Committed run results (per machine, per idea)
 └── analysis/                          # Cross-machine variance analysis
+calibration/                           # Scoring system validation
+└── scenarios.md                       # 13 calibration scenarios (84.6% accuracy)
+docs/                                  # Reference
+└── idea-loop-architecture.md          # Future Idea Engine module design
 ```
