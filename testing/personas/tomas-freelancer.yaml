@@ -1,0 +1,195 @@
+# P1: Tomás — "El freelancer que quiere escapar del servicio"
+#
+# Quién es realmente:
+# 32 años, Montevideo. Diseñador UX/UI freelance hace 6 años. Factura $4-5K/mes
+# pero está quemado de clientes. Quiere un producto propio pero nunca programó.
+# Tiene $20K ahorrados, vive austero. Solo, sin co-founder. 4.5K seguidores en
+# Instagram sobre diseño UX LATAM. Conoce muchos freelancers (3-4 comunidades
+# Slack/Discord). Impulsivo — se entusiasma y abandona. 2 side-projects muertos
+# (app de tracking, marketplace de designers). No le interesa gobierno ni educación.
+# Se cree aggressive pero es moderate.
+#
+# Lo que se le escapa al profiler (a menos que pregunte bien):
+# - Los 2 proyectos abandonados
+# - Que se cree aggressive pero es moderate
+# - Que conoce a muchos freelancers (distribución latente)
+# - Que las comunidades son canales de distribución
+
+persona_id: "P1"
+persona_name: "tomas-freelancer"
+version: "1.0"
+
+quick_mode_input: >
+  Soy Tomás, diseñador UX freelance en Montevideo, 6 años de experiencia.
+  Facturo bien pero estoy podrido de hacer servicios. Tengo 20K ahorrados
+  y quiero armar un producto SaaS. No sé programar pero puedo diseñar todo
+  y tengo contactos para tercerizar el dev. Tengo 4500 seguidores en Instagram
+  sobre diseño UX. No me interesa nada con gobierno ni educación.
+
+# What we expect the profiler to extract from the quick_mode_input above
+# (not prescriptive — used for verification after the fact)
+expected_extractions:
+  should_capture:
+    - "UX/UI design skills at expert level"
+    - "Location: Montevideo, Uruguay"
+    - "$20K capital available"
+    - "Instagram audience: 4500, niche: UX design"
+    - "Hard-nos: gobierno, educación"
+    - "Cannot code — needs to outsource development"
+    - "Wants to build SaaS"
+  likely_misses:
+    - "2 abandoned side-projects (not mentioned)"
+    - "Risk tolerance mismatch — says nothing but is impulsive"
+    - "Freelancer communities as distribution (implied but not explicit)"
+    - "6 years freelancing = practitioner in service business ops"
+
+# Full persona data (ground truth — what a perfect profiler would capture
+# if it asked all the right follow-up questions)
+ground_truth:
+  identity:
+    name: "Tomás"
+    location:
+      city: "Montevideo"
+      country: "Uruguay"
+      timezone: "UTC-3"
+      willing_to_relocate: false
+      target_geographies: ["Uruguay", "Argentina", "LATAM"]
+    languages:
+      - language: "Español"
+        level: "native"
+      - language: "Inglés"
+        level: "conversational"
+    professional_background:
+      current_role: "Diseñador UX/UI freelance"
+      years_experience: 6
+      industries_worked: ["design", "SaaS", "freelance-services"]
+      notable_employers: []
+      education_highlight: null
+
+  skills:
+    technical:
+      - skill: "UX/UI Design"
+        level: "expert"
+        evidence: "6 años freelance, 4.5K followers por contenido de UX"
+      - skill: "Figma"
+        level: "expert"
+        evidence: "Herramienta principal de trabajo diario"
+      - skill: "User Research"
+        level: "proficient"
+        evidence: "Parte del servicio freelance"
+    business:
+      - skill: "Freelance operations"
+        level: "proficient"
+        evidence: "6 años facturando $4-5K/mes de forma independiente"
+      - skill: "Content creation"
+        level: "familiar"
+        evidence: "Instagram con 4.5K seguidores"
+    domain_expertise:
+      - domain: "UX/UI design services"
+        depth: "practitioner"
+        years: 6
+        insider_knowledge: "Sabe cuánto cobra el mercado, qué dolores tienen los freelancers, cómo es el ciclo de venta de servicios de diseño"
+
+  resources:
+    capital:
+      available: 20000
+      currency: "USD"
+      source: "savings"
+      runway_months: 8
+      willing_to_fundraise: false
+      fundraising_experience: "none"
+    time:
+      commitment: "full-time"
+      hours_per_week: 40
+      deadline: null
+    team:
+      solo: true
+      cofounders: []
+      contractors_available: true
+      hiring_budget_monthly: null
+    infrastructure:
+      existing_tech: []
+      existing_products: []
+      existing_data: []
+
+  constraints:
+    hard_nos: ["gobierno", "educación formal"]
+    regulatory_limits: []
+    geographic_limits: []
+    ethical_limits: []
+    time_limits:
+      max_months_to_revenue: null
+      max_months_to_mvp: null
+    capital_limits:
+      max_initial_investment: 20000
+      max_monthly_burn: null
+    risk_tolerance: "moderate"
+    risk_tolerance_evidence: "Se cree aggressive pero tiene historial de abandonar proyectos. 2 side-projects muertos. Con $20K de ahorros no puede permitirse perder todo."
+
+  network:
+    audience:
+      - platform: "Instagram"
+        followers: 4500
+        engagement: "medium"
+        niche: "UX design LATAM"
+    professional_network:
+      - description: "Freelancers de diseño y desarrollo en LATAM"
+        sector: "freelance-services"
+        strength: "strong"
+        activatable: true
+    communities:
+      - name: "Comunidades Slack/Discord de freelancers"
+        role: "active-member"
+        size: null
+    distribution_channels: []
+
+  motivation:
+    primary_goal: "build-something"
+    success_definition: "Un SaaS propio que genere ingresos recurrentes y lo saque del servicio freelance"
+    values: ["independencia", "diseño"]
+    working_style:
+      preference: "solo"
+      decision_speed: "fast-iterate"
+      orientation: "technical"
+      comfort_with_ambiguity: "medium"
+
+  advantages:
+    proprietary_insights:
+      - "Sabe exactamente qué dolores tienen los freelancers de diseño porque ES uno"
+    unique_access:
+      - "Acceso directo a comunidades de freelancers (Slack, Discord)"
+    credibility_capital:
+      - "4.5K seguidores en UX design — tiene voz en el nicho"
+    timing_advantages: []
+    regulatory_knowledge: []
+    existing_ip: []
+
+  previous_ventures:
+    - name: "App de tracking (side-project)"
+      outcome: "shut-down"
+      duration_months: 3
+      revenue_reached: null
+      key_lesson: "Se aburrió antes de lanzar"
+      assets_remaining: []
+      mistakes_to_avoid: ["No definir scope mínimo antes de arrancar"]
+    - name: "Marketplace de designers (side-project)"
+      outcome: "shut-down"
+      duration_months: 4
+      revenue_reached: null
+      key_lesson: "Chicken-egg problem sin tracción inicial"
+      assets_remaining: []
+      mistakes_to_avoid: ["No construir marketplace sin tener un lado asegurado"]
+
+  opportunity_cost:
+    current_income: 54000
+    best_alternative: "Seguir freelanceando a $4-5K/mes"
+    switching_cost: "Pierde ingresos estables si deja de tomar clientes"
+    personal_obligations: []
+
+  meta_signals:
+    market_proximity: 0
+    execution_readiness: "preparing"
+    blind_spots_detected:
+      - "Historial de abandonar proyectos — puede repetir el patrón"
+      - "Se cree aggressive pero la evidencia dice moderate"
+    capital_efficiency: "lean"

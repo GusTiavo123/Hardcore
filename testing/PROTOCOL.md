@@ -132,7 +132,7 @@ After each run, verify these before committing:
 - [ ] `competitive.json` → `data` has all 9 fields (3 competitor arrays + failed + gaps + benchmark + queries + sub_scores + competitive_score); direct_competitors include `moat_type` and `vulnerability_signals`
 - [ ] `bizmodel.json` → `data` has all 10 fields (model + pricing + unit_economics + sensitivity + precedents + assumptions + scores)
 - [ ] `risk.json` → `data` has all 7 fields (risks array + dependencies + overall + killers + queries + scores)
-- [ ] `synthesis.json` → `data` has all 13 fields (verdict through department_flags)
+- [ ] `synthesis.json` → `data` has all 14 fields (verdict through department_flags + founder_fit)
 
 ### Envelope Integrity
 - [ ] Every department JSON has ALL 11 required envelope fields: `schema_version`, `status`, `department`, `executive_summary`, `score`, `score_reasoning`, `data`, `evidence`, `artifacts`, `flags`, `next_recommended`
@@ -165,6 +165,38 @@ After each run, verify these before committing:
 - [ ] Weighted score falls within `expected_score_range` (if defined)
 - [ ] Expected knockouts match actual knockouts
 
+### Profile — Envelope & Persistence (skip if no profile used)
+- [ ] Profile envelope has `schema_version: "1.0"` and valid `status` (ok/partial/blocked)
+- [ ] Status follows rules: `ok` if core >= 0.7, `partial` if 0.3-0.69, `blocked` if < 0.3
+- [ ] All `data` fields from `hc-profile/references/data-schema.md` present (populated or null)
+- [ ] Completeness arithmetic: `overall = (core × 0.6) + (extended × 0.3) + (meta × 0.1)`
+- [ ] `user_slug` is lowercase, hyphens, no special characters
+- [ ] Engram: `mem_search("Founder Profile core")` returns the profile artifact
+- [ ] Engram: `mem_get_observation(id)` returns parseable JSON in `**Data**` section
+
+### Profile — Pre-Filter (skip if no profile used)
+- [ ] Pre-filter result recorded (PROCEED/WARN/BLOCK)
+- [ ] If BLOCK: pipeline did NOT run (no department artifacts)
+- [ ] If BLOCK: reason shown to user is specific and accurate
+- [ ] If no profile: pre-filter was skipped entirely
+
+### Profile — Integration (skip if no profile used)
+- [ ] `founder_context` passed to all 5 departments
+- [ ] Profile snapshot persisted in Engram at `profile/{user-slug}/snapshot/{slug}`
+- [ ] Department scores are within ±5 of baseline (P0/no-profile run of same idea)
+- [ ] Verdict (GO/PIVOT/NO-GO) is IDENTICAL with and without profile
+- [ ] Founder-specific flags appear in department outputs where applicable
+
+### Profile — Founder-Idea Fit (skip if no profile used)
+- [ ] `founder_fit.available` is `true` when profile exists, `false` when absent
+- [ ] When `available: false`: only `available` field present (no fit_score, etc.)
+- [ ] When `available: true`: all fit fields present (fit_score, fit_label, dimensions, fit_summary, fit_boosters, fit_blockers, adjusted_verdict_note)
+- [ ] `fit_score = round((sum of 6 dimensions / 120) × 100)` — verify arithmetic
+- [ ] `fit_label` matches ranges: 80-100=strong, 60-79=moderate, 40-59=weak, 0-39=misaligned
+- [ ] `adjusted_verdict_note` is specific to both the founder AND the idea (not generic)
+- [ ] `fit_blockers` has at least 1 entry (every founder has gaps)
+- [ ] If partial profile: `partial-fit-assessment` flag set, unknown dimensions at midpoint (10)
+
 ## Cross-Machine Variance Analysis
 
 After running the same idea on 2+ machines:
@@ -193,3 +225,32 @@ testing/analysis/{idea-id}-variance.md
 - [ ] Verdict accuracy ≥ 80% against suite expectations
 - [ ] No systematic schema issues (Output Assembly Checklist working)
 - [ ] Calibration scenarios (calibration/scenarios.md) updated with real run data
+
+### Profile Module — Phase Gates
+
+**Gate 1: Profile Standalone**
+- [ ] 5 test personas (`testing/personas/`) created via quick mode, schema valid, persisted in Engram
+- [ ] At least 1 profile update tested (field changed, revision_count incremented)
+- [ ] `diego-minimo` has status `partial` (core completeness < 0.7)
+- [ ] `/profile:show` displays the profile correctly
+
+**Gate 2: Backward Compatibility**
+- [ ] 2+ ideas run with NO profile (P0), results coherent with previous runs
+- [ ] Baseline department scores established for comparison
+
+**Gate 3: Integration**
+- [ ] 2+ personas run against 2+ ideas each
+- [ ] Department scores within ±5 of baseline (P0) for same ideas
+- [ ] Verdict identical with and without profile for same ideas
+- [ ] Fit assessment produced with specific adjusted_verdict_note
+- [ ] At least 1 BLOCK scenario verified (hard-no triggers, pipeline stops)
+- [ ] Human evaluation: do the fit narratives make sense for these real people?
+
+**Gate 4: Fit Calibration**
+- [ ] 6 fit calibration scenarios (`calibration/fit-scenarios.md`) arithmetic verified
+- [ ] Fit labels correct in all 6 scenarios
+
+**Profile Acceptance** (all gates passed):
+- [ ] Gates 1-4 complete
+- [ ] Zero regressions on existing validation test results
+- [ ] Anomalies documented and either resolved or tracked

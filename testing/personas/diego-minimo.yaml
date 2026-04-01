@@ -1,0 +1,130 @@
+# P5: Diego — "El perfil mínimo"
+#
+# No sabemos casi nada de Diego. Escribió una oración y nada más.
+# Esto es realista — mucha gente quiere ir al grano y no quiere
+# una entrevista de 15 minutos.
+#
+# El punto de este persona es testear:
+# - Que el sistema no se rompe con datos mínimos
+# - Que el status es "partial"
+# - Que el fit scoring usa midpoints (10/20) para dims desconocidas
+# - Que el flag "partial-fit-assessment" se activa
+
+persona_id: "P5"
+persona_name: "diego-minimo"
+version: "1.0"
+
+quick_mode_input: "Diego, Lima, developer, 5 años."
+
+expected_extractions:
+  should_capture:
+    - "Name: Diego"
+    - "Location: Lima, Peru"
+    - "Some kind of developer"
+    - "5 years experience"
+  likely_misses:
+    - "Everything else — this is intentionally minimal"
+    - "What kind of developer (frontend, backend, fullstack?)"
+    - "Capital, time commitment, team, network"
+    - "Domain expertise, hard-nos, motivation"
+
+ground_truth:
+  identity:
+    name: "Diego"
+    location:
+      city: "Lima"
+      country: "Perú"
+      timezone: "UTC-5"
+      willing_to_relocate: null
+      target_geographies: null
+    languages:
+      - language: "Español"
+        level: "native"
+    professional_background:
+      current_role: "Developer"
+      years_experience: 5
+      industries_worked: []
+      notable_employers: []
+      education_highlight: null
+
+  skills:
+    technical:
+      - skill: "Software development"
+        level: "proficient"
+        evidence: "5 años de experiencia (sin más detalle)"
+    business: []
+    domain_expertise: []
+
+  resources:
+    capital:
+      available: null
+      currency: "USD"
+      source: null
+      runway_months: null
+      willing_to_fundraise: null
+      fundraising_experience: null
+    time:
+      commitment: null
+      hours_per_week: null
+      deadline: null
+    team:
+      solo: null
+      cofounders: []
+      contractors_available: null
+      hiring_budget_monthly: null
+    infrastructure:
+      existing_tech: []
+      existing_products: []
+      existing_data: []
+
+  constraints:
+    hard_nos: null
+    regulatory_limits: null
+    geographic_limits: null
+    ethical_limits: null
+    time_limits:
+      max_months_to_revenue: null
+      max_months_to_mvp: null
+    capital_limits:
+      max_initial_investment: null
+      max_monthly_burn: null
+    risk_tolerance: null
+    risk_tolerance_evidence: null
+
+  network:
+    audience: []
+    professional_network: []
+    communities: []
+    distribution_channels: []
+
+  motivation:
+    primary_goal: null
+    success_definition: null
+    values: []
+    working_style:
+      preference: null
+      decision_speed: null
+      orientation: null
+      comfort_with_ambiguity: null
+
+  advantages:
+    proprietary_insights: []
+    unique_access: []
+    credibility_capital: []
+    timing_advantages: []
+    regulatory_knowledge: []
+    existing_ip: []
+
+  previous_ventures: []
+
+  opportunity_cost:
+    current_income: null
+    best_alternative: null
+    switching_cost: null
+    personal_obligations: []
+
+  meta_signals:
+    market_proximity: null
+    execution_readiness: null
+    blind_spots_detected: []
+    capital_efficiency: null
