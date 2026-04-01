@@ -15,8 +15,8 @@ Un ecosistema modular de agentes AI donde el usuario es el CEO y los agentes son
 | Módulo | Estado | Descripción |
 |---|---|---|
 | **Idea Validation** | Completo | 6 departamentos, scoring anclado a evidencia, GO/NO-GO/PIVOT. Testeado con 80% accuracy. |
-| **Founder Profile** | Pendiente | Próximo módulo a construir. |
-| **Brand & Identity** | Pendiente | Después de Profile. |
+| **Founder Profile** | Completo | Profiling adaptivo + Founder-Idea Fit integrado en Synthesis. 3 entry points, 3 tiers, backward compatible. |
+| **Brand & Identity** | Pendiente | Próximo módulo a construir. |
 
 ---
 

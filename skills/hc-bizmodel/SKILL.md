@@ -170,6 +170,27 @@ Always return `["synthesis"]`.
 
 Full calculation derivation, all benchmarks reviewed, sensitivity methodology, rejected alternatives.
 
+## Founder Context Integration
+
+If `founder_context` is provided in the input (not null), use it as follows:
+
+**What changes:**
+
+1. **Capital constraint flag**: If `founder_context.capital.available` is known AND `estimated_cac * 100 > capital.available`, add flag `"founder-capital-constraint"` and note in `executive_summary`: "At estimated CAC of ${cac}, founder's available capital (${available}) limits initial customer acquisition to ~{available/cac} customers."
+
+2. **Geographic pricing calibration**: If `founder_context.geography.country` indicates a market with different pricing dynamics (e.g., LATAM vs US), note in `pricing_suggestion.justification` that geographic pricing adjustment may be relevant and search for regional pricing benchmarks in addition to global ones.
+
+3. **Bootstrap viability scenario**: If `founder_context.capital.willing_to_fundraise == false` OR `fundraising_experience == "none"`, add a note in `executive_summary` about whether the unit economics work at bootstrap scale. Consider: can the founder reach profitability within their `runway_months` given the `payback_months`?
+
+4. **Assumptions enrichment**: If capital constraints or time constraints from founder_context affect the business model's viability assumptions, add them to the `assumptions[]` array (e.g., "Bootstrap constraint: must reach profitability within 12 months of founder runway").
+
+**What does NOT change:**
+- `score` and `sub_scores` — unit economics are evaluated against industry benchmarks, not founder constraints.
+- `unit_economics` calculations — LTV, CAC, payback remain based on market data.
+- `sensitivity_analysis` — the three standard scenarios remain unchanged.
+
+If `founder_context` is null, ignore this section entirely.
+
 ## Critical Rules
 
 1. **Show your math.** Every calculation must be traceable. No "LTV/CAC is about 4x" without the formula.

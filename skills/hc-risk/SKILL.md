@@ -197,6 +197,30 @@ Always return `["synthesis"]`.
 
 Full risk register, dependency analysis, timing signals, regulatory framework list.
 
+## Founder Context Integration
+
+If `founder_context` is provided in the input (not null), use it as follows:
+
+**What changes:**
+
+1. **Founder-specific risk entries**: Add to the risk register (in `data.risks[]`) any founder-related risks that are relevant:
+   - If `team.solo == true`: Add execution risk entry — "Solo founder increases execution risk and key-person dependency" with `category: "execution"`, `source_department: "own-research"`.
+   - If `time_commitment` is `"part-time"` or `"side-project"`: Add execution risk — "Part-time commitment extends timeline and increases abandonment risk."
+   - If critical technical skills needed for the idea are absent from `skills_summary.technical` AND `team.cofounder_skills`: Add execution risk — "Critical skill gap: {skill} not covered by founder or team."
+
+2. **Execution feasibility annotation**: In `executive_summary`, note if founder skills cover the technical requirements for execution, or if gaps exist. This informs Synthesis's fit assessment.
+
+3. **Regulatory risk annotation**: If `founder_context.advantages.regulatory_knowledge[]` contains expertise relevant to identified regulatory risks, note in `executive_summary`: "Founder has regulatory expertise in {area}, which may improve navigability of {specific regulatory risk}." Add flag `"founder-regulatory-advantage"`.
+
+4. **Flags**: Add `"founder-execution-risk"` if any founder-specific risk entries were added. Add `"founder-regulatory-advantage"` if regulatory expertise is relevant.
+
+**What does NOT change:**
+- `score` and `sub_scores` — risk landscape is scored objectively. The regulatory framework count doesn't change because the founder has expertise; the navigability is annotated qualitatively.
+- `overall_risk_level` — derived from the score, not adjusted for founder.
+- `top_3_killers` — ranked by market reality, not founder capability.
+
+If `founder_context` is null, ignore this section entirely. Do NOT add founder-specific risk entries.
+
 ## Critical Rules
 
 1. **Score is INVERTED.** 100 = safest. 0 = most dangerous. Double-check every sub-score. This is the most common error.

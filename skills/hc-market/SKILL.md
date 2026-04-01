@@ -161,6 +161,36 @@ Always return `["bizmodel"]`.
 
 Full methodology, all sources reviewed, TAM/SAM derivation logic, rejected segments.
 
+## Founder Context Integration
+
+If `founder_context` is provided in the input (not null), use it as follows:
+
+**What changes:**
+
+1. **Early adopter enrichment**: If `founder_context.network.audience[]` contains an audience whose `niche` overlaps with the idea's target market, add it as an additional early adopter segment in `data.early_adopters[]`:
+   ```
+   {
+     "segment": "Founder's {platform} audience ({niche})",
+     "estimated_size": {followers},
+     "evidence_of_spending": "Direct channel — founder controls distribution",
+     "reachable_channels": [{ "name": "{platform} (founder-owned)", "type": "other", "members": {followers} }]
+   }
+   ```
+   This does NOT inflate SOM — it enriches the reachable channels for early adopter identification.
+
+2. **Geographic precision**: If `founder_context.geography.target_geographies` is specified, use these for SAM geographic filtering instead of guessing. Note in `sam.methodology` if filtering was informed by founder geography.
+
+3. **Distribution channel cross-reference**: If `founder_context.network.distribution_channels[]` contains owned channels, note them in `executive_summary` as potential distribution advantages.
+
+4. **Flags**: Add `"founder-audience-overlap"` if the founder's audience niche matches an early adopter segment. Add `"founder-geographic-mismatch"` if the idea's primary market is outside the founder's `target_geographies`.
+
+**What does NOT change:**
+- `score` and `sub_scores` — market size is market size regardless of who's asking.
+- TAM/SAM/SOM values — these remain based on market research, not founder reach.
+- `market_stage` — driven by market data, not founder perspective.
+
+If `founder_context` is null, ignore this section entirely.
+
 ## Critical Rules
 
 1. **SOM must be conservative.** Optimistic SOM projections are the #1 source of bad validation calls.

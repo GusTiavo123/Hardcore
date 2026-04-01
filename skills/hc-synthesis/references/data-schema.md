@@ -17,6 +17,7 @@ Before persisting or returning, verify every field is populated:
 - [ ] `next_steps[]` ← Step 9 (each with `action`, `priority`, `timeframe`, `rationale`)
 - [ ] `validation_experiments[]` ← Step 10 (each with `experiment`, `success_metric`, `effort`, `what_it_validates` — empty `[]` for NO-GO)
 - [ ] `department_flags` ← Step 11 (object with `problem`, `market`, `competitive`, `bizmodel`, `risk` — each an array of flag strings)
+- [ ] `founder_fit` ← Step 6b (object — `available: false` if no profile, full assessment if profile exists)
 - [ ] `evidence[]` ← ENVELOPE field (Synthesis is exempt from >= 3 requirement — may be empty `[]`)
 
 ## `data` Schema
@@ -76,6 +77,38 @@ Field names, nesting, and enum values are exact contracts. See `output-contract.
     "competitive": [],
     "bizmodel": [],
     "risk": []
+  },
+
+  "founder_fit": {
+    "available": "boolean — true if founder_context was provided, false otherwise",
+    "fit_score": "number 0-100 | null — null when available is false",
+    "fit_label": "strong | moderate | weak | misaligned | null",
+    "dimensions": {
+      "domain_expertise_match": "number 0-20 | null",
+      "resource_sufficiency": "number 0-20 | null",
+      "risk_tolerance_alignment": "number 0-20 | null",
+      "network_distribution": "number 0-20 | null",
+      "execution_capability": "number 0-20 | null",
+      "asymmetric_advantage": "number 0-20 | null"
+    },
+    "fit_summary": "string | null — 2-3 sentences connecting founder to this idea",
+    "fit_boosters": ["string — specific founder advantages for this idea"],
+    "fit_blockers": ["string — specific founder gaps or mismatches"],
+    "adjusted_verdict_note": "string | null — how the verdict should be interpreted for THIS founder"
   }
 }
 ```
+
+### `founder_fit` — Backward Compatibility
+
+When no founder profile is available, the `founder_fit` object MUST still be present but minimal:
+
+```json
+{
+  "founder_fit": {
+    "available": false
+  }
+}
+```
+
+All other fields (`fit_score`, `dimensions`, etc.) may be omitted when `available` is `false`. When `available` is `true`, ALL fields are required.
