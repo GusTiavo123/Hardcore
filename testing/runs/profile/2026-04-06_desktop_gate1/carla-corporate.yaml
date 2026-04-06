@@ -1,0 +1,98 @@
+# Profile Test Result — P2: Carla Corporate
+# Quick mode extraction from testing/personas/carla-corporate.yaml
+
+persona_id: "P2"
+persona_name: "carla-corporate"
+machine: "desktop"
+date: "2026-04-06"
+mode: "quick"
+user_slug: "carla-logistics-santiago"
+engram_ids: [4, 5, 6]  # core, extended, state
+
+# Profile Envelope
+status: "partial"
+completeness:
+  core: 0.56
+  extended: 0.18
+  meta: 0.75
+  overall: 0.47
+overall_arithmetic_verified: true  # (0.56×0.6)+(0.18×0.3)+(0.75×0.1) = 0.336+0.054+0.075 = 0.465 ≈ 0.47
+
+# Extraction Results
+should_capture:
+  - field: "Operations manager, logistics industry"
+    captured: true
+    extracted_as: 'current_role: "Gerenta de Operaciones — empresa de logística"'
+  - field: "Location: Santiago, Chile"
+    captured: true
+    extracted_as: "city: Santiago, country: Chile, timezone: America/Santiago"
+  - field: "$35K capital"
+    captured: true
+    extracted_as: "capital.available: 35000, source: savings"
+  - field: "Part-time 15hrs/week"
+    captured: true
+    extracted_as: "commitment: part-time, hours_per_week: 15"
+  - field: "MBA, ex-Deloitte (business skills)"
+    captured: true
+    extracted_as: 'education_highlight: "MBA", notable_employers: ["Deloitte"]'
+  - field: "Supply chain domain expertise — likely operator level"
+    captured: false
+    extracted_as: "practitioner (not operator)"
+    note: "Depth classification differs. She's an employee/manager, not owner — practitioner is defensible per schema definitions but GT says operator."
+  - field: "Husband is programmer (team resource, ambiguous role)"
+    captured: false
+    extracted_as: "Classified as cofounder part-time"
+    note: "Overinterpreted ambiguity. Input says 'me puede ayudar' — sub-agent made him cofounder. GT says solo: true."
+should_capture_score: "5/7 (2 partial)"
+
+likely_misses:
+  - field: "Bonus $15K coming in 3 months"
+    correctly_missed: true
+  - field: "Husband's exact role"
+    correctly_missed: false
+    note: "Sub-agent resolved ambiguity instead of leaving it open — classified as cofounder."
+  - field: "Zero entrepreneurial experience"
+    correctly_missed: true
+  - field: "200+ logistics contacts never activated"
+    correctly_missed: true
+  - field: "Conservative risk tolerance driven by family"
+    correctly_missed: true
+  - field: "No online presence at all"
+    correctly_missed: true
+likely_misses_score: "5/6 correct, 1 partial"
+
+# Discrepancies vs Ground Truth
+discrepancies:
+  - field: "domain_expertise.depth"
+    extracted: "practitioner"
+    ground_truth: "operator"
+    severity: "medium"
+    note: "Gerenta de operaciones = employee. Schema says operator = 'ran a business'. Defensible either way."
+  - field: "team.solo"
+    extracted: false
+    ground_truth: true
+    severity: "medium-high"
+    note: "Husband classified as cofounder. The 'me puede ayudar' trap worked — sub-agent overcommitted."
+  - field: "years_experience"
+    extracted: null
+    ground_truth: 9
+    severity: "low"
+    note: "Not mentioned explicitly. Could infer from Deloitte + logistics but sub-agent didn't fabricate."
+  - field: "target_geographies"
+    extracted: '["LATAM"]'
+    ground_truth: '["Chile", "Perú", "LATAM"]'
+    severity: "low"
+    note: "GT is more granular but input only says LATAM."
+
+# Checks
+engram_persisted: true
+schema_complete: true
+envelope_valid: true
+no_fabrication: true
+
+# Overall
+pass: true
+notes: >
+  Pass with observations. The husband-as-cofounder classification (solo: false vs GT solo: true)
+  is the most significant discrepancy — the SKILL.md should add guidance on conservative team
+  classification for ambiguous roles. Domain depth practitioner vs operator is a gray area.

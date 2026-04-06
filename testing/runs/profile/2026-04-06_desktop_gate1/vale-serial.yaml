@@ -1,0 +1,109 @@
+# Profile Test Result — P4: Vale Serial
+# Quick mode extraction from testing/personas/vale-serial.yaml
+
+persona_id: "P4"
+persona_name: "vale-serial"
+machine: "desktop"
+date: "2026-04-06"
+mode: "quick"
+user_slug: "vale-ecom-bogota"
+engram_ids: [10, 11, 12]  # core, extended, state
+
+# Profile Envelope
+status: "partial"
+completeness:
+  core: 0.46
+  extended: 0.36
+  meta: 1.0
+  overall: 0.49
+overall_arithmetic_verified: true  # (0.46×0.6)+(0.36×0.3)+(1.0×0.1) = 0.276+0.108+0.1 = 0.484 ≈ 0.49
+
+# Extraction Results
+should_capture:
+  - field: "Serial entrepreneur — 3 ventures"
+    captured: true
+    extracted_as: "previous_ventures: 3 entries (e-commerce shut-down, agencia sold, SaaS shut-down)"
+  - field: "Location: Bogotá, Colombia"
+    captured: true
+    extracted_as: "city: Bogotá, country: Colombia, timezone: America/Bogota"
+  - field: "$60K capital, full-time"
+    captured: true
+    extracted_as: "capital.available: 60000, commitment: full-time"
+  - field: "Sales, operations, marketing skills"
+    captured: false
+    extracted_as: "Sales (expert), Operations (expert). Marketing NOT listed as business skill."
+    note: "Marketing captured as domain_expertise (operator) but not as a business skill."
+  - field: "Cannot code"
+    captured: true
+    extracted_as: "technical: []"
+  - field: "8K Twitter/X followers, entrepreneurship LATAM"
+    captured: true
+    extracted_as: "audience: X (Twitter), 8000, niche: emprendimiento"
+  - field: "Previous ventures with outcomes"
+    captured: true
+    extracted_as: "3 ventures with correct outcomes and key lessons"
+  - field: "Wants B2B SaaS"
+    captured: true
+    extracted_as: 'primary_goal: "build-something", mentioned in executive_summary'
+should_capture_score: "7/8 (1 partial)"
+
+likely_misses:
+  - field: "Specific lessons: margins on clothing, validate before building"
+    correctly_missed: false
+    note: "SaaS lesson captured. E-commerce lesson NOT captured (key_lesson: 'Not specified')."
+  - field: "100+ online business owners as contacts (quantified)"
+    correctly_missed: true
+    note: "Network captured as strong/activatable but not quantified."
+  - field: "Hard-nos on fashion/clothing and services"
+    correctly_missed: true
+  - field: "Failed SaaS = proof she needs validation tools"
+    correctly_missed: true
+  - field: "Agency exit at $80K"
+    correctly_missed: true
+likely_misses_score: "4/5 correct, 1 partial"
+
+# Discrepancies vs Ground Truth
+discrepancies:
+  - field: "market_proximity"
+    extracted: 2
+    ground_truth: 1
+    severity: "medium"
+    note: "Vale knows her market personally (100+ business owners). Proximity should be 1, not 2."
+  - field: "execution_readiness"
+    extracted: "preparing"
+    ground_truth: "ready"
+    severity: "medium"
+    note: "GT says ready: 60K + full-time + sales/ops skills. Tech gap resolvable with capital."
+  - field: "industries_worked"
+    extracted: '["e-commerce", "marketing digital"]'
+    ground_truth: '["e-commerce", "marketing-digital", "SaaS"]'
+    severity: "medium"
+    note: "Missing SaaS as industry. She built a SaaS (even though it failed)."
+  - field: "domain_expertise (SaaS missing)"
+    extracted: "e-commerce (operator), marketing digital (operator)"
+    ground_truth: "+ SaaS (observer, 1 year)"
+    severity: "medium"
+    note: "8 months with a SaaS gives at least observer-level knowledge. Data was in input."
+  - field: "capital.source"
+    extracted: null
+    ground_truth: "revenue"
+    severity: "low"
+    note: "Input doesn't specify source. Could infer from agency exit but not explicit."
+  - field: "null vs [] in arrays"
+    extracted: "communities: null, values: null, proprietary_insights: null"
+    ground_truth: "Should be [] for consistency"
+    severity: "low"
+    note: "P1-P3 use [] for empty arrays. P4 uses null. Inconsistency across profiles."
+
+# Checks
+engram_persisted: true
+schema_complete: true
+envelope_valid: true
+no_fabrication: true
+
+# Overall
+pass: true
+notes: >
+  Pass with observations. Best extraction of extended data (3 ventures, network, audience).
+  Main issues: SaaS missing as domain/industry (data was in input), market_proximity
+  overestimated (2 vs 1), null vs [] inconsistency with other profiles.
