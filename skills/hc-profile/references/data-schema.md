@@ -249,6 +249,17 @@ Before persisting or returning, verify every field:
 
 ## Field Semantics
 
+### Boundary: `skills.technical` / `skills.business` vs `skills.domain_expertise`
+
+These three arrays capture fundamentally different things:
+
+- **`technical`** and **`business`**: WHAT you can DO — capabilities, tools, methodologies. These are transferable across industries. Examples: "Python", "UX Design", "Sales", "Financial Analysis".
+- **`domain_expertise`**: WHERE you did it — industry or vertical knowledge gained from working IN that industry. These are not transferable. Examples: "Fintech", "Logistics", "E-commerce", "Healthcare".
+
+**"Software Development" is a skill, not a domain.** "Fintech" is a domain. A developer with 5 years at a fintech has `technical: [{skill: "Python", ...}]` AND `domain_expertise: [{domain: "Fintech", ...}]`. The technical skill goes in `technical`, the industry knowledge goes in `domain_expertise`.
+
+If you cannot name a specific industry or vertical, the expertise belongs in `technical` or `business`, not in `domain_expertise`.
+
 ### `skills.domain_expertise[].depth`
 
 This is the most impactful classification in the entire profile. The three levels represent fundamentally different types of knowledge:
@@ -288,13 +299,22 @@ Self-reported but calibrated during interview with a scenario question (see `int
 
 ## Null Handling
 
-Every field accepts `null`. Arrays can be empty `[]`. The profile is designed for progressive population:
+The profile uses two empty representations with distinct semantics:
 
-- **Quick mode**: Most extended and meta fields will be `null`
+- **`null`**: Used for **scalar fields** only. Means "unknown / not addressed."
+- **`[]`**: Used for **array fields** only. Means "no entries."
+
+**Array fields MUST always be `[]`, never `null`.** This includes: `skills.technical`, `skills.business`, `skills.domain_expertise`, `hard_nos`, `audience`, `professional_network`, `communities`, `distribution_channels`, `values`, `proprietary_insights`, `previous_ventures`, `personal_obligations`, and all other array-typed fields.
+
+This rule ensures downstream modules can always iterate over arrays without null checks. It applies across all modes (quick, guided, update).
+
+The profile is designed for progressive population:
+
+- **Quick mode**: Most extended scalars will be `null`, arrays will be `[]`
 - **Guided mode**: Core fields should be non-null; extended depends on interview depth
 - **After multiple updates**: Most fields populated
 
-Downstream modules MUST handle `null` gracefully. A `null` field means "unknown", not "absent". The distinction matters: `hard_nos: []` means "no hard-nos declared", while `hard_nos: null` means "we haven't asked yet."
+Downstream modules MUST handle `null` gracefully on scalar fields. A `null` scalar means "unknown", not "absent".
 
 ---
 

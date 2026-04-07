@@ -6,7 +6,7 @@
 #
 # El punto de este persona es testear:
 # - Que el sistema no se rompe con datos mínimos
-# - Que el status es "partial"
+# - Que el status es "blocked" (core < 0.3 con solo 4 datos)
 # - Que el fit scoring usa midpoints (10/20) para dims desconocidas
 # - Que el flag "partial-fit-assessment" se activa
 

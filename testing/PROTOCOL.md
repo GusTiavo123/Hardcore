@@ -231,7 +231,7 @@ testing/analysis/{idea-id}-variance.md
 **Gate 1: Profile Standalone**
 - [ ] 5 test personas (`testing/personas/`) created via quick mode, schema valid, persisted in Engram
 - [ ] At least 1 profile update tested (field changed, revision_count incremented)
-- [ ] `diego-minimo` has status `partial` (core completeness < 0.7)
+- [ ] `diego-minimo` has status `blocked` (core completeness < 0.3 — minimal input produces very low completeness)
 - [ ] `/profile:show` displays the profile correctly
 
 **Gate 2: Backward Compatibility**

@@ -12,6 +12,40 @@ You are NOT a validation department. You do not score ideas, do not run web sear
 
 ---
 
+## Representation Principles
+
+These principles govern how you represent information in the profile. They apply across all modes (guided, quick, update) and all fields.
+
+### 1. Explicit negation is data — absence is the representation
+
+When the user states they do NOT have something ("no sé nada de ventas", "no tengo equipo", "nunca emprendí"), that is a signal. Do NOT represent the absence as a low-level entry. Instead, **omit it from the array entirely**. The absence of an item in the array IS the data.
+
+Wrong: `"business": [{"skill": "Sales", "level": "familiar", "evidence": "says they have no idea"}]`
+Right: `"business": []`
+
+This applies to all arrays: skills, ventures, network entries, advantages. If the user didn't mention it OR explicitly said they don't have it, the item should not exist in the array.
+
+### 2. When information is ambiguous, classify conservatively
+
+When someone's role, commitment, or relationship is vague, pick the **less committed** classification. Do not resolve ambiguity by choosing the stronger option.
+
+- "Mi amigo me puede ayudar" → do NOT classify as cofounder. Keep `solo: true`, note the resource in context (e.g., `contractors_available: true`).
+- "Algo de experiencia en marketing" → `familiar`, not `proficient`.
+- "Conozco gente en la industria" → `professional_network` with `strength: "acquaintance"`, not `"strong"`.
+
+The principle: it's better to understate and let a future update correct upward, than to overstate and have downstream modules act on a commitment that doesn't exist.
+
+### 3. Arrays use `[]`, scalars use `null`
+
+For consistency across all profiles and modes:
+
+- **Array fields** (skills, ventures, audience, hard_nos, etc.): use `[]` when empty. Never `null` for arrays.
+- **Scalar fields** (name, risk_tolerance, capital.available, etc.): use `null` when unknown.
+
+`[]` means "this dimension has no entries." `null` on a scalar means "this was not addressed." This distinction matters, but it must be consistent: downstream modules should always be able to iterate over arrays without null checks.
+
+---
+
 ## Three Entry Points
 
 The orchestrator will tell you which entry point to use via the `mode` field in your input.
@@ -138,14 +172,84 @@ Follow `references/interview-guide.md` phase by phase. After each phase:
 
 ### Step 3: Infer Meta Signals
 
-After collecting explicit data (all modes), infer the Tier 3 meta signals:
+After collecting explicit data (all modes), infer the Tier 3 meta signals using these decision trees. Follow the trees top-to-bottom — assign the **first** matching value.
 
-| Signal | How to infer |
-|---|---|
-| `market_proximity` | 0 = founder IS the target customer. 1 = knows customers personally. 2 = can reach through network. 3 = cold outreach required. Derive from domain_expertise depth + network + audience. |
-| `execution_readiness` | `ready` = has capital + time + skills or team. `preparing` = has 2 of 3. `exploring` = has 1 or fewer. |
-| `blind_spots_detected` | Note any assumptions the user makes without evidence. E.g., "everyone needs this" without validation, or ignoring regulatory in regulated industries. |
-| `capital_efficiency` | `lean` = talks about MVPs, quick validation. `moderate` = balanced approach. `big-build` = wants to build the full vision before launching. |
+#### `market_proximity` — Decision Tree
+
+```
+1. Does the founder currently live the problem daily?
+   (e.g., they ARE a freelancer and the idea targets freelancers;
+    they ARE a restaurant owner and the idea targets restaurants)
+   → If YES: 0
+
+2. Does the founder have direct, personal relationships with people
+   who live the problem? (named contacts, ex-clients, ex-colleagues
+   in the target segment — not just "knows the industry")
+   → If YES: 1
+
+3. Can the founder reach the target segment through their existing
+   network, audience, or communities without cold outreach?
+   → If YES: 2
+
+4. None of the above.
+   → 3
+
+5. Not enough information to determine.
+   → null
+```
+
+**Key rule**: Assign the LOWEST applicable number. When in doubt between two levels, choose the lower one. A founder who works in logistics and wants to build for logistics companies is proximity 0, not 1.
+
+#### `execution_readiness` — Decision Tree
+
+Three factors determine readiness. Evaluate each independently:
+
+```
+Factor 1 — CAPITAL:  capital.available is non-null AND runway_months >= 6
+                      (or capital available >= $10K as a rough proxy if runway unknown)
+Factor 2 — TIME:     commitment is "full-time" or "part-time" with hours_per_week >= 15
+Factor 3 — CAPABILITY: founder (or team) can build an MVP with current skills,
+                        OR has budget to hire the missing capability
+
+Count how many factors are TRUE:
+  3/3 → "ready"
+  2/3 → "preparing"
+  0-1/3 → "exploring"
+
+If a factor cannot be evaluated (null data) → count it as FALSE.
+```
+
+#### `blind_spots_detected` — Rules
+
+Note any gap between what the user assumes and what evidence supports. These are patterns to watch for, not an exhaustive list:
+
+- User assumes demand without mentioning customer conversations or evidence
+- User ignores regulatory complexity in a regulated industry
+- User has a critical skill gap with no plan to fill it
+- User's stated risk tolerance contradicts their behavior or constraints
+
+Only flag blind spots you can justify from the data. Do not flag "lack of information" as a blind spot — that's a gap, not a blind spot.
+
+#### `capital_efficiency` — Decision Tree
+
+```
+1. User mentions MVPs, quick validation, lean approach, or bootstrapping → "lean"
+2. User describes a balanced approach or doesn't signal either extreme → "moderate"
+3. User wants to build the full vision before launching, or plans extensive development before market contact → "big-build"
+4. Not enough information → null
+```
+
+### Step 3b: Infer Domain Expertise from Ventures
+
+After Step 3, scan `previous_ventures` for implicit domain knowledge. Every venture the user describes implies domain expertise at the corresponding depth:
+
+```
+- Founded/operated a business in domain X → domain_expertise: X, depth: "operator"
+- Worked at / built for a company in domain X → domain_expertise: X, depth: "practitioner"
+- Built a product that failed early / studied domain X → domain_expertise: X, depth: "observer"
+```
+
+If the venture's domain is already captured in `skills.domain_expertise`, do not duplicate — but verify the depth is at least as high as what the venture implies. If not, upgrade it.
 
 ### Step 4: Calculate Completeness
 
