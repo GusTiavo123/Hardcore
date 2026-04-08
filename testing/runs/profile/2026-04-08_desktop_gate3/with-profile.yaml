@@ -1,0 +1,59 @@
+# Integration Test — Tomás × go-invoice-freelancers (WITH profile)
+# Validates: founder_context injection, fit scoring, department annotations
+
+idea_id: "go-invoice-freelancers"
+persona: "tomas-freelancer"
+user_slug: "tomas-ux-montevideo"
+machine: "desktop"
+date: "2026-04-08"
+mode: "fast"
+profile_active: true
+
+scores:
+  problem: 71
+  market: 63
+  competitive: 63
+  bizmodel: 48
+  risk: 62
+weighted: 62.3
+verdict: "PIVOT"
+
+founder_fit:
+  available: true
+  fit_score: 45
+  fit_label: "weak"
+  dimensions:
+    domain_expertise_match: 10
+    resource_sufficiency: 5
+    risk_tolerance_alignment: 15
+    network_distribution: 13
+    execution_capability: 4
+    asymmetric_advantage: 7
+  fit_arithmetic_verified: true  # round((54/120) × 100) = 45
+  fit_label_verified: true       # 45 → weak (40-59 range)
+  fit_boosters_count: 3
+  fit_blockers_count: 3
+  adjusted_verdict_note_personalized: true
+
+founder_flags:
+  market: ["founder-audience-overlap"]
+  bizmodel: ["founder-capital-constraint"]
+  risk: ["founder-execution-risk"]
+
+pre_filter:
+  result: "PROCEED"
+  hard_no_match: false
+  warnings: ["skill gap — no backend development capability"]
+
+profile_snapshot_persisted: true
+
+# Checks
+all_departments_completed: true
+founder_context_injected: true
+engram_persisted: true
+
+pass: true
+notes: >
+  Full pipeline completed with profile integration. Fit scoring produced
+  reasonable assessment (45/100 weak). Three founder-specific flags raised
+  across departments. Profile snapshot persisted in Engram.
