@@ -1,0 +1,27 @@
+# BLOCK Test — Tomás × pivot-ai-tutoring-kids
+# Validates: pre-filter hard-no detection stops pipeline
+
+idea_id: "pivot-ai-tutoring-kids"
+idea_text: "An AI-powered personalized tutoring platform for K-12 students that replaces human tutors entirely, using generative AI for real-time teaching across all subjects"
+persona: "tomas-freelancer"
+user_slug: "tomas-ux-montevideo"
+machine: "desktop"
+date: "2026-04-08"
+profile_active: true
+
+pre_filter:
+  result: "BLOCK"
+  trigger: "hard-no violation"
+  hard_no_matched: "Educación"
+  idea_match_reason: "Tutoring platform for K-12 students is directly in the education vertical"
+  user_message_shown: true
+  override_offered: true
+
+pipeline_launched: false
+departments_run: 0
+engram_artifacts_created: 0
+
+pass: true
+notes: >
+  Pre-filter correctly identified "Educación" hard-no match with tutoring/K-12 idea.
+  Pipeline was NOT launched. User was informed with specific reason and offered override.

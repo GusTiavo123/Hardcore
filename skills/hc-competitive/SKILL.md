@@ -168,6 +168,25 @@ Always return `["bizmodel"]`.
 
 Full competitor profiles, review excerpts, gap analysis methodology, failure timelines.
 
+## Founder Context Integration
+
+If `founder_context` is provided in the input (not null), use it as follows:
+
+**What changes:**
+
+1. **Insider knowledge annotation**: If `founder_context.domain_expertise[]` contains an entry matching the competitive landscape's industry at `operator` or `practitioner` depth, note in `executive_summary`: "Founder has {depth}-level domain knowledge, which may inform competitive dynamics not visible from public sources."
+
+2. **Regulatory moat navigability**: If competitors have regulatory moats (`moat_type: "regulatory"`) AND `founder_context.advantages.regulatory_knowledge[]` contains relevant expertise, add a note in the competitor's profile or `executive_summary`: "Founder has regulatory expertise in {area}, potentially reducing this moat's defensibility for them specifically."
+
+3. **Flags**: Add `"founder-domain-expertise"` if the founder has `practitioner` or `operator` depth in the competitive landscape's industry. Add `"founder-regulatory-advantage"` if regulatory moats exist and the founder has relevant regulatory knowledge.
+
+**What does NOT change:**
+- `score` and `sub_scores` — competitive landscape is what it is. Moats are scored objectively.
+- Competitor profiles — remain factual, not adjusted for founder perspective.
+- `market_gaps` — gaps are market-level, not founder-specific.
+
+If `founder_context` is null, ignore this section entirely.
+
 ## Critical Rules
 
 1. **Every competitor must be real** with a URL. Shorter verified list > long hallucinated list.

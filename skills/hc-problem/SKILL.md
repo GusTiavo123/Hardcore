@@ -166,6 +166,21 @@ Always return `["market", "competitive"]`.
 
 Full methodology, raw search results, reasoning per sub-dimension.
 
+## Founder Context Integration
+
+If `founder_context` is provided in the input (not null), use it as follows:
+
+**What changes:**
+- In `executive_summary`: If the founder has `domain_expertise` at `operator` or `practitioner` depth in the idea's `industry`, add a note: "Founder has {depth}-level knowledge in {domain}, which provides additional qualitative signal for problem understanding." This is informational — it helps Synthesis assess founder-idea fit.
+- In `flags`: Add `"founder-domain-expertise"` if `domain_expertise[].depth` is `practitioner` or `operator` for a domain matching the idea's industry.
+
+**What does NOT change:**
+- `score` and `sub_scores` — these remain anchored to evidence found through web search. The problem either exists in the market or it doesn't, regardless of who the founder is.
+- Search queries — do not bias your search based on the founder's claims.
+- `problem_exists` criteria — remains evidence-based (3+ unique complaint threads, etc.).
+
+If `founder_context` is null, ignore this section entirely. Operate exactly as before.
+
 ## Critical Rules
 
 1. **Never invent complaints or evidence.** A low score from honest data beats a high score from fabricated evidence.

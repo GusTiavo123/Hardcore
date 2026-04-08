@@ -1,0 +1,86 @@
+# Profile Test Result — P1: Tomás Freelancer
+# Quick mode extraction from testing/personas/tomas-freelancer.yaml
+
+persona_id: "P1"
+persona_name: "tomas-freelancer"
+machine: "desktop"
+date: "2026-04-06"
+mode: "quick"
+user_slug: "tomas-ux-montevideo"
+engram_ids: [1, 2, 3]  # core, extended, state
+
+# Profile Envelope
+status: "partial"
+completeness:
+  core: 0.46
+  extended: 0.18
+  meta: 1.0
+  overall: 0.43
+overall_arithmetic_verified: true  # (0.46×0.6)+(0.18×0.3)+(1.0×0.1) = 0.276+0.054+0.1 = 0.43
+
+# Extraction Results
+should_capture:
+  - field: "UX/UI design skills at expert level"
+    captured: true
+    extracted_as: "UX Design (expert), UI Design (proficient)"
+  - field: "Location: Montevideo, Uruguay"
+    captured: true
+    extracted_as: "city: Montevideo, country: Uruguay, timezone: America/Montevideo"
+  - field: "$20K capital available"
+    captured: true
+    extracted_as: "capital.available: 20000, source: savings"
+  - field: "Instagram audience: 4500, niche: UX design"
+    captured: true
+    extracted_as: "audience: Instagram, 4500, niche: UX Design"
+  - field: "Hard-nos: gobierno, educación"
+    captured: true
+    extracted_as: 'hard_nos: ["Gobierno", "Educación"]'
+  - field: "Cannot code — needs to outsource development"
+    captured: true
+    extracted_as: "No coding skills listed + contractors_available: true"
+  - field: "Wants to build SaaS"
+    captured: true
+    extracted_as: 'primary_goal: "escape-job", mentioned in executive_summary'
+should_capture_score: "7/7"
+
+likely_misses:
+  - field: "2 abandoned side-projects"
+    correctly_missed: true
+  - field: "Risk tolerance mismatch (impulsive)"
+    correctly_missed: true
+  - field: "Freelancer communities as distribution"
+    correctly_missed: true
+  - field: "6 years freelancing = practitioner in service business ops"
+    correctly_missed: false
+    note: "Captured UX/UI as practitioner but not freelance operations as separate domain"
+likely_misses_score: "3/4 correct, 1 partial"
+
+# Discrepancies vs Ground Truth
+discrepancies:
+  - field: "primary_goal"
+    extracted: "escape-job"
+    ground_truth: "build-something"
+    severity: "low"
+    note: "Both valid. 'Podrido de servicios' = escape, 'quiero armar un producto' = build."
+  - field: "working_style.orientation"
+    extracted: "business"
+    ground_truth: "technical"
+    severity: "low"
+    note: "Designer is debatable — design IS technical but he's not a coder."
+  - field: "market_proximity"
+    extracted: 1
+    ground_truth: 0
+    severity: "medium"
+    note: "Tomás IS a freelancer — if he builds for freelancers, proximity is 0. Sub-agent overestimated."
+
+# Checks
+engram_persisted: true       # 3 artifacts found and recoverable
+schema_complete: true        # All data-schema.md fields present
+envelope_valid: true         # All envelope fields present, status correct
+no_fabrication: true         # No data invented beyond input
+
+# Overall
+pass: true
+notes: >
+  Clean pass. Discrepancies are interpretive (primary_goal, orientation, market_proximity)
+  and within expected variance for quick mode with limited input.

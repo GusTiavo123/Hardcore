@@ -10,6 +10,7 @@ Read and follow these files exactly:
 - skills/_shared/persistence-contract.md
 - skills/_shared/department-protocol.md
 - skills/_shared/glossary.md
+- skills/_shared/profile-contract.md
 - skills/hc-{department}/SKILL.md
 
 For the data schema and assembly checklist, read:
@@ -20,12 +21,16 @@ Input:
   "idea": "{original idea text}",
   "slug": "{slug}",
   "persistence_mode": "{mode}",
-  "detail_level": "{level}"
+  "detail_level": "{level}",
+  "founder_context": {founder_context_json} or null
 }
 
 CRITICAL: Your `data` object must contain EVERY field from the data schema in your references/data-schema.md.
 Cross-reference the Assembly Checklist before returning.
 Missing fields break downstream departments.
+
+If `founder_context` is not null, read `skills/_shared/profile-contract.md` for how to use it.
+Founder context provides qualitative annotations only — it NEVER changes your scores.
 
 Execute the full process defined in the SKILL.md and return the output envelope.
 ```
@@ -34,6 +39,7 @@ Each department needs **web search** capabilities. The sub-agent must use WebSea
 
 **For Synthesis**, the template is the same except:
 - Synthesis also reads: `skills/hc-synthesis/references/upstream-field-map.md`
+- Synthesis also reads: `skills/hc-profile/references/fit-dimensions.md` (for Founder-Idea Fit scoring)
 - Synthesis does NOT do web search (it synthesizes upstream data only)
 
 ## Envelope Validation (after each department)

@@ -23,7 +23,14 @@ project:   "hardcore"
 scope:     "project"
 ```
 
-`project` is `"hardcore"` (the parent ecosystem). The `validation/` prefix in `topic_key` namespaces this module. Future modules (discovery, research, etc.) will use their own prefixes under the same project.
+`project` is `"hardcore"` (the parent ecosystem). Topic key prefixes namespace each module within the project:
+
+| Module | `topic_key` prefix | Example |
+|---|---|---|
+| Idea Validation | `validation/` | `validation/{slug}/problem` |
+| Founder Profile | `profile/` | `profile/{user-slug}/core` |
+
+Future modules will use their own prefixes under the same project.
 
 ### Idea Slug
 
@@ -51,6 +58,10 @@ Engram only accepts 7 type values. Our departments map as follows:
 | `synthesis` | `decision` | Final verdict is a decision |
 | `report` | `decision` | Consolidated decision report |
 | `state` | `config` | Pipeline configuration and recovery state |
+| `profile/core` | `config` | Founder profile — core dimensions |
+| `profile/extended` | `config` | Founder profile — extended dimensions |
+| `profile/state` | `config` | Founder profile — metadata and completeness |
+| `profile/snapshot` | `discovery` | Frozen profile at validation time |
 
 ### Content Format
 

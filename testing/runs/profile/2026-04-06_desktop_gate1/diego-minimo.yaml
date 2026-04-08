@@ -1,0 +1,88 @@
+# Profile Test Result — P5: Diego Mínimo
+# Quick mode extraction from testing/personas/diego-minimo.yaml
+
+persona_id: "P5"
+persona_name: "diego-minimo"
+machine: "desktop"
+date: "2026-04-06"
+mode: "quick"
+user_slug: "diego-dev-lima"
+engram_ids: [13, 14, 15]  # core, extended, state
+
+# Profile Envelope
+status: "blocked"  # EXPECTED: partial — see notes
+completeness:
+  core: 0.22
+  extended: 0.0
+  meta: 0.25
+  overall: 0.16
+overall_arithmetic_verified: true  # (0.22×0.6)+(0.0×0.3)+(0.25×0.1) = 0.132+0+0.025 = 0.157 ≈ 0.16
+
+# Extraction Results
+should_capture:
+  - field: "Name: Diego"
+    captured: true
+    extracted_as: 'name: "Diego"'
+  - field: "Location: Lima, Peru"
+    captured: true
+    extracted_as: "city: Lima, country: Peru, timezone: America/Lima"
+  - field: "Some kind of developer"
+    captured: true
+    extracted_as: 'current_role: "developer", skills.technical: Software Development (proficient)'
+  - field: "5 years experience"
+    captured: true
+    extracted_as: "years_experience: 5"
+should_capture_score: "4/4"
+
+likely_misses:
+  - field: "Everything else (intentionally minimal)"
+    correctly_missed: true
+  - field: "What kind of developer"
+    correctly_missed: true
+    note: 'Generic "Software Development" — correct, no specialization data.'
+  - field: "Capital, time, team, network"
+    correctly_missed: true
+  - field: "Domain expertise, hard-nos, motivation"
+    correctly_missed: true
+likely_misses_score: "4/4"
+
+# Discrepancies vs Ground Truth
+discrepancies:
+  - field: "languages"
+    extracted: null
+    ground_truth: '[{language: "Español", level: "native"}]'
+    severity: "low"
+    note: "Should infer Spanish from Lima, Peru. Other 4 profiles did infer language from location."
+  - field: "domain_expertise"
+    extracted: '[{domain: "Software Development", depth: "practitioner", years: 5}]'
+    ground_truth: "[] (empty)"
+    severity: "low"
+    note: "Generic 'Software Development' is not an industry domain. Should be in skills.technical only."
+  - field: "status"
+    extracted: "blocked"
+    ground_truth: "partial (expected by protocol)"
+    severity: "high"
+    note: >
+      PROTOCOL EXPECTATION MISMATCH. Core 0.22 < 0.3 = blocked per SKILL.md rules.
+      Protocol and persona expect "partial". Recommendation: update protocol expectation
+      to "blocked" — with 4 words of input, blocked is the honest answer.
+
+# Stress Test Checks
+no_fabrication: true          # Did NOT invent data beyond 4 input points
+system_stable: true           # Did not crash or error with minimal input
+extended_empty: true          # Extended is 100% empty (as expected)
+extended_persisted: true      # ISSUE: persisted despite being empty (SKILL.md says "only if populated")
+
+# Checks
+engram_persisted: true
+schema_complete: true
+envelope_valid: true
+
+# Overall
+pass: false  # Status mismatch: expected partial, got blocked
+notes: >
+  The system handled minimal input correctly — no fabrication, no crashes, correct
+  calculation of very low completeness. The only FAIL is status "blocked" when the
+  protocol expects "partial". This is a protocol expectation issue, not a profiler bug.
+  Recommendation: update PROTOCOL.md and diego-minimo.yaml to expect "blocked".
+  Secondary issue: extended artifact persisted when empty (minor protocol violation).

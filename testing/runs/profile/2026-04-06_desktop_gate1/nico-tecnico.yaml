@@ -1,0 +1,87 @@
+# Profile Test Result — P3: Nico Técnico
+# Quick mode extraction from testing/personas/nico-tecnico.yaml
+
+persona_id: "P3"
+persona_name: "nico-tecnico"
+machine: "desktop"
+date: "2026-04-06"
+mode: "quick"
+user_slug: "nico-backend-cordoba"
+engram_ids: [7, 8, 9]  # core, extended, state
+
+# Profile Envelope
+status: "partial"
+completeness:
+  core: 0.46
+  extended: 0.05
+  meta: 1.0
+  overall: 0.39
+overall_arithmetic_verified: true  # (0.46×0.6)+(0.05×0.3)+(1.0×0.1) = 0.276+0.015+0.1 = 0.391 ≈ 0.39
+
+# Extraction Results
+should_capture:
+  - field: "Backend developer, Python/Go, expert level"
+    captured: true
+    extracted_as: "Python (expert), Go (proficient), Backend Architecture (expert)"
+  - field: "Location: Córdoba, Argentina"
+    captured: true
+    extracted_as: "city: Córdoba, country: Argentina, timezone: America/Argentina/Cordoba"
+  - field: "$3K capital"
+    captured: true
+    extracted_as: "capital.available: 3000, source: savings"
+  - field: "Part-time 25hrs/week"
+    captured: true
+    extracted_as: "commitment: part-time, hours_per_week: 25"
+  - field: "Works at a fintech (4 years)"
+    captured: true
+    extracted_as: 'industries_worked: ["Fintech"], years_experience: 4'
+  - field: "No sales/marketing skills (explicitly stated)"
+    captured: false
+    extracted_as: 'Listed as business skills at "familiar" level with "zero knowledge" evidence'
+    note: "ISSUE: Should NOT list skills declared as absent. GT has business: []. See findings."
+should_capture_score: "5/6 (1 partial)"
+
+likely_misses:
+  - field: "Fintech experience = practitioner knowledge of payments/APIs"
+    correctly_missed: false
+    note: "POSITIVE: Sub-agent correctly inferred fintech as domain_expertise (practitioner, 4y). Better than expected."
+  - field: "B2C aversion (never mentioned)"
+    correctly_missed: true
+  - field: "GitHub projects as existing infrastructure"
+    correctly_missed: true
+  - field: "Discord dev communities as distribution"
+    correctly_missed: true
+  - field: "Fear of leaving salary (affects risk tolerance)"
+    correctly_missed: true
+likely_misses_score: "4/5 correct + 1 better-than-expected"
+
+# Discrepancies vs Ground Truth
+discrepancies:
+  - field: "business skills"
+    extracted: 'Sales (familiar), Marketing (familiar) with "zero knowledge" evidence'
+    ground_truth: "[] (empty)"
+    severity: "medium"
+    note: "Should not list skills explicitly declared as absent. Schema lacks 'none' level but correct action is to omit."
+  - field: "primary_goal"
+    extracted: null
+    ground_truth: "build-something"
+    severity: "low"
+    note: "Not explicit in input. Sub-agent chose not to infer. Defensible."
+  - field: "execution_readiness"
+    extracted: "preparing"
+    ground_truth: "exploring"
+    severity: "medium"
+    note: "$3K is very limited capital. GT argues 'exploring' (1 of 3 factors). Sub-agent overestimated."
+
+# Checks
+engram_persisted: true
+schema_complete: true
+envelope_valid: true
+no_fabrication: true  # except the familiar-level skills issue
+
+# Overall
+pass: true
+notes: >
+  Pass with observations. Positive finding: fintech expertise correctly inferred as
+  domain_expertise (was expected to be missed). Negative: sales/marketing listed as
+  "familiar" when explicitly declared as absent — needs SKILL.md fix.

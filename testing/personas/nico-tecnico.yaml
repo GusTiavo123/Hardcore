@@ -1,0 +1,168 @@
+# P3: Nico — "El técnico que nunca vendió"
+#
+# Quién es realmente:
+# 27 años, Córdoba, Argentina. Dev backend Python/Go, 4 años en startup fintech.
+# Muy bueno técnicamente — puede construir cualquier cosa. Nunca habló con un
+# cliente. Cero marketing, ventas, pricing. $3K ahorrados (gana bien, gasta todo).
+# Quiere algo full-time pero tiene miedo de dejar el sueldo. 25hs/semana "por ahora".
+# Sin audiencia, sin red pro fuera de devs. Lurker en Discord de devs. Sabe de
+# pagos digitales y APIs financieras pero no lo piensa como expertise. Le dan
+# pereza los B2C. Solo proyectos de GitHub, nunca emprendió.
+#
+# Lo que se le escapa al profiler:
+# - Practitioner-level en fintech/pagos (para él es "solo mi laburo")
+# - B2C le da pereza (soft hard-no no declarado)
+# - Proyectos en GitHub (infra existente)
+# - Discord de devs como distribución latente
+
+persona_id: "P3"
+persona_name: "nico-tecnico"
+version: "1.0"
+
+quick_mode_input: >
+  Soy Nico, dev backend en Córdoba, 4 años laburando con Python y Go en una
+  fintech. Puedo armar prácticamente cualquier backend. Tengo unos 3K ahorrados,
+  puedo meter 25 horas por semana por ahora al margen del laburo. No tengo ni
+  idea de ventas ni marketing.
+
+expected_extractions:
+  should_capture:
+    - "Backend developer, Python/Go, expert level"
+    - "Location: Córdoba, Argentina"
+    - "$3K capital"
+    - "Part-time 25hrs/week"
+    - "Works at a fintech (4 years)"
+    - "No sales/marketing skills (explicitly stated)"
+  likely_misses:
+    - "Fintech experience = practitioner knowledge of payments/APIs (he doesn't frame it as expertise)"
+    - "B2C aversion (never mentioned)"
+    - "GitHub projects as existing infrastructure"
+    - "Discord dev communities as potential distribution"
+    - "Fear of leaving salary (not mentioned, affects risk tolerance)"
+
+ground_truth:
+  identity:
+    name: "Nico"
+    location:
+      city: "Córdoba"
+      country: "Argentina"
+      timezone: "UTC-3"
+      willing_to_relocate: false
+      target_geographies: ["Argentina", "LATAM"]
+    languages:
+      - language: "Español"
+        level: "native"
+      - language: "Inglés"
+        level: "conversational"
+    professional_background:
+      current_role: "Backend developer — fintech startup"
+      years_experience: 4
+      industries_worked: ["fintech"]
+      notable_employers: []
+      education_highlight: null
+
+  skills:
+    technical:
+      - skill: "Python"
+        level: "expert"
+        evidence: "4 años de uso diario en producción fintech"
+      - skill: "Go"
+        level: "proficient"
+        evidence: "Microservicios en producción"
+      - skill: "APIs / System Design"
+        level: "expert"
+        evidence: "Diseña e implementa APIs de pagos en producción"
+      - skill: "PostgreSQL"
+        level: "proficient"
+        evidence: "Manejo diario"
+      - skill: "Docker/Infra"
+        level: "proficient"
+        evidence: "Deploy y mantenimiento de servicios"
+    business: []
+    domain_expertise:
+      - domain: "Fintech / pagos digitales"
+        depth: "practitioner"
+        years: 4
+        insider_knowledge: "Entiende flujos de pago, integraciones con procesadores, reconciliación, pero desde el lado técnico — no ve los unit economics"
+
+  resources:
+    capital:
+      available: 3000
+      currency: "USD"
+      source: "savings"
+      runway_months: 2
+      willing_to_fundraise: false
+      fundraising_experience: "none"
+    time:
+      commitment: "part-time"
+      hours_per_week: 25
+      deadline: null
+    team:
+      solo: true
+      cofounders: []
+      contractors_available: false
+      hiring_budget_monthly: null
+    infrastructure:
+      existing_tech: ["GitHub repos con proyectos personales"]
+      existing_products: []
+      existing_data: []
+
+  constraints:
+    hard_nos: []
+    regulatory_limits: []
+    geographic_limits: []
+    ethical_limits: []
+    time_limits:
+      max_months_to_revenue: null
+      max_months_to_mvp: null
+    capital_limits:
+      max_initial_investment: 3000
+      max_monthly_burn: null
+    risk_tolerance: "moderate"
+    risk_tolerance_evidence: "Quiere hacer algo propio pero tiene miedo de dejar el sueldo. No dice que es conservador pero su comportamiento lo es."
+
+  network:
+    audience: []
+    professional_network: []
+    communities:
+      - name: "Discord communities de devs"
+        role: "lurker"
+        size: null
+    distribution_channels: []
+
+  motivation:
+    primary_goal: "build-something"
+    success_definition: "Tener un producto propio que le permita eventualmente dejar el empleo"
+    values: ["autonomía técnica"]
+    working_style:
+      preference: "solo"
+      decision_speed: "deliberate"
+      orientation: "technical"
+      comfort_with_ambiguity: "medium"
+
+  advantages:
+    proprietary_insights:
+      - "Conoce la infra técnica de pagos digitales por dentro — qué APIs son confiables, cuáles fallan, cómo se reconcilia"
+    unique_access: []
+    credibility_capital: []
+    timing_advantages: []
+    regulatory_knowledge: []
+    existing_ip:
+      - "Proyectos de código en GitHub (potencialmente reutilizables)"
+
+  previous_ventures: []
+
+  opportunity_cost:
+    current_income: null
+    best_alternative: "Seguir como dev en la fintech — buen sueldo, estable"
+    switching_cost: "Sueldo estable que financia su vida"
+    personal_obligations: []
+
+  meta_signals:
+    market_proximity: 2
+    execution_readiness: "exploring"
+    blind_spots_detected:
+      - "No reconoce su expertise en fintech/pagos como ventaja"
+      - "Cree que 'saber vender' es el único gap cuando también le falta validar ideas"
+      - "B2C aversion no declarada puede limitar opciones sin que lo sepa"
+    capital_efficiency: "lean"

@@ -1,0 +1,180 @@
+# P2: Carla — "La corporate que quiere saltar"
+#
+# Quién es realmente:
+# 38 años, Santiago de Chile. Gerenta de Operaciones en logística hace 5 años.
+# Antes consultora en Deloitte 4 años. MBA. Entiende supply chain, procurement,
+# costos operativos como operadora real. $35K ahorrados + bono $15K en 3 meses.
+# Part-time 15hs (no deja el empleo). Marido dev senior que "ayuda" (no es
+# co-founder). Red de 200+ contactos en logística Chile/Perú que nunca activó.
+# Cero experiencia emprendiendo. Conservadora por hijos. Sin presencia online.
+# Le interesa última milla LATAM.
+#
+# Lo que se le escapa al profiler:
+# - Bono de $15K en 3 meses
+# - Marido es "ayuda" ambigua (¿co-founder o no?)
+# - Nunca emprendió (execution risk serio)
+# - 200+ contactos no activados
+# - Conservadora POR los hijos (el motivo importa)
+
+persona_id: "P2"
+persona_name: "carla-corporate"
+version: "1.0"
+
+quick_mode_input: >
+  Soy Carla, 38, gerenta de operaciones en una empresa de logística en Santiago.
+  Antes fui consultora en Deloitte. Tengo MBA y entiendo supply chain y costos
+  operativos de adentro. Tengo como 35K ahorrados, puedo dedicar 15 horas por
+  semana. Mi marido es programador y me puede ayudar. Quiero resolver algo en
+  logística de última milla en LATAM.
+
+expected_extractions:
+  should_capture:
+    - "Operations manager, logistics industry"
+    - "Location: Santiago, Chile"
+    - "$35K capital"
+    - "Part-time 15hrs/week"
+    - "MBA, ex-Deloitte (business skills)"
+    - "Supply chain domain expertise — likely operator level"
+    - "Husband is programmer (team resource, ambiguous role)"
+  likely_misses:
+    - "Bonus $15K coming in 3 months"
+    - "Husband's exact role — co-founder vs occasional help"
+    - "Zero entrepreneurial experience (never mentioned)"
+    - "200+ logistics contacts never activated"
+    - "Conservative risk tolerance driven by family obligations"
+    - "No online presence at all"
+
+ground_truth:
+  identity:
+    name: "Carla"
+    location:
+      city: "Santiago"
+      country: "Chile"
+      timezone: "UTC-4"
+      willing_to_relocate: false
+      target_geographies: ["Chile", "Perú", "LATAM"]
+    languages:
+      - language: "Español"
+        level: "native"
+      - language: "Inglés"
+        level: "fluent"
+    professional_background:
+      current_role: "Gerenta de Operaciones — empresa de logística"
+      years_experience: 9
+      industries_worked: ["logística", "consulting", "supply-chain"]
+      notable_employers: ["Deloitte"]
+      education_highlight: "MBA, Universidad de Chile"
+
+  skills:
+    technical: []
+    business:
+      - skill: "Operations management"
+        level: "expert"
+        evidence: "5 años como gerenta de operaciones en logística"
+      - skill: "Consulting"
+        level: "proficient"
+        evidence: "4 años en Deloitte"
+      - skill: "Financial analysis"
+        level: "proficient"
+        evidence: "MBA + daily cost analysis in logistics"
+      - skill: "Supply chain management"
+        level: "expert"
+        evidence: "Maneja procurement, routing, cost optimization diariamente"
+    domain_expertise:
+      - domain: "Logística y supply chain"
+        depth: "operator"
+        years: 5
+        insider_knowledge: "Conoce los márgenes reales de última milla, los cuellos de botella de routing, y por qué las soluciones tech fallan en LATAM — la infra no aguanta lo que el software promete"
+      - domain: "Management consulting"
+        depth: "practitioner"
+        years: 4
+        insider_knowledge: null
+
+  resources:
+    capital:
+      available: 35000
+      currency: "USD"
+      source: "savings"
+      runway_months: 10
+      willing_to_fundraise: null
+      fundraising_experience: "none"
+    time:
+      commitment: "part-time"
+      hours_per_week: 15
+      deadline: null
+    team:
+      solo: true
+      cofounders: []
+      contractors_available: false
+      hiring_budget_monthly: null
+    infrastructure:
+      existing_tech: []
+      existing_products: []
+      existing_data: []
+
+  constraints:
+    hard_nos: []
+    regulatory_limits: []
+    geographic_limits: []
+    ethical_limits: []
+    time_limits:
+      max_months_to_revenue: null
+      max_months_to_mvp: null
+    capital_limits:
+      max_initial_investment: 35000
+      max_monthly_burn: null
+    risk_tolerance: "conservative"
+    risk_tolerance_evidence: "Tiene hijos, no se puede dar el lujo de perder los ahorros. Nunca emprendió — la incertidumbre le pesa."
+
+  network:
+    audience: []
+    professional_network:
+      - description: "200+ contactos en logística y supply chain en Chile y Perú"
+        sector: "logistics"
+        strength: "strong"
+        activatable: true
+      - description: "Red de ex-Deloitte"
+        sector: "consulting"
+        strength: "acquaintance"
+        activatable: false
+    communities: []
+    distribution_channels: []
+
+  motivation:
+    primary_goal: "build-something"
+    success_definition: "Resolver un problema real en logística LATAM con un producto propio"
+    values: ["eficiencia", "impacto operativo"]
+    working_style:
+      preference: "small-team"
+      decision_speed: "deliberate"
+      orientation: "business"
+      comfort_with_ambiguity: "low"
+
+  advantages:
+    proprietary_insights:
+      - "Sabe por qué las soluciones tech de última milla fallan en LATAM — la infraestructura real no soporta lo que el software promete"
+      - "Conoce los márgenes reales y cuellos de botella operativos que los founders tech no ven"
+    unique_access:
+      - "200+ contactos en logística que podrían ser early adopters o fuentes de validación"
+    credibility_capital:
+      - "MBA + Deloitte + 5 años de gerencia da credibilidad en el espacio B2B logística"
+    timing_advantages: []
+    regulatory_knowledge: []
+    existing_ip: []
+
+  previous_ventures: []
+
+  opportunity_cost:
+    current_income: null
+    best_alternative: "Seguir como gerenta de operaciones — estable, bien pago"
+    switching_cost: "Sueldo estable + beneficios + seguridad para la familia"
+    personal_obligations: ["Hijos", "Hipoteca"]
+
+  meta_signals:
+    market_proximity: 1
+    execution_readiness: "preparing"
+    blind_spots_detected:
+      - "Nunca emprendió — puede subestimar la ejecución independiente"
+      - "Red de contactos nunca activada — asume que puede activarla pero no lo probó"
+      - "El marido como 'ayuda' técnica es ambiguo y puede no materializar"
+    capital_efficiency: "deliberate"

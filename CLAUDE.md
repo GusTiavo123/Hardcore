@@ -6,7 +6,7 @@
 
 **Current modules:**
 - **Idea Validation** (complete) — 6-department pipeline, GO/NO-GO/PIVOT verdicts with real evidence
-- **Founder Profile** (planned) — User context that personalizes everything downstream
+- **Founder Profile** (complete) — Adaptive profiling that personalizes validation with Founder-Idea Fit scoring
 - **Brand & Identity** (planned) — Company identity generation for validated ideas
 
 See `ROADMAP.md` for the strategic plan.
@@ -97,6 +97,50 @@ Execute the full process defined in the SKILL.md and return the output envelope.
 
 Each department needs **web search** capabilities. The sub-agent must use WebSearch and WebFetch tools to find real evidence (complaints, market reports, competitors, benchmarks, regulations).
 
+## How to Build a Founder Profile (Profile Module)
+
+When the user asks to create their profile (e.g., "crea mi perfil", "create my profile", "quiero armar mi perfil"), launch the profile sub-agent.
+
+Before starting, read the shared conventions listed above PLUS:
+- `skills/_shared/profile-contract.md`
+
+### Profile Commands
+
+| Command | What it does |
+|---|---|
+| `/profile:new` | Start guided interview (default, 8-15 adaptive questions) |
+| `/profile:quick <text>` | Create profile from freeform text |
+| `/profile:show` | Display current profile |
+| `/profile:update <changes>` | Update specific dimensions |
+
+### How Profile Integrates with Validation
+
+When a profile exists in Engram, the validation pipeline automatically:
+1. **Retrieves the profile** at Step 0b (before launching departments)
+2. **Pre-filters** for hard-no violations and obvious mismatches
+3. **Injects `founder_context`** into each department for qualitative annotations
+4. **Calculates Founder-Idea Fit** in Synthesis (Step 6b) — 6 dimensions, 0-100 score
+
+The profile is **optional**. Validations work identically without one (backward compatible). With a profile, you get personalized context and a fit assessment alongside the verdict.
+
+### Profile Persistence
+
+Profile artifacts live in Engram under `profile/{user-slug}/`:
+- `profile/{user-slug}/core` — main profile
+- `profile/{user-slug}/extended` — extended dimensions
+- `profile/{user-slug}/state` — metadata, completeness, staleness
+- `profile/{user-slug}/snapshot/{validation-slug}` — frozen at validation time
+
+### Profile Department
+
+| Component | File |
+|---|---|
+| Profiler Instructions | `skills/hc-profile/SKILL.md` |
+| Profile Schema | `skills/hc-profile/references/data-schema.md` |
+| Interview Guide | `skills/hc-profile/references/interview-guide.md` |
+| Fit Scoring Rubrics | `skills/hc-profile/references/fit-dimensions.md` |
+| Consumption Contract | `skills/_shared/profile-contract.md` |
+
 ## Persistence Mode Resolution
 
 **Engram is required.** The pipeline cannot run without it.
@@ -158,11 +202,18 @@ skills/
 │   ├── engram-convention.md           # Engram naming, recovery, session lifecycle
 │   ├── persistence-contract.md        # Mode resolution (engram/file)
 │   ├── department-protocol.md         # Common procedures for all departments
-│   └── glossary.md                    # Ambiguity resolutions and term definitions
+│   ├── glossary.md                    # Ambiguity resolutions and term definitions
+│   └── profile-contract.md           # How any module consumes founder profile
 ├── hc-orchestrator/
 │   ├── SKILL.md                       # Orchestrator (your primary instructions)
 │   └── references/
 │       └── sub-agent-template.md      # Launch template + envelope validation
+├── hc-profile/
+│   ├── SKILL.md                       # Founder Profile — adaptive profiling
+│   └── references/
+│       ├── data-schema.md             # Profile schema + assembly checklist
+│       ├── interview-guide.md         # Adaptive interview questions by phase
+│       └── fit-dimensions.md          # Founder-Idea Fit scoring rubrics
 ├── hc-problem/
 │   ├── SKILL.md                       # Dept 1: Problem Validation
 │   └── references/

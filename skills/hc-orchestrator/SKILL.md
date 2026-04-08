@@ -82,6 +82,41 @@ OUTPUT: Verdict + Report
 
 7. **Check for existing validation**: `mem_search("validation/{slug}/report", project: "hardcore")`. If found: "Ya validaste esta idea el {date}. ¿Re-validar o ver resultados?"
 
+### Step 0b: Founder Profile Retrieval & Pre-Filter
+
+Read `skills/_shared/profile-contract.md` for the full protocol.
+
+1. **Attempt profile retrieval**: `mem_search("Founder Profile core", project: "hardcore")`.
+   - If found: retrieve with `mem_get_observation(id)`, parse the `**Data**` section as JSON.
+   - If not found: `founder_context = null`. Skip pre-filter. Continue normally.
+
+2. **Build `founder_context`**: Extract the projection defined in `profile-contract.md` from the full profile data. This curated object is what departments receive.
+
+3. **Pre-filter checks** (only if `founder_context` is not null):
+
+   | Check | Condition | Result |
+   |---|---|---|
+   | Hard-no violation | Idea text or inferred industry matches any `hard_nos[]` entry | `BLOCK` |
+   | Capital floor | Idea category requires capital >> `capital.available` | `WARN` |
+   | Critical skill gap | Idea requires skills absent from founder + team | `WARN` |
+   | Geographic mismatch | Idea targets market outside `target_geographies[]` | `WARN` |
+
+   - **BLOCK**: Show reason. Do NOT launch pipeline. "Esta idea conflicta con tu perfil: {reason}. Si querés validarla igual, decime."
+   - **WARN**: Show concern. "Detecté una posible fricción: {reason}. ¿Seguimos?" In fast mode, proceed with warning noted.
+   - **PROCEED**: No issues. Continue.
+
+4. **Snapshot profile** (if founder_context is not null): Persist a frozen copy for this validation:
+   ```
+   mem_save(
+     title: "Profile Snapshot: {name} @ {slug}",
+     topic_key: "profile/{user-slug}/snapshot/{slug}",
+     type: "discovery",
+     project: "hardcore",
+     scope: "project",
+     content: "**What**: Frozen profile at validation time [profile] [snapshot] [{slug}]\n\n**Where**: profile/{user-slug}/snapshot/{slug}\n\n**Data**:\n{founder_context as JSON string}"
+   )
+   ```
+
 ### Step 1: Problem Validation
 
 1. Launch sub-agent using the template in `references/sub-agent-template.md`
@@ -208,3 +243,33 @@ If multiple active validations: show list, ask which to resume.
 | `/validate:report <slug>` | Retrieve previous report | Implemented |
 | `/validate:compare <slug1> <slug2>` | Side-by-side comparison | Planned |
 | `/validate:rerun <slug> <dept>` | Re-run single department | Planned |
+
+### Profile Commands
+
+| Command | Description | Status |
+|---------|-------------|--------|
+| `/profile:new` | Start guided profile interview | Implemented |
+| `/profile:quick <text>` | Create profile from freeform text | Implemented |
+| `/profile:show` | Display current profile summary | Implemented |
+| `/profile:update <changes>` | Update specific profile dimensions | Implemented |
+
+**Profile sub-agent launch**: For `/profile:new`, `/profile:quick`, and `/profile:update`, launch a sub-agent with:
+
+```
+Read and follow these files exactly:
+- skills/hc-profile/SKILL.md
+- skills/hc-profile/references/data-schema.md
+- skills/hc-profile/references/interview-guide.md
+
+Input:
+{
+  "mode": "{guided | quick | update}",
+  "user_input": "{freeform text or update instructions}",
+  "existing_profile": {existing_profile_json} or null,
+  "user_slug": "{user-slug}" or null
+}
+
+Execute the full process defined in the SKILL.md and return the Profile Envelope.
+```
+
+For `/profile:show`: Retrieve directly from Engram (`mem_search("Founder Profile core", project: "hardcore")`) and display the `executive_summary` + completeness + gaps.

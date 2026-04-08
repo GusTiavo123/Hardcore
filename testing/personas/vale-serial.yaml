@@ -1,0 +1,218 @@
+# P4: Vale — "La serial entrepreneur con cicatrices"
+#
+# Quién es realmente:
+# 41 años, Bogotá. 3 empresas: e-commerce de ropa (cerró, márgenes horribles),
+# agencia de marketing digital (vendió por $80K), SaaS de redes sociales (murió
+# en 8 meses por no validar). $60K del exit, full-time, quiere SaaS B2B.
+# Network enorme en marketing digital y e-commerce LATAM (100+ dueños de
+# negocios online). Sabe vender, operar, marketing. No programa. 8K followers
+# en X sobre emprendimiento LATAM. Realista sobre riesgo. No quiere moda/ropa
+# ni servicios (hard-nos de experiencia).
+#
+# Lo que se le escapa al profiler:
+# - Lecciones específicas de cada venture (márgenes ropa, no validar)
+# - Los 100+ contactos de dueños de negocios online (activables)
+# - Hard-nos por experiencia (moda, servicios) vs los que dice explícitamente
+# - Que el SaaS muerto es exactamente el contexto perfecto para usar Hardcore
+
+persona_id: "P4"
+persona_name: "vale-serial"
+version: "1.0"
+
+quick_mode_input: >
+  Soy Vale, 41, Bogotá. Emprendí 3 veces: un e-commerce que cerré, una agencia
+  de marketing que vendí, y un SaaS que fracasó porque no validé la idea.
+  Tengo 60K, estoy full-time, y esta vez quiero hacer un SaaS B2B bien hecho.
+  Sé vender y operar pero no programo. Tengo 8K seguidores en X hablando de
+  emprendimiento y conozco a mucha gente en marketing digital y e-commerce en LATAM.
+
+expected_extractions:
+  should_capture:
+    - "Serial entrepreneur — 3 ventures"
+    - "Location: Bogotá, Colombia"
+    - "$60K capital, full-time"
+    - "Sales, operations, marketing skills"
+    - "Cannot code"
+    - "8K Twitter/X followers, entrepreneurship LATAM"
+    - "Previous ventures with outcomes"
+    - "Wants B2B SaaS"
+  likely_misses:
+    - "Specific lessons: margins on clothing are terrible, validate before building"
+    - "100+ online business owners as activatable contacts (says 'mucha gente' but not quantified)"
+    - "Hard-nos on fashion/clothing and services (experiential, not stated as hard-nos)"
+    - "The failed SaaS = proof she needs validation tools like Hardcore"
+    - "Agency exit at $80K = demonstrated ability to build and sell a business"
+
+ground_truth:
+  identity:
+    name: "Vale"
+    location:
+      city: "Bogotá"
+      country: "Colombia"
+      timezone: "UTC-5"
+      willing_to_relocate: false
+      target_geographies: ["Colombia", "México", "Argentina", "LATAM"]
+    languages:
+      - language: "Español"
+        level: "native"
+      - language: "Inglés"
+        level: "conversational"
+    professional_background:
+      current_role: "Emprendedora full-time (entre proyectos)"
+      years_experience: 10
+      industries_worked: ["e-commerce", "marketing-digital", "SaaS"]
+      notable_employers: []
+      education_highlight: null
+
+  skills:
+    technical: []
+    business:
+      - skill: "Ventas"
+        level: "expert"
+        evidence: "Vendió servicios de agencia durante 3 años, cerró contratos B2B"
+      - skill: "Marketing digital"
+        level: "expert"
+        evidence: "Operó agencia de marketing digital, 8K seguidores propios"
+      - skill: "Operaciones"
+        level: "proficient"
+        evidence: "Gestionó equipo y procesos en agencia y e-commerce"
+      - skill: "Fundraising"
+        level: "familiar"
+        evidence: "Bootstrapped todo pero entiende el landscape"
+    domain_expertise:
+      - domain: "Marketing digital"
+        depth: "operator"
+        years: 4
+        insider_knowledge: "Sabe cuánto cuesta un lead por canal, qué métricas importan, y por qué la mayoría de las agencias son un commodity"
+      - domain: "E-commerce"
+        depth: "operator"
+        years: 2
+        insider_knowledge: "Aprendió que los márgenes de ropa son una miseria y que inventory management mata el cashflow"
+      - domain: "SaaS"
+        depth: "observer"
+        years: 1
+        insider_knowledge: "Construyó un SaaS que murió — sabe lo que NO hay que hacer (no validar) pero le falta experiencia operando uno exitoso"
+
+  resources:
+    capital:
+      available: 60000
+      currency: "USD"
+      source: "revenue"
+      runway_months: 14
+      willing_to_fundraise: true
+      fundraising_experience: "none"
+    time:
+      commitment: "full-time"
+      hours_per_week: 45
+      deadline: null
+    team:
+      solo: true
+      cofounders: []
+      contractors_available: true
+      hiring_budget_monthly: 2000
+    infrastructure:
+      existing_tech: []
+      existing_products: []
+      existing_data: ["Base de contactos de la agencia (clientes pasados)"]
+
+  constraints:
+    hard_nos: ["moda/ropa", "agencia de servicios"]
+    regulatory_limits: []
+    geographic_limits: []
+    ethical_limits: []
+    time_limits:
+      max_months_to_revenue: 12
+      max_months_to_mvp: 4
+    capital_limits:
+      max_initial_investment: 60000
+      max_monthly_burn: 4000
+    risk_tolerance: "moderate"
+    risk_tolerance_evidence: "Ya perdió plata. No es kamikaze pero tampoco conservadora. Sabe que emprender tiene riesgo pero quiere mitigarlo validando primero."
+
+  network:
+    audience:
+      - platform: "Twitter/X"
+        followers: 8000
+        engagement: "medium"
+        niche: "Emprendimiento LATAM"
+    professional_network:
+      - description: "100+ dueños de negocios online en LATAM"
+        sector: "e-commerce y marketing digital"
+        strength: "strong"
+        activatable: true
+      - description: "Ex-clientes de la agencia de marketing"
+        sector: "SMBs digitales"
+        strength: "strong"
+        activatable: true
+    communities:
+      - name: "Comunidad de emprendedores LATAM en X"
+        role: "active-member"
+        size: null
+    distribution_channels:
+      - channel: "Twitter/X (owned)"
+        owned: true
+        estimated_reach: 8000
+      - channel: "Email list de ex-clientes de agencia"
+        owned: true
+        estimated_reach: 300
+
+  motivation:
+    primary_goal: "build-something"
+    success_definition: "Un SaaS B2B que facture recurrente y no dependa de vender horas. Hacerlo bien esta vez."
+    values: ["independencia", "validación antes de construir"]
+    working_style:
+      preference: "small-team"
+      decision_speed: "fast-iterate"
+      orientation: "business"
+      comfort_with_ambiguity: "high"
+
+  advantages:
+    proprietary_insights:
+      - "Sabe por experiencia propia que no validar mata un SaaS — el error le enseñó el proceso"
+      - "Conoce los márgenes reales de e-commerce y por qué la mayoría fracasa en logística/inventory"
+    unique_access:
+      - "100+ dueños de negocios online que confían en ella — potenciales early adopters o fuentes de validación"
+      - "Base de datos de ex-clientes de la agencia"
+    credibility_capital:
+      - "Exit de agencia por $80K — demuestra que puede construir y vender un negocio"
+      - "8K seguidores que la ven como referente en emprendimiento LATAM"
+    timing_advantages: []
+    regulatory_knowledge: []
+    existing_ip: []
+
+  previous_ventures:
+    - name: "E-commerce de ropa"
+      outcome: "shut-down"
+      duration_months: 24
+      revenue_reached: null
+      key_lesson: "Márgenes de ropa son una miseria. Inventory management mata el cashflow."
+      assets_remaining: []
+      mistakes_to_avoid: ["No meterse en negocios con márgenes bajos y alto capital de trabajo"]
+    - name: "Agencia de marketing digital"
+      outcome: "sold"
+      duration_months: 36
+      revenue_reached: 80000
+      key_lesson: "Vender horas tiene techo. Pero aprendió a vender, operar, y construir equipo."
+      assets_remaining: ["Base de contactos de clientes", "Reputación en el nicho"]
+      mistakes_to_avoid: ["No volver a vender tiempo"]
+    - name: "SaaS de gestión de redes sociales"
+      outcome: "shut-down"
+      duration_months: 8
+      revenue_reached: null
+      key_lesson: "Construyó sin validar. Nunca habló con un cliente antes de escribir código."
+      assets_remaining: []
+      mistakes_to_avoid: ["No construir sin validar la idea primero"]
+
+  opportunity_cost:
+    current_income: null
+    best_alternative: "Armar otra agencia — sabe que funciona pero no quiere"
+    switching_cost: "Ninguno — está full-time disponible"
+    personal_obligations: []
+
+  meta_signals:
+    market_proximity: 1
+    execution_readiness: "ready"
+    blind_spots_detected:
+      - "Observer-level en SaaS — sabe lo que no hay que hacer pero no operó uno exitoso"
+      - "No programa y siempre depende de terceros para el producto"
+    capital_efficiency: "lean"

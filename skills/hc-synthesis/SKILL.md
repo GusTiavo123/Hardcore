@@ -100,6 +100,49 @@ Neither NO-GO nor GO → **PIVOT**. Includes:
 
 **Concerns** (3-5): Scores <60, bottom-tier sub-dimensions, Risk's `top_3_killers`, BizModel sensitivity `viable: false`, data quality flags.
 
+### Step 6b: Founder-Idea Fit Assessment
+
+**Skip this step entirely if `founder_context` is null.** Set `data.founder_fit.available = false` and move on.
+
+If `founder_context` is provided, read `skills/hc-profile/references/fit-dimensions.md` for the detailed rubrics.
+
+**Score 6 dimensions (0-20 each):**
+
+| # | Dimension | Cross-reference |
+|---|---|---|
+| 1 | Domain Expertise Match | `founder_context.domain_expertise` vs Problem's `data.industry` |
+| 2 | Resource Sufficiency | `founder_context.capital/time/team` vs BizModel's `data.unit_economics` |
+| 3 | Risk Tolerance Alignment | `founder_context.risk_tolerance` vs Risk's `data.overall_risk_level` |
+| 4 | Network & Distribution | `founder_context.network` vs Market's `data.early_adopters` |
+| 5 | Execution Capability | `founder_context.skills_summary/team` vs idea requirements |
+| 6 | Asymmetric Advantage | `founder_context.advantages` vs Competitive landscape |
+
+**Calculate fit_score**: `round((sum of 6 dimensions / 120) * 100)`
+
+**Determine fit_label**:
+- 80-100: `"strong"`
+- 60-79: `"moderate"`
+- 40-59: `"weak"`
+- 0-39: `"misaligned"`
+
+**Generate fit_summary** (2-3 sentences): Connect the founder's specific strengths and gaps to THIS idea's validation results. Reference specific numbers from both the profile and the department outputs.
+
+**Generate fit_boosters** (1-3 items): Specific founder advantages for this idea.
+
+**Generate fit_blockers** (1-3 items): Specific founder gaps or mismatches for this idea.
+
+**Generate adjusted_verdict_note** (1-2 sentences): How the market verdict should be interpreted for THIS specific founder. This is the most valuable output — it bridges "what the market says" and "what that means for you."
+
+Examples:
+- GO + strong fit: "Strong market and strong founder fit — you're well-positioned to execute. Prioritize the validation experiments."
+- GO + weak fit: "The market opportunity is real, but your profile has significant gaps (capital, domain expertise). Consider finding a co-founder with {missing skill} before committing."
+- PIVOT + strong fit: "The market says PIVOT, but your {specific advantage} gives you a credible path through {specific weakness}. Consider the first pivot direction with your existing {resource}."
+- NO-GO + any fit: "Market fundamentals don't support this idea regardless of founder. {Specific knockout reason}."
+
+**Partial profiles**: If a dimension can't be scored due to missing profile data, score it at 10 (midpoint) and note it. Add flag `"partial-fit-assessment"` to the flags list.
+
+**CRITICAL**: The fit score does NOT change the verdict. GO/PIVOT/NO-GO remains anchored to market reality. The fit assessment is an additional lens, not a modifier.
+
 ### Step 7: Extract Key Assumptions
 
 Pull from:
@@ -143,6 +186,8 @@ Use Market's `early_adopters[].reachable_channels` for channels. Use Risk's `top
 - `"narrow-nogo"` — NO-GO but triggering score within 5 of threshold
 - `"missing-department-data"` — upstream recovery failed
 - `"high-assumption-risk"` — 3+ critical assumptions
+- `"partial-fit-assessment"` — founder fit scored with incomplete profile data
+- `"founder-misaligned"` — founder fit score < 40 (misaligned label)
 
 **Status:**
 | Status | Condition |
@@ -208,6 +253,9 @@ Score Breakdown:
 Knockouts: {list or "None"}
 GO Conditions: {met/not met for each}
 Confidence: {level} — {reason}
+
+Founder-Idea Fit: {score}/100 ({label}) — {one-line summary}
+  or: Founder-Idea Fit: N/A (no profile available)
 ```
 
 For early abort: `{dept}: 0/100 × {weight} = 0.0 — (not executed — early abort)`.
