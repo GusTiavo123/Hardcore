@@ -15,7 +15,7 @@ See `ROADMAP.md` for the strategic plan.
 
 ## How to Validate an Idea
 
-When the user asks to validate a startup idea (in any language), you become the **HC Orchestrator**. Read and follow `skills/hc-orchestrator/SKILL.md` as your primary instruction set.
+When the user asks to validate a startup idea (in any language), you become the **HC Orchestrator**. Read and follow `skills/validation/orchestrator/SKILL.md` as your primary instruction set.
 
 Before starting, read ALL shared conventions:
 - `skills/_shared/output-contract.md`
@@ -43,7 +43,7 @@ PROBLEM → (MARKET ∥ COMPETITIVE) → (BIZMODEL ∥ RISK) → SYNTHESIS
 ```
 
 Each department is a sub-agent. For each one:
-1. Read the corresponding `skills/hc-{dept}/SKILL.md`
+1. Read the corresponding `skills/validation/{dept}/SKILL.md`
 2. Launch a sub-agent (use the Agent tool) with that SKILL as instructions
 3. Pass: `{ idea, slug, persistence_mode, detail_level }`
 4. The sub-agent does its research, scores, persists, and returns an output envelope
@@ -56,16 +56,16 @@ Each department is a sub-agent. For each one:
 
 | Department | Skill file | Weight |
 |---|---|---|
-| Problem Validation | `skills/hc-problem/SKILL.md` | 30% |
-| Market Sizing | `skills/hc-market/SKILL.md` | 25% |
-| Competitive Intelligence | `skills/hc-competitive/SKILL.md` | 15% |
-| Business Model | `skills/hc-bizmodel/SKILL.md` | 20% |
-| Risk Assessment | `skills/hc-risk/SKILL.md` | 10% |
-| GO/NO-GO Synthesis | `skills/hc-synthesis/SKILL.md` | — |
+| Problem Validation | `skills/validation/problem/SKILL.md` | 30% |
+| Market Sizing | `skills/validation/market/SKILL.md` | 25% |
+| Competitive Intelligence | `skills/validation/competitive/SKILL.md` | 15% |
+| Business Model | `skills/validation/bizmodel/SKILL.md` | 20% |
+| Risk Assessment | `skills/validation/risk/SKILL.md` | 10% |
+| GO/NO-GO Synthesis | `skills/validation/synthesis/SKILL.md` | — |
 
 ### Sub-Agent Launch Pattern
 
-When launching each department as a sub-agent, use the template in `skills/hc-orchestrator/references/sub-agent-template.md`:
+When launching each department as a sub-agent, use the template in `skills/validation/orchestrator/references/sub-agent-template.md`:
 
 ```
 Read and follow these files exactly:
@@ -75,10 +75,10 @@ Read and follow these files exactly:
 - skills/_shared/persistence-contract.md
 - skills/_shared/department-protocol.md
 - skills/_shared/glossary.md
-- skills/hc-{department}/SKILL.md
+- skills/validation/{department}/SKILL.md
 
 For the data schema and assembly checklist, read:
-- skills/hc-{department}/references/data-schema.md
+- skills/validation/{department}/references/data-schema.md
 
 Input:
 {
@@ -135,10 +135,10 @@ Profile artifacts live in Engram under `profile/{user-slug}/`:
 
 | Component | File |
 |---|---|
-| Profiler Instructions | `skills/hc-profile/SKILL.md` |
-| Profile Schema | `skills/hc-profile/references/data-schema.md` |
-| Interview Guide | `skills/hc-profile/references/interview-guide.md` |
-| Fit Scoring Rubrics | `skills/hc-profile/references/fit-dimensions.md` |
+| Profiler Instructions | `skills/profile/SKILL.md` |
+| Profile Schema | `skills/profile/references/data-schema.md` |
+| Interview Guide | `skills/profile/references/interview-guide.md` |
+| Fit Scoring Rubrics | `skills/profile/references/fit-dimensions.md` |
 | Consumption Contract | `skills/_shared/profile-contract.md` |
 
 ## Persistence Mode Resolution
@@ -204,41 +204,42 @@ skills/
 │   ├── department-protocol.md         # Common procedures for all departments
 │   ├── glossary.md                    # Ambiguity resolutions and term definitions
 │   └── profile-contract.md           # How any module consumes founder profile
-├── hc-orchestrator/
-│   ├── SKILL.md                       # Orchestrator (your primary instructions)
-│   └── references/
-│       └── sub-agent-template.md      # Launch template + envelope validation
-├── hc-profile/
-│   ├── SKILL.md                       # Founder Profile — adaptive profiling
+├── validation/                        # Idea Validation module
+│   ├── orchestrator/
+│   │   ├── SKILL.md                   # Orchestrator (primary instructions)
+│   │   └── references/
+│   │       └── sub-agent-template.md  # Launch template + envelope validation
+│   ├── problem/
+│   │   ├── SKILL.md                   # Dept 1: Problem Validation
+│   │   └── references/
+│   │       └── data-schema.md         # Data schema + assembly checklist
+│   ├── market/
+│   │   ├── SKILL.md                   # Dept 2: Market Sizing
+│   │   └── references/
+│   │       └── data-schema.md
+│   ├── competitive/
+│   │   ├── SKILL.md                   # Dept 3: Competitive Intelligence
+│   │   └── references/
+│   │       └── data-schema.md
+│   ├── bizmodel/
+│   │   ├── SKILL.md                   # Dept 4: Business Model
+│   │   └── references/
+│   │       └── data-schema.md
+│   ├── risk/
+│   │   ├── SKILL.md                   # Dept 5: Risk Assessment
+│   │   └── references/
+│   │       └── data-schema.md
+│   └── synthesis/
+│       ├── SKILL.md                   # Dept 6: GO/NO-GO Synthesis
+│       └── references/
+│           ├── data-schema.md
+│           └── upstream-field-map.md  # Field source mapping for synthesis
+├── profile/                           # Founder Profile module
+│   ├── SKILL.md                       # Adaptive profiling
 │   └── references/
 │       ├── data-schema.md             # Profile schema + assembly checklist
 │       ├── interview-guide.md         # Adaptive interview questions by phase
 │       └── fit-dimensions.md          # Founder-Idea Fit scoring rubrics
-├── hc-problem/
-│   ├── SKILL.md                       # Dept 1: Problem Validation
-│   └── references/
-│       └── data-schema.md             # Data schema + assembly checklist
-├── hc-market/
-│   ├── SKILL.md                       # Dept 2: Market Sizing
-│   └── references/
-│       └── data-schema.md
-├── hc-competitive/
-│   ├── SKILL.md                       # Dept 3: Competitive Intelligence
-│   └── references/
-│       └── data-schema.md
-├── hc-bizmodel/
-│   ├── SKILL.md                       # Dept 4: Business Model
-│   └── references/
-│       └── data-schema.md
-├── hc-risk/
-│   ├── SKILL.md                       # Dept 5: Risk Assessment
-│   └── references/
-│       └── data-schema.md
-├── hc-synthesis/
-│   ├── SKILL.md                       # Dept 6: GO/NO-GO Synthesis
-│   └── references/
-│       ├── data-schema.md
-│       └── upstream-field-map.md      # Field source mapping for synthesis
 testing/                               # Quality assurance
 ├── PROTOCOL.md                        # Testing protocol, checklist, phase gates
 ├── suite.yaml                         # 10 curated test ideas with expected outcomes

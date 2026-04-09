@@ -28,11 +28,11 @@
 
 **Why it matters**: Downstream modules seeing a "familiar" skill may assume there's some capability. The ground truth has `business: []` — the correct approach is to not list skills the user explicitly says they don't have.
 
-**Fix**: Add rule to `skills/hc-profile/SKILL.md` Step 2 (quick mode extraction):
+**Fix**: Add rule to `skills/profile/SKILL.md` Step 2 (quick mode extraction):
 > "If the user explicitly declares they do NOT have a skill (e.g., 'no sé nada de X'), do NOT include it in the skills arrays. The absence of a skill is the data — do not list it at any level. The schema has no 'none' level; omission is the correct representation."
 
 **Files to change**:
-- `skills/hc-profile/SKILL.md` — add rule under quick mode extraction
+- `skills/profile/SKILL.md` — add rule under quick mode extraction
 
 ---
 
@@ -42,11 +42,11 @@
 
 **Why it matters**: "Me puede ayudar" is deliberately ambiguous. Classifying someone as cofounder has downstream implications (team capability assessment, execution risk).
 
-**Fix**: Add rule to `skills/hc-profile/SKILL.md` Step 2:
+**Fix**: Add rule to `skills/profile/SKILL.md` Step 2:
 > "When a person's role is ambiguous (e.g., 'can help', 'sometimes assists'), do NOT classify them as a cofounder. Keep `solo: true` and note the available resource in a less committed way — e.g., add them to `resources.infrastructure` or `resources.team.contractors_available: true` with context. Only classify someone as a cofounder when their commitment and role are explicit."
 
 **Files to change**:
-- `skills/hc-profile/SKILL.md` — add rule under team classification
+- `skills/profile/SKILL.md` — add rule under team classification
 
 ---
 
@@ -58,11 +58,11 @@
 
 **Why it matters**: market_proximity is the single most impactful meta signal for founder-idea fit. Off by 1 means the difference between "strong domain match" and "moderate."
 
-**Fix**: Sharpen the inference rules in `skills/hc-profile/SKILL.md` Step 3 (Infer Meta Signals):
+**Fix**: Sharpen the inference rules in `skills/profile/SKILL.md` Step 3 (Infer Meta Signals):
 > "When evaluating market_proximity, ask: if this founder built a product for the domain they work in, would they themselves be a user? If YES → 0. Do they have direct, personal relationships with potential customers (not just 'knows the industry')? If YES → 1. The default should be to give the LOWEST applicable number, not the highest."
 
 **Files to change**:
-- `skills/hc-profile/SKILL.md` — update market_proximity inference table
+- `skills/profile/SKILL.md` — update market_proximity inference table
 
 ---
 
@@ -82,12 +82,12 @@
 
 **Why it matters**: Downstream modules must handle both `null` and `[]`. The semantic difference (null = "not asked", [] = "asked, none declared") is meaningful but the inconsistency across profiles created in the same mode (quick) is a bug.
 
-**Fix**: Add convention to `skills/hc-profile/SKILL.md`:
+**Fix**: Add convention to `skills/profile/SKILL.md`:
 > "In quick mode, use `null` for scalar fields not mentioned in the input. For array fields, use `[]` (empty array) — even if the user didn't mention them. Reserve `null` for arrays only in update mode when a specific array was never addressed. This ensures downstream modules can always iterate over arrays without null checks."
 
 **Files to change**:
-- `skills/hc-profile/SKILL.md` — add null vs [] convention
-- `skills/hc-profile/references/data-schema.md` — clarify in Null Handling section
+- `skills/profile/SKILL.md` — add null vs [] convention
+- `skills/profile/references/data-schema.md` — clarify in Null Handling section
 
 ---
 
@@ -95,11 +95,11 @@
 
 **What**: Diego's profile has `domain_expertise: [{domain: "Software Development"}]`. The ground truth has `[]`. Domain expertise refers to industry/vertical knowledge (fintech, logistics, e-commerce), not generic technical categories.
 
-**Fix**: Add clarification to `skills/hc-profile/references/data-schema.md` under the domain_expertise section:
+**Fix**: Add clarification to `skills/profile/references/data-schema.md` under the domain_expertise section:
 > "domain_expertise refers to industry or vertical knowledge, not technical skill categories. 'Software Development' is not a domain — it belongs in `skills.technical`. Domains are industries where the founder has insider knowledge: fintech, logistics, healthcare, e-commerce, etc."
 
 **Files to change**:
-- `skills/hc-profile/references/data-schema.md` — clarify domain_expertise definition
+- `skills/profile/references/data-schema.md` — clarify domain_expertise definition
 
 ---
 
@@ -167,9 +167,9 @@ Three root-cause fixes from Gate 1 testing:
 
 | Fix | File | What |
 |---|---|---|
-| A: Representation Principles | `skills/hc-profile/SKILL.md` | Negation handling, conservative classification, arrays always [] |
-| B: Algorithmic Inference | `skills/hc-profile/SKILL.md` | Decision trees for meta signals, Step 3b domain from ventures |
-| C: Schema Boundaries | `skills/hc-profile/references/data-schema.md` | Skills vs domains boundary, null handling convention |
+| A: Representation Principles | `skills/profile/SKILL.md` | Negation handling, conservative classification, arrays always [] |
+| B: Algorithmic Inference | `skills/profile/SKILL.md` | Decision trees for meta signals, Step 3b domain from ventures |
+| C: Schema Boundaries | `skills/profile/references/data-schema.md` | Skills vs domains boundary, null handling convention |
 | Housekeeping | `testing/PROTOCOL.md`, `testing/personas/diego-minimo.yaml` | Diego expected status → "blocked" |
 
 Fixes verified by re-running P2, P3, P4 — all 7 issues resolved (see Gate 1 re-verification).
@@ -180,8 +180,8 @@ Fixes verified by re-running P2, P3, P4 — all 7 issues resolved (see Gate 1 re
 
 ```
 # Spec changes
-skills/hc-profile/SKILL.md                          — Representation Principles + algorithmic inference
-skills/hc-profile/references/data-schema.md          — Schema boundaries + null handling
+skills/profile/SKILL.md                          — Representation Principles + algorithmic inference
+skills/profile/references/data-schema.md          — Schema boundaries + null handling
 testing/PROTOCOL.md                                  — Diego expectation fix
 testing/personas/diego-minimo.yaml                   — Diego expectation fix
 

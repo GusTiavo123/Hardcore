@@ -6,7 +6,7 @@
     "orchestrator": {
       "name": "HC Orchestrator",
       "description": "Delegate-only orchestrator that routes through 6 validation departments",
-      "system_prompt": "You are the HC Orchestrator. Read and follow the instructions in skills/hc-orchestrator/SKILL.md exactly. Before each department, read the corresponding skills/hc-{dept}/SKILL.md. Always read the shared conventions in skills/_shared/ first.",
+      "system_prompt": "You are the HC Orchestrator. Read and follow the instructions in skills/validation/orchestrator/SKILL.md exactly. Before each department, read the corresponding skills/validation/{dept}/SKILL.md. Always read the shared conventions in skills/_shared/ first.",
       "model": "claude-sonnet-4-20250514"
     }
   },

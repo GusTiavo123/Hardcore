@@ -41,7 +41,7 @@ Snapshots use `type: "discovery"`.
 
 3. Parse the **Data** section as JSON
    → This is the structured profile data matching the schema in
-     skills/hc-profile/references/data-schema.md
+     skills/profile/references/data-schema.md
 ```
 
 ### Finding extended profile (optional)
@@ -178,7 +178,7 @@ These flags are consumed by Synthesis for the Founder-Idea Fit assessment.
 
 The quantitative Founder-Idea Fit scoring happens exclusively in `hc-synthesis` (Step 6b). Departments provide qualitative context and flags. Synthesis integrates everything into a structured fit assessment.
 
-See `skills/hc-profile/references/fit-dimensions.md` for the fit scoring rubrics.
+See `skills/profile/references/fit-dimensions.md` for the fit scoring rubrics.
 
 ---
 
@@ -244,4 +244,4 @@ profile_dimensions:
     Credibility capital informs brand authority messaging.
 ```
 
-When `hc-brand` is installed (`skills/hc-brand/references/profile-needs.md` exists), the profiler ensures Phase 5 (Motivation & Working Style) is never skipped and probes `values` specifically.
+When `hc-brand` is installed (`skills/brand/references/profile-needs.md` exists), the profiler ensures Phase 5 (Motivation & Working Style) is never skipped and probes `values` specifically.

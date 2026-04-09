@@ -104,7 +104,7 @@ Neither NO-GO nor GO → **PIVOT**. Includes:
 
 **Skip this step entirely if `founder_context` is null.** Set `data.founder_fit.available = false` and move on.
 
-If `founder_context` is provided, read `skills/hc-profile/references/fit-dimensions.md` for the detailed rubrics.
+If `founder_context` is provided, read `skills/profile/references/fit-dimensions.md` for the detailed rubrics.
 
 **Score 6 dimensions (0-20 each):**
 

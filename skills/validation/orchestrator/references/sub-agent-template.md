@@ -11,10 +11,10 @@ Read and follow these files exactly:
 - skills/_shared/department-protocol.md
 - skills/_shared/glossary.md
 - skills/_shared/profile-contract.md
-- skills/hc-{department}/SKILL.md
+- skills/validation/{department}/SKILL.md
 
 For the data schema and assembly checklist, read:
-- skills/hc-{department}/references/data-schema.md
+- skills/validation/{department}/references/data-schema.md
 
 Input:
 {
@@ -38,8 +38,8 @@ Execute the full process defined in the SKILL.md and return the output envelope.
 Each department needs **web search** capabilities. The sub-agent must use WebSearch and WebFetch tools to find real evidence.
 
 **For Synthesis**, the template is the same except:
-- Synthesis also reads: `skills/hc-synthesis/references/upstream-field-map.md`
-- Synthesis also reads: `skills/hc-profile/references/fit-dimensions.md` (for Founder-Idea Fit scoring)
+- Synthesis also reads: `skills/validation/synthesis/references/upstream-field-map.md`
+- Synthesis also reads: `skills/profile/references/fit-dimensions.md` (for Founder-Idea Fit scoring)
 - Synthesis does NOT do web search (it synthesizes upstream data only)
 
 ## Envelope Validation (after each department)

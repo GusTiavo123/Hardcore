@@ -257,9 +257,9 @@ If multiple active validations: show list, ask which to resume.
 
 ```
 Read and follow these files exactly:
-- skills/hc-profile/SKILL.md
-- skills/hc-profile/references/data-schema.md
-- skills/hc-profile/references/interview-guide.md
+- skills/profile/SKILL.md
+- skills/profile/references/data-schema.md
+- skills/profile/references/interview-guide.md
 
 Input:
 {
