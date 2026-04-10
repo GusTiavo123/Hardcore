@@ -46,9 +46,11 @@ For consistency across all profiles and modes:
 
 ---
 
-## Three Entry Points
+## Entry Points
 
 The orchestrator will tell you which entry point to use via the `mode` field in your input.
+
+**Entry Points 1-3 (`guided`, `quick`, `update`)** are executed by the profile sub-agent and modify profile data. **Entry Point 4 (`show`)** is a pure read+format operation handled directly by the orchestrator (CLAUDE.md context) — no sub-agent needed.
 
 ### Entry Point 1: `guided` (Default — Full Interview)
 
@@ -99,11 +101,125 @@ The user wants to modify specific dimensions of an existing profile. You receive
 - Increment `revision_count` in state
 - Update `last_updated` timestamp
 
+### Entry Point 4: `show` (Read & Display — handled by orchestrator)
+
+The user wants to see their current profile in a human-readable format. This is a pure read+format operation: recover the artifacts from Engram, parse them, render markdown. **No sub-agent is launched** — the orchestrator (CLAUDE.md context) executes this directly because there is no extraction, inference, or persistence involved.
+
+**Steps:**
+
+**S1 — Locate the profile**
+
+If the user provides a slug explicitly (`/profile:show maria-fintech-cdmx`):
+- Search Engram with topic_key prefix `profile/{slug}/core`
+
+If no slug provided:
+- Search Engram for `Founder Profile` (or topic_key matching `profile/*/core`)
+- If exactly **one** core artifact → use it
+- If **multiple** core artifacts → list them as "Encontré N perfiles: {name1} ({slug1}), {name2} ({slug2})... ¿Cuál querés ver?"
+- If **zero** matches → "No encontré ningún perfil guardado. Querés crear uno con `/profile:new`?"
+
+**S2 — Recover the 3 artifacts**
+
+Use `mem_get_observation` to retrieve the full content of:
+- `profile/{user-slug}/core` (required)
+- `profile/{user-slug}/extended` (optional — may be absent if all extended dims were empty)
+- `profile/{user-slug}/state` (required)
+
+Parse the `**Data**:` section of each as JSON. If `core` or `state` cannot be parsed, abort with: "Error: el perfil de {slug} está corrupto o incompleto en Engram. Reportá esto."
+
+**S3 — Compute display fields**
+
+From the recovered data:
+- `name` ← `core.identity.name`
+- `headline` ← `core.identity.professional_background.current_role` + " · " + city + ", " + country
+- `status_label` ← "Listo" if status==ok, "Parcial" if partial, "Bloqueado" if blocked (derive status from `state.completeness.core`: ≥0.7=ok, 0.3-0.69=partial, <0.3=blocked)
+- `overall_pct` ← `round(state.completeness.overall × 100)`
+- `days_since_update` ← `(today - state.last_updated).days`
+- `is_stale` ← true if `days_since_update > 90`
+- `top_gaps` ← first 5 entries from `state.tier_gaps`
+
+**S4 — Render markdown**
+
+Use this structure (Spanish by default; mirror the user's invocation language if explicit):
+
+```markdown
+# Perfil: {name}
+
+**{headline}**
+**Estado:** {status_label} · {overall_pct}% completo · revisión #{state.revision_count}
+**Última actualización:** {state.last_updated} ({days_since_update} días){"  ⚠ desactualizado" if is_stale else ""}
+
+## Capacidades
+
+**Técnicas:**
+{bullet list of core.skills.technical: "- {skill} ({level})"}
+
+**Business:**
+{bullet list of core.skills.business: "- {skill} ({level})"}
+
+**Domain expertise:**
+{bullet list of core.skills.domain_expertise: "- {domain} ({depth}, {years}a)"}
+
+## Recursos
+
+- **Capital:** ${capital.available} {currency}{f", runway {runway_months}m" if runway_months}
+- **Tiempo:** {commitment or "no especificado"}{f", {hours_per_week}h/sem" if hours_per_week}
+- **Equipo:** {"Solo" if solo else f"{len(cofounders)} cofounders"}{", contractors disponibles" if contractors_available}
+
+## Constraints
+
+- **Hard-nos:** {", ".join(hard_nos) or "ninguno declarado"}
+- **Risk tolerance:** {risk_tolerance or "no especificada"}
+
+{if extended exists and has any non-empty section, render:}
+## Red & ventajas
+
+- **Audiencia:** {audience entries: "{platform} ({followers} seguidores, {niche})"}
+- **Comunidades:** {communities or "—"}
+- **Insights propietarios:** {first 2 of advantages.proprietary_insights}
+- **Acceso único:** {first 2 of advantages.unique_access}
+
+## Completitud
+
+| Tier | % |
+|---|---|
+| Core | {core × 100}% |
+| Extended | {extended × 100}% |
+| Meta | {meta × 100}% |
+| **Overall** | **{overall × 100}%** |
+
+## Gaps prioritarios
+
+Para mejorar la personalización de futuras validaciones, completá:
+{numbered list of top_gaps, max 5}
+
+---
+
+→ Actualizar: `/profile:update <campo>: <valor>`
+→ Empezar de nuevo: `/profile:new`
+```
+
+**Edge cases:**
+
+| Situation | Behavior |
+|---|---|
+| `core` artifact missing | Abort with error (can't show a profile that doesn't exist) |
+| `extended` artifact missing | Skip the "Red & ventajas" section silently |
+| `state` artifact missing | Show profile but mark "Estado: desconocido (state artifact ausente)" and skip completeness/gaps sections |
+| Profile is `blocked` (core < 0.3) | Show what exists + add at top: "⚠ Tu perfil está incompleto. Faltan dimensiones críticas — considerá completarlo con `/profile:new` o `/profile:update`" |
+| Profile is stale (`days_since_update > 90`) | Add stale flag in the header and in the closing line: "Tu perfil tiene {N} días. Considerá una actualización." |
+| Multiple matches with same slug prefix | List them and ask which |
+| User passes a slug that doesn't exist | "No encontré perfil con slug `{slug}`. Perfiles disponibles: {list}" |
+
+**Critical: do NOT modify any artifact during `show`.** No `mem_save`, no `mem_update`, no Engram writes of any kind. This is read-only.
+
 ---
 
 ## Step-by-Step Process
 
 ### Step 0: Read Input
+
+The Step-by-Step Process below applies when this skill is invoked as a sub-agent for **Entry Points 1-3** (`guided`, `quick`, `update`). Entry Point 4 (`show`) is handled directly by the orchestrator and does NOT execute these steps.
 
 Your input will be:
 

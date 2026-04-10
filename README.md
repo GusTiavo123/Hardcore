@@ -26,9 +26,15 @@ Reglas de decisión:
 - **NO-GO**: Problem < 40, Market < 40, Risk < 30, o 2+ scores < 45
 - **PIVOT**: todo lo demás
 
-### Founder Profile (en desarrollo)
+### Founder Profile (disponible)
 
-Entiende quién sos — skills, recursos, constraints, mercados — para personalizar todo lo que viene después.
+Entiende quién sos — skills, recursos, constraints, mercados, hard-nos — para personalizar todo lo que viene después. Incluye Founder-Idea Fit scoring (6 dimensiones, 0-100) integrado en Synthesis. Backward compatible: las validaciones funcionan idéntico sin perfil.
+
+Comandos:
+- `/profile:new` — interview adaptiva (8-15 preguntas)
+- `/profile:quick <texto>` — extracción desde texto libre
+- `/profile:show` — mostrar perfil actual
+- `/profile:update <cambios>` — actualizar dimensiones específicas
 
 ### Brand & Identity (planificado)
 
@@ -44,8 +50,8 @@ Genera la identidad empresarial de una idea validada — posicionamiento, naming
 ### 1. Clonar
 
 ```bash
-git clone https://github.com/tu-usuario/idea-validation.git
-cd idea-validation
+git clone https://github.com/tu-usuario/hardcore.git
+cd hardcore
 ```
 
 ### 2. Setup
@@ -70,16 +76,18 @@ validación rápida: Una plataforma que ayuda a freelancers a gestionar contrato
 
 ```
 skills/
-├── _shared/                    # Convenciones compartidas
-├── hc-orchestrator/            # Orquestador delegate-only
-├── hc-problem/                 # Problem Validation (30%)
-├── hc-market/                  # Market Sizing (25%)
-├── hc-competitive/             # Competitive Intelligence (15%)
-├── hc-bizmodel/                # Business Model (20%)
-├── hc-risk/                    # Risk Assessment (10%)
-└── hc-synthesis/               # GO/NO-GO Synthesis
-testing/                        # Suite de 10 ideas + protocolo + runs
-calibration/                    # 13 escenarios de calibración de scoring
+├── _shared/                    # Convenciones compartidas (output, scoring, persistence, profile-contract)
+├── validation/                 # Módulo Idea Validation
+│   ├── orchestrator/           # Orquestador delegate-only
+│   ├── problem/                # Problem Validation (30%)
+│   ├── market/                 # Market Sizing (25%)
+│   ├── competitive/            # Competitive Intelligence (15%)
+│   ├── bizmodel/               # Business Model (20%)
+│   ├── risk/                   # Risk Assessment (10%)
+│   └── synthesis/              # GO/NO-GO Synthesis + Founder-Idea Fit
+└── profile/                    # Módulo Founder Profile (interview, quick, update, show)
+testing/                        # Suite de 10 ideas + protocolo + runs + personas
+calibration/                    # Escenarios de calibración de scoring + fit
 docs/                           # Documentación histórica y arquitectura
 ```
 

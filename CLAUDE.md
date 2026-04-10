@@ -106,12 +106,14 @@ Before starting, read the shared conventions listed above PLUS:
 
 ### Profile Commands
 
-| Command | What it does |
-|---|---|
-| `/profile:new` | Start guided interview (default, 8-15 adaptive questions) |
-| `/profile:quick <text>` | Create profile from freeform text |
-| `/profile:show` | Display current profile |
-| `/profile:update <changes>` | Update specific dimensions |
+| Command | Handler | What it does |
+|---|---|---|
+| `/profile:new` | sub-agent (mode: `guided`) | Start guided interview (default, 8-15 adaptive questions) |
+| `/profile:quick <text>` | sub-agent (mode: `quick`) | Create profile from freeform text |
+| `/profile:update <changes>` | sub-agent (mode: `update`) | Update specific dimensions of an existing profile |
+| `/profile:show [slug]` | **orchestrator (direct)** | Recover from Engram and display in markdown — no sub-agent |
+
+For `/profile:show`, the orchestrator follows Entry Point 4 in `skills/profile/SKILL.md` directly: locate the profile (search by slug or by latest), recover the 3 artifacts via `mem_get_observation`, parse the `**Data**:` JSON, and render the markdown card. **No writes to Engram.**
 
 ### How Profile Integrates with Validation
 
