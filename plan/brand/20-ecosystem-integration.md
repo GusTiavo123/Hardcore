@@ -2,291 +2,280 @@
 
 ## 20.1 Propósito
 
-Cómo Brand se conecta con el resto del ecosistema Hardcore (Validation + Profile presentes, módulos futuros) para funcionar como parte de un sistema coherente, no como herramienta aislada.
+Cómo Brand se conecta con el resto del ecosistema Hardcore + con Claude Design downstream.
+
+Claude Design es el downstream layer explícito. Módulos futuros consumen via brand-contract.md.
 
 ## 20.2 Upstream dependencies
 
 ### Validation module (obligatorio)
 
 **Qué Brand consume**:
-- `validation/{idea-slug}/report` — verdict, scores, flags (para determinar si Brand puede correr)
-- `validation/{idea-slug}/problem` — target audience real, pain points, user research
-- `validation/{idea-slug}/market` — SOM, segmentos, geografías, CAGR (informa cultural_scope)
-- `validation/{idea-slug}/competitive` — incumbents, gaps, moats, visual landscape del mercado
-- `validation/{idea-slug}/bizmodel` — pricing model, unit economics (informa distribution en Scope Analysis, informa voice register)
-- `validation/{idea-slug}/risk` — timing context, regulatory (puede informar archetype conservative vs disruptive)
-- `validation/{idea-slug}/synthesis` — verdict + scores + cross-dept flags
+- `validation/{idea-slug}/report` — verdict, scores, flags
+- `validation/{idea-slug}/problem` — target audience, pain points
+- `validation/{idea-slug}/market` — SOM, segmentos, geografías
+- `validation/{idea-slug}/competitive` — incumbents, gaps, white space
+- `validation/{idea-slug}/bizmodel` — pricing, revenue model
+- `validation/{idea-slug}/risk` — timing, regulatory
+- `validation/{idea-slug}/synthesis` — verdict + scores
 
-**Cuándo Brand falla sin Validation**:
-- NO PUEDE correr — obligatorio
-- Error message: "Brand requiere Validation output. Run `/validation:new` primero."
-
-**Si Validation se update después de Brand run**:
-- Brand snapshot v1 preservado
-- Flag staleness cuando módulo futuro lea Brand: "brand v1 was created against validation v1, current validation is v2"
-- User puede `/brand:new` para regenerar con updated inputs (crea v2)
+**Cuándo falla sin Validation**: cannot run — mandatory.
 
 ### Profile module (opcional)
 
-**Qué Brand consume si existe**:
-- `profile/{user-slug}/core` — identity, skills, resources, constraints
-- `profile/{user-slug}/extended` — network, motivation, advantages, previous ventures
+**Qué Brand consume**:
+- `profile/{user-slug}/core`
+- `profile/{user-slug}/extended`
 
-**Cómo Brand usa Profile**:
+**Mapping fields → usage**: ver tabla en [01-overview-and-architecture.md#17](./01-overview-and-architecture.md#17).
 
-| Campo del profile | Usado en | Cómo |
-|---|---|---|
-| `identity.name` | Strategy (brand_values evidence), Verbal (personal bio) | Direct reference |
-| `identity.languages` | Verbal (naming linguistic check, copy language) | Filter |
-| `professional_background` | Strategy (archetype fit) | Compatibility matrix |
-| `skills.domain_expertise` | Strategy (positioning — insider knowledge) | Evidence |
-| `resources.capital` | Scope Analysis (stage inference) | Signal |
-| `constraints.risk_tolerance` | Strategy (archetype fit) | Hard filter para Outlaw/Hero |
-| `constraints.hard_nos` | Scope Analysis (block sensitive archetypes) | Filter |
-| `network.audience` | Verbal (copy de founder-as-creator) | Context |
-| `motivation.primary_goal` | Strategy (archetype fit) | Signal |
-| `meta_signals` (if persisted) | Scope Analysis (cultural context) | Context |
+**Cuando falta**: backward compatible, flag `decided_without_profile: true`.
 
-**Cuándo Brand corre sin Profile**:
-- Degrades gracefully (ver [19-edge-cases.md#brand-sin-profile](./19-edge-cases.md#brand-sin-profile))
-- Flag `decided_without_profile: true`
-- Personalization parcial
-- README + brand book suggest creating profile
+## 20.3 Downstream: Claude Design
 
-## 20.3 Downstream consumption (módulos futuros)
+**Claude Design es el PRIMARY downstream consumer** de nuestro output.
 
-Brand produce artifacts que módulos futuros pueden consumir vía `skills/_shared/brand-contract.md` (ver [10-persistence-and-contracts.md](./10-persistence-and-contracts.md)).
+### Integración actual (manual — v1)
+
+Flow:
+```
+1. Hardcore Brand generates package
+2. User opens claude.ai/design
+3. User uploads brand-design-document.pdf (design system setup)
+4. Claude Design extracts design system
+5. User validates + publishes
+6. User copy-pastes prompts from prompts-for-claude-design.md into Claude Design projects
+7. Claude Design generates deliverables with design system applied
+8. Claude Design handoff bundle → Claude Code → deploy
+```
+
+### Integración futura (programmatic — v2)
+
+Cuando Anthropic ship Claude Design MCP:
+
+Flow:
+```
+1. Hardcore Brand generates package (same)
+2. Handoff Compiler --auto-setup flag:
+   - Invoke Claude Design MCP
+   - Upload brand-design-document.pdf via API
+   - Validate design system
+   - Publish automatically
+3. User optionally: ejecuta prompts via MCP (auto-run all required prompts)
+4. Claude Design generates everything automatically
+5. Output routed back to Hardcore for user review
+6. User approves → Claude Design handoff to Claude Code → deploy
+```
+
+Architecture prepared: Handoff Compiler ya produce package en formato Claude Design-compatible. Solo falta agregar MCP invocation layer cuando API disponible.
+
+### Dependency risk
+
+Brand v1 depende fuertemente de Claude Design para execution. Si Claude Design:
+- Cambia format expectations → update Brand Document template
+- Aumenta pricing → affects user economics (Brand sigue funcional)
+- Deprecada → fallback a manual path (Brand Document como brief para human designer)
+- Expande capabilities → Brand puede aprovechar
+
+**Mitigation**: Brand outputs son tool-agnostic en el core. Brand Design Document PDF, Tokens CSS/JSON, SVGs — todos son standard formats usables en cualquier tool.
+
+## 20.4 Downstream: módulos futuros de Hardcore
+
+Brand provee artifacts vía `skills/_shared/brand-contract.md` (a escribir en Sprint 0).
 
 ### Launch module (future)
 
-**Qué consumiría**:
-- `brand/{slug}/activation.microsite` — para deploy automatizado
-- `brand/{slug}/activation.brand_book_pdf` — para team onboarding
-- `brand/{slug}/activation.social` — para schedule launch posts en platforms
-- `brand/{slug}/verbal.press_release_boilerplate` — para outreach PR
-- `brand/{slug}/verbal.sample_posts_*` — para seed social presence
+**Consume**:
+- `brand/{slug}/handoff` (package manifest + deliverables paths)
+- Invoca Claude Design (vía MCP when available) para deploy microsite
+- `verbal.core_copy.value_props` para meta tags
 
-**Flow example**:
-```
-User: /launch auren-compliance --platforms=linkedin,twitter,producthunt
+### GTM module (future)
 
-Launch module:
-  1. Read brand artifacts (contract)
-  2. Deploy microsite to vercel (use brand.microsite/ + netlify.toml si disponible)
-  3. Schedule 5 LinkedIn posts desde brand.communications.bios.linkedin-company + sample-posts
-  4. Generate Product Hunt description desde brand.verbal.value_props + about
-  5. Send PR draft a founder para approval
-```
+**Consume**:
+- `strategy.target_audience_refined`
+- `strategy.voice_attributes`
+- `verbal.core_copy.value_props` para A/B tests
+- `visual.palette` + logo para ad creative
 
-### Go-to-Market (GTM) module (future)
+### Ops module (future)
 
-**Qué consumiría**:
-- `brand/{slug}/strategy.target_audience_refined` — para audience targeting en ads
-- `brand/{slug}/strategy.voice_attributes` — para ad copy consistency
-- `brand/{slug}/verbal.value_props` — para A/B test variants
-- `brand/{slug}/visual.palette` + `logo` — para ad creative
-- `brand/{slug}/verbal.cta_copy` — para CTA variations
+**Consume**:
+- `prompts_library` para set up email/WhatsApp templates en tools de operations
+- `verbal.communications.bios` para consistency audit
 
-### Operations (Ops) module (future)
+### Future Brand Maintenance module
 
-**Qué consumiría**:
-- `brand/{slug}/verbal.email_templates` — para set up en email provider (Loops, Klaviyo, Customer.io)
-- `brand/{slug}/verbal.whatsapp_templates` (si local) — para WhatsApp Business API setup
-- `brand/{slug}/verbal.communications.bios` — para consistency audit en profiles existentes
-- `brand/{slug}/verbal.faq_seed` — para chatbot / customer support KB
+**Consume**: todo para monitor consistency over time.
 
-### Future "Brand Maintenance" module
+## 20.5 Cross-module data flow
 
-**Conceptual**: ongoing brand consistency checking.
-
-**Qué consumiría**:
-- All brand artifacts
-- Monitor other content (blog posts, emails sent, social posts) para consistency con voice attributes
-- Flag drift del brand over time
-
-## 20.4 Cross-module data flow
-
-### El flujo canónico del user
-
-Ordenar de forma natural:
+### Flujo canónico del user
 
 ```
-User arrives → /profile:new
-  ↓ Creates profile/{user-slug}/*
-  
-User has idea → /validation:new "{idea}"
-  ↓ Runs validation pipeline
-  ↓ Creates validation/{idea-slug}/*
-  ↓ Verdict GO o PIVOT
-  
-User (optional) → /brand:new
-  ↓ Reads profile + validation
-  ↓ Creates brand/{idea-slug}/*
-  ↓ Generates package
-  
-User (future) → /launch:new
-  ↓ Reads brand + validation
-  ↓ Deploys + orchestrates launch
-  
-User (future) → /gtm:new
-  ↓ Reads brand + validation
-  ↓ Generates ad campaigns
-```
+/profile:new
+  ↓ profile/{user-slug}/*
 
-Cada paso **lee** pero no modifica los anteriores. Artifacts inmutables (via snapshots).
+/validation:new "{idea}"
+  ↓ validation/{idea-slug}/*
+  ↓ Verdict GO/PIVOT
+
+/brand:new
+  ↓ brand/{idea-slug}/* (4 deliverables en output/{slug}/brand/)
+  ↓ 
+[Claude Design — user-mediated v1, auto v2]
+  ↓ Design system + UI generations
+  ↓ Handoff bundle → Claude Code → deploy
+
+Future:
+/launch:new
+  ↓ Consumes brand + validation
+  ↓ Orchestrates launch (deploy, PR, social)
+```
 
 ### Dependency graph
 
 ```
-                     profile/{user-slug}/*
-                              ↓
-                              ↓
-                              ↓
-validation/{idea-slug}/* → brand/{idea-slug}/* → launch/{idea-slug}/* (future)
-                              ↓
-                              ↓
-                              ↓
-                              ↓ → gtm/{idea-slug}/* (future)
-                              ↓
-                              ↓ → ops/{idea-slug}/* (future)
+                   profile/{user-slug}/*
+                            ↓
+                            ↓
+                            ↓
+validation/{idea-slug}/* → brand/{idea-slug}/* → Claude Design (downstream)
+                            ↓                            ↓
+                            ↓                     Claude Code → deploy
+                            ↓
+                            ↓ → launch/{idea-slug}/* (future)
+                            ↓ → gtm/{idea-slug}/* (future)
+                            ↓ → ops/{idea-slug}/* (future)
 ```
 
-## 20.5 Shared conventions
+## 20.6 Shared conventions
 
-Brand aligns con existing `skills/_shared/` conventions:
+Brand aligns con `skills/_shared/` conventions existentes:
 
-| Existing convention | Brand compliance |
+| Convention | Brand compliance |
 |---|---|
-| `output-contract.md` | Brand output envelope has: schema_version, status, department, executive_summary, data, evidence, artifacts, flags, next_recommended |
-| `scoring-convention.md` | N/A (Brand no tiene scoring en sentido Validation). Brand tiene coherence gates en su lugar |
-| `engram-convention.md` | Brand usa topic_key pattern `brand/{slug}/{artifact}`. Follows naming + session lifecycle conventions |
-| `persistence-contract.md` | Brand requires Engram. Optional file mode for debugging |
-| `department-protocol.md` | Brand deptos follow sub-agent launch pattern con inputs + outputs schema |
-| `glossary.md` | Brand adds its own terms (archetype, voice_attributes, brand_profile, etc.) — will extend glossary in Sprint 0 |
-| `profile-contract.md` | Brand is a consumer of profile via this contract |
+| `output-contract.md` | Brand envelope: schema_version, status, department, executive_summary, data, evidence, artifacts, flags, next_recommended |
+| `scoring-convention.md` | N/A (Brand tiene coherence gates, no scoring) |
+| `engram-convention.md` | Topic key pattern `brand/{slug}/{artifact}` |
+| `persistence-contract.md` | Requires Engram. Filesystem para deliverables |
+| `department-protocol.md` | Deptos follow sub-agent launch pattern |
+| `glossary.md` | Brand agrega terms (archetype, voice_attributes, brand_profile, tier, etc.) — extendido en Sprint 0 |
+| `profile-contract.md` | Brand es consumer de profile |
 
-Nuevo convention que Brand introduce:
+Nuevo convention:
 - `brand-contract.md` — how future modules consume Brand (paralelo a profile-contract)
 
-## 20.6 Configuration management
+## 20.7 Configuration management
 
-### CLAUDE.md updates
+### CLAUDE.md updates (Sprint 0)
 
-CLAUDE.md (project instructions) debe updatearse en Sprint 0 para incluir:
-
-- Section "How to Brand an Idea" (paralelo a existing "How to Validate an Idea" y "How to Build a Founder Profile")
+CLAUDE.md (project instructions) debe updatearse:
+- Section "How to Brand an Idea" (paralelo a "How to Validate" y "How to Build a Founder Profile")
 - Brand commands table
 - Brand departments
 - How Brand integrates con Validation + Profile
+- **Claude Design workflow section** (downstream)
 - Brand persistence model
 
 ### Skills registration
 
-New skills a registrar:
+New skills:
 - `skills/brand/SKILL.md` (orchestrator)
 - `skills/brand/strategy/SKILL.md`
 - `skills/brand/verbal/SKILL.md`
 - `skills/brand/visual/SKILL.md`
 - `skills/brand/logo/SKILL.md`
-- `skills/brand/activation/SKILL.md`
+- `skills/brand/handoff-compiler/SKILL.md`
 
-Estos skills no son user-invocable directamente (sub-agentes). El orchestrator los invoca.
+Sub-agentes (no user-invocable directly).
 
 ### MCP configuration
 
-Nuevos MCPs a agregar en `.mcp.json` o settings del user:
-- Stitch MCP (`@_davideast/stitch-mcp`)
-- Image Gen MCP (`@merlinrabens/image-gen-mcp-server`)
-- Domain Availability MCP (`imprvhub/mcp-domain-availability`)
+Nuevos MCPs en `.mcp.json`:
+- `imprvhub/mcp-domain-availability` (required Tier 0)
+- `merlinrabens/image-gen-mcp-server` (required Tier 1+)
 
-User setup required — ver [11-tools-stack.md](./11-tools-stack.md) para pasos.
+User setup necesario — ver [11-tools-stack.md](./11-tools-stack.md).
 
-## 20.7 Backward compatibility
+## 20.8 Backward compatibility
 
-Brand NO rompe Validation ni Profile.
+Brand NO rompe Validation ni Profile:
+- Validation unchanged, readable by Brand
+- Profile unchanged, readable by Brand
+- New topic key namespace (`brand/*`)
+- New skills subdirectory (`skills/brand/*`)
 
-- Validation artifacts: unchanged, readable by Brand
-- Profile artifacts: unchanged, readable by Brand
-- New topic key namespace (`brand/*`) — no collision
-- New skills subdirectory (`skills/brand/*`) — no overlap con existing skills
+Existing tests continúan pasando.
 
-Existing tests de Validation y Profile continúan pasando después de Brand implementation.
+## 20.9 Future extensibility
 
-## 20.8 Future extensibility
+### Adding new brand profile
 
-Brand está diseñado para extenderse:
+Edit `skills/brand/references/brand-profiles.md`. No code change — Scope Analysis picks up automatically.
 
-### Adding new brand profiles
+### Adding new archetype
 
-Agregar a `skills/brand/references/brand-profiles.md`:
-- New profile entry with its characteristics
-- Expected signals for matching
-- Output manifest defaults
-- Intensity modifier defaults
-- Archetype constraints
+Edit `skills/brand/references/archetype-guide.md`.
 
-No cambio de code — just reference doc update. Scope Analysis picks it up automatically.
+### Adding new asset
 
-### Adding new assets
+Edit relevant reference matrix. Dept picks up based on scope.
 
-Agregar a `skills/brand/verbal/references/copy-asset-matrix.md` (o visual, o logo):
-- New asset entry con condition rules (qué scopes lo necesitan)
-- Generation template
+### Adding new dept (future module)
 
-Dept picks it up automatically based on scope manifest.
+Prefer separate módulos (`skills/brand-physical/`, etc.) vs extending Brand.
 
-### Adding new tools
+### Adding new tool
 
-Agregar a `skills/brand/references/version-compatibility.md`:
-- New tool + tested versions
-- How it integrates
+Edit `skills/brand/references/version-compatibility.md` + relevant SKILL.md.
 
-Update relevant dept SKILL.md con how to use.
+### Integrating Claude Design MCP (when released)
 
-### Adding new future modules
+Update Handoff Compiler con `--auto-setup` flag. No changes elsewhere.
 
-Document en `skills/_shared/brand-contract.md` cómo consume. Extensibility sin breaking changes.
+**Design philosophy**: additive changes cheap, breaking changes require v2.
 
-## 20.9 Documentation hierarchy
+## 20.10 Documentation hierarchy
 
-Para evitar duplication + asegurar single source of truth:
+Para evitar duplication:
 
 | Info tipo | Lives in |
 |---|---|
-| Overall module philosophy | `plan/brand/` (planning docs, este directorio) |
+| Module philosophy | `plan/brand/` (planning docs) |
 | Canonical specs | `skills/brand/*/SKILL.md` |
-| References (archetypes, profiles, etc.) | `skills/brand/references/` |
-| User-facing docs | `CLAUDE.md` (section de Brand) + brand book PDF per run |
+| References | `skills/brand/references/` + `skills/brand/{dept}/references/` |
+| User-facing | `CLAUDE.md` (section) + README del package + Brand Document PDF |
 | Testing protocol | `testing/brand-PROTOCOL.md` |
-| Results de tests | `testing/brand-runs/` |
+| Test results | `testing/brand-runs/` |
 
-## 20.10 Reference file a escribir en Sprint 0
+## 20.11 Reference file a escribir en Sprint 0
 
 - `skills/_shared/brand-contract.md` — consumption contract para módulos futuros
-- `CLAUDE.md` section update con Brand module
+- `CLAUDE.md` section update con Brand module + Claude Design workflow
 
-## 20.11 Testing de integración
+## 20.12 Testing integración
 
-Ver [14-testing-strategy.md](./14-testing-strategy.md). Integration tests:
+Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Validation run + Brand run → Brand reads Validation correctly
-2. Profile run + Validation run + Brand run → Brand reads both correctly
-3. Brand sin profile → backward compatible, runs with flags
-4. Future module (mock Launch) reads Brand via contract → works
-5. CLAUDE.md updates coherent, no contradicciones con Validation/Profile sections
-6. Existing Validation + Profile tests continúan pasando con Brand in place
+1. Validation + Brand → Brand reads Validation correctly
+2. Profile + Validation + Brand → Brand reads both
+3. Brand sin profile → backward compatible con flags
+4. Future module (mock Launch) reads Brand vía contract → works
+5. CLAUDE.md coherent with other modules
+6. Existing Validation + Profile tests continúan pasando
+7. **Claude Design handoff**: Brand Document PDF uploadable + extractable
+8. **Brand Tokens folder**: linkable a Claude Design codebase integration
 
-## 20.12 The vision — Hardcore como sistema
-
-Brand no es un producto standalone. Es parte del arco completo:
+## 20.13 The vision — Hardcore como sistema
 
 **Profile** dice quién sos.
 **Validation** dice si tu idea vale la pena.
-**Brand** le da identidad ejecutable a esa idea.
-**Launch** (future) la pone en el mundo.
+**Brand** le da brief + prompts + tokens + assets para que **Claude Design** ejecute la identidad visual.
+**Launch** (future) la deploya.
 **GTM** (future) la comunica al mercado.
 **Ops** (future) la opera día a día.
 
-Cada módulo independiente pero potenciado por los anteriores. Ese es el moat — no somos "otra herramienta AI", somos el sistema completo.
+Hardcore no compite con Claude Design — lo alimenta con contexto que ningún otro workflow tiene. Profile + Validation = founder-specific + evidence-based context que Claude Design no puede generar por sí solo.
 
-Brand v1 es un milestone crítico: cierra el arco "idea → marca" y habilita el launch de Hardcore mismo (dogfooding).
+Ese es el moat real. Hardcore = **brand intelligence layer para Claude Design**, expandible a un full operational OS del founder.

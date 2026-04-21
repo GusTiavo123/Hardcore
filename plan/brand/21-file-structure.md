@@ -2,109 +2,121 @@
 
 ## 21.1 Propósito
 
-Definir exactamente qué archivos se crean dónde en el repo durante Sprint 0 (specs) y Sprint 1 (implementación).
+Exactamente qué archivos se crean dónde en Sprint 0 (specs) y Sprint 1 (implementación).
 
-Sprint 0 crea specs + references. Sprint 1 lo conecta a la realidad via MCPs + testing.
+Estructura simplificada usando Handoff Compiler como depto final.
 
 ## 21.2 Estructura general
 
 ```
 hardcore/ (repo root)
 │
-├── CLAUDE.md                                   # UPDATE — agregar sección Brand
+├── CLAUDE.md                                   # UPDATE — agregar sección Brand + Claude Design workflow
 │
 ├── skills/
 │   ├── _shared/                                # UPDATE — agregar brand-contract.md
 │   │   ├── output-contract.md                  # existing, unchanged
-│   │   ├── scoring-convention.md               # existing, unchanged (Validation)
-│   │   ├── engram-convention.md                # existing, unchanged
-│   │   ├── persistence-contract.md             # existing, unchanged
-│   │   ├── department-protocol.md              # existing, unchanged
+│   │   ├── scoring-convention.md               # existing
+│   │   ├── engram-convention.md                # existing
+│   │   ├── persistence-contract.md             # existing
+│   │   ├── department-protocol.md              # existing
 │   │   ├── glossary.md                         # UPDATE — agregar términos Brand
-│   │   ├── profile-contract.md                 # existing (Profile), unchanged
-│   │   └── brand-contract.md                   # NEW — consumption contract for downstream modules
+│   │   ├── profile-contract.md                 # existing
+│   │   └── brand-contract.md                   # NEW — consumption contract
 │   │
-│   ├── validation/                             # existing, unchanged
-│   ├── profile/                                # existing, unchanged
+│   ├── validation/                             # existing
+│   ├── profile/                                # existing
 │   │
 │   └── brand/                                  # NEW — todo el módulo
-│       ├── SKILL.md                            # Orchestrator (paralelo a validation/orchestrator/)
+│       ├── SKILL.md                            # Orchestrator
 │       ├── references/
-│       │   ├── pipeline-contract.md            # Contrato entre deptos + coherence gates overview
-│       │   ├── archetype-guide.md              # 12 Jung archetypes expanded + tables
-│       │   ├── brand-profiles.md               # Los 8 profiles canónicos
-│       │   ├── coherence-rules.md              # Los 9 gates detallados
-│       │   ├── reveal-script.md                # Templates de reveals por modo
-│       │   ├── scope-analysis-rubric.md        # Reglas de clasificación
-│       │   ├── failure-protocols.md            # Failure modes + fallbacks
-│       │   ├── versioning.md                   # Snapshot + diff + rollback protocols
-│       │   ├── edge-cases.md                   # Edge cases handling
-│       │   ├── interaction-flow.md             # Decision tree de user interactions
-│       │   ├── budget-tracking.md              # Cost tracking schema + estimates
-│       │   └── version-compatibility.md        # Tool versions matrix
+│       │   ├── pipeline-contract.md
+│       │   ├── archetype-guide.md              # 12 Jung archetypes
+│       │   ├── brand-profiles.md               # 8 canonical profiles
+│       │   ├── coherence-rules.md              # 8 gates
+│       │   ├── reveal-script.md
+│       │   ├── scope-analysis-rubric.md
+│       │   ├── failure-protocols.md
+│       │   ├── versioning.md
+│       │   ├── edge-cases.md
+│       │   ├── interaction-flow.md
+│       │   ├── budget-tracking.md              # Cost per tier tracking
+│       │   ├── version-compatibility.md        # Tool versions
+│       │   └── tier-system.md                  # NEW — tier 0/1/2 logic
 │       │
-│       ├── scope-analysis/                     # No sub-agente — orchestrator lo ejecuta
-│       │   └── ALGORITHM.md                    # Algoritmo detallado inline
+│       ├── scope-analysis/                     # No sub-agente — orchestrator inline
+│       │   └── ALGORITHM.md
 │       │
 │       ├── strategy/
-│       │   ├── SKILL.md                        # Instrucciones para sub-agente Strategy
+│       │   ├── SKILL.md
 │       │   └── references/
 │       │       ├── data-schema.md
-│       │       └── positioning-frameworks.md   # Templates + examples
+│       │       └── positioning-frameworks.md
 │       │
 │       ├── verbal/
 │       │   ├── SKILL.md
 │       │   └── references/
 │       │       ├── data-schema.md
-│       │       ├── verification-protocol.md    # Domain + TM check queries per jurisdiction
+│       │       ├── verification-protocol.md
 │       │       ├── naming-strategies-by-profile.md
-│       │       ├── copy-asset-matrix.md        # Qué assets por brand profile
-│       │       └── voice-application-examples.md # Do/don'ts examples per voice attribute
+│       │       ├── core-copy-matrix.md         # Core assets matrix
+│       │       └── voice-application-examples.md
 │       │
 │       ├── visual/
 │       │   ├── SKILL.md
 │       │   └── references/
 │       │       ├── data-schema.md
-│       │       ├── archetype-palette-seeds.md  # 12 archetypes → color families
-│       │       ├── archetype-typography-map.md # Archetype × era → font pairings
-│       │       ├── wcag-utility.md             # Contrast algorithm pseudocode
-│       │       └── mood-prompt-templates.md    # Recraft prompts per archetype
+│       │       ├── archetype-palette-seeds.md
+│       │       ├── archetype-typography-map.md
+│       │       ├── wcag-utility.md
+│       │       ├── mood-prompt-templates.md    # Tier 2 Recraft
+│       │       └── unsplash-query-templates.md # NEW — Tier 1 mood refs
 │       │
 │       ├── logo/
 │       │   ├── SKILL.md
 │       │   └── references/
 │       │       ├── data-schema.md
-│       │       ├── prompt-templates.md         # Recraft prompts per archetype × direction
-│       │       ├── direction-strategies-by-profile.md # Directions per brand profile
-│       │       └── quality-validation.md       # Automated quality checks
+│       │       ├── claude-svg-templates.md     # NEW — Tier 0 SVG templates
+│       │       ├── recraft-prompt-templates.md # Tier 1+ prompts
+│       │       ├── direction-strategies-by-profile.md
+│       │       ├── quality-validation.md
+│       │       └── auto-elevation-rules.md     # NEW — tier elevation logic
 │       │
-│       └── activation/
+│       └── handoff-compiler/                   # REPLACES activation/
 │           ├── SKILL.md
 │           └── references/
 │               ├── data-schema.md
-│               ├── design-md-template.md       # Template para DESIGN.md
-│               ├── screen-prompts.md           # Stitch prompts per screen type
+│               ├── brand-document-template.md  # NEW — PDF structure
+│               ├── prompts-library-templates.md # NEW — prompts per scope
+│               ├── tokens-templates/           # NEW — token file templates
+│               │   ├── tokens.css.template
+│               │   ├── tokens.json.template
+│               │   ├── tailwind.config.js.template
+│               │   └── examples/
+│               │       ├── button.html.template
+│               │       ├── card.html.template
+│               │       └── hero.html.template
 │               ├── package-structure-by-profile.md
-│               └── readme-template.md          # Template para README.md del package
+│               └── readme-template.md
 │
 ├── testing/
-│   ├── PROTOCOL.md                             # existing, unchanged
-│   ├── suite.yaml                              # existing (Validation suite)
-│   ├── brand-PROTOCOL.md                       # NEW — protocolo testing Brand
-│   ├── brand-suite.yaml                        # NEW — 8 ideas curadas per brand profile
-│   ├── brand-human-eval-template.md            # NEW — template para human eval
-│   ├── brand-runs/                             # NEW — runs de testing Brand
-│   │   └── REGISTRY.md                         # Index de runs
+│   ├── PROTOCOL.md                             # existing
+│   ├── suite.yaml                              # existing (Validation)
+│   ├── brand-PROTOCOL.md                       # NEW
+│   ├── brand-suite.yaml                        # NEW — 8 test ideas
+│   ├── brand-human-eval-template.md            # NEW
+│   ├── brand-runs/                             # NEW
+│   │   └── REGISTRY.md
 │   └── analysis/
-│       └── brand-coverage.md                   # NEW — aggregated testing stats
+│       └── brand-coverage.md                   # NEW
 │
-├── calibration/                                # OPTIONAL new addition
+├── calibration/
 │   ├── scenarios.md                            # existing (Validation)
 │   ├── fit-scenarios.md                        # existing (Profile)
-│   └── brand-scenarios.md                      # NEW (si decidimos crear — ver open-decisions)
+│   └── brand-scenarios.md                      # OPTIONAL (deferred Sprint 1+)
 │
-├── plan/                                       # NEW — planning artifacts
-│   └── brand/                                  # NEW — este plan
+├── plan/                                       # Planning docs (este directorio)
+│   └── brand/
 │       ├── README.md
 │       ├── 01-overview-and-architecture.md
 │       ├── 02-scope-analysis.md
@@ -113,43 +125,45 @@ hardcore/ (repo root)
 │       ├── 05-dept-verbal.md
 │       ├── 06-dept-visual.md
 │       ├── 07-dept-logo.md
-│       ├── 08-dept-activation.md
-│       ├── 09-coherence-model.md
+│       ├── 08-dept-handoff-compiler.md         # Renamed from activation
+│       ├── 09-coherence-model.md               # 8 gates
 │       ├── 10-persistence-and-contracts.md
-│       ├── 11-tools-stack.md
+│       ├── 11-tools-stack.md                   # Tier-based
 │       ├── 12-modes-and-interactions.md
 │       ├── 13-failure-modes.md
 │       ├── 14-testing-strategy.md
 │       ├── 15-versioning-reproducibility.md
 │       ├── 16-v1-limitations.md
-│       ├── 17-cost-and-timing.md
-│       ├── 18-output-package-structure.md
+│       ├── 17-cost-and-timing.md               # Tier-based numbers
+│       ├── 18-output-package-structure.md      # 4 deliverables
 │       ├── 19-edge-cases.md
 │       ├── 20-ecosystem-integration.md
 │       ├── 21-file-structure.md (this file)
-│       └── 22-open-decisions.md
+│       ├── 22-open-decisions.md
+│       ├── 23-brand-design-document-structure.md # PDF spec detailed
+│       └── 24-prompts-library-templates.md     # Prompts templates
 │
-├── output/                                     # existing — artifacts de runs
+├── output/
 │   └── {idea-slug}/
-│       ├── brand/                              # NEW — per idea
+│       ├── brand/                              # NEW per run
 │       └── validation/                         # existing
 │
-├── docs/                                       # existing
-│   └── idea-loop-architecture.md               # existing
+├── docs/
+│   └── idea-loop-architecture.md
 │
-└── .mcp.json                                   # UPDATE — agregar new MCPs
+└── .mcp.json                                   # UPDATE — nuevos MCPs
 ```
 
 ## 21.3 Archivos nuevos a crear en Sprint 0
 
 ### Specs core (skills/brand/)
 
-**Orchestrator level**:
-1. `skills/brand/SKILL.md` — orchestrator instructions
+**Orchestrator level** (13 archivos):
+1. `skills/brand/SKILL.md`
 2. `skills/brand/references/pipeline-contract.md`
 3. `skills/brand/references/archetype-guide.md`
 4. `skills/brand/references/brand-profiles.md`
-5. `skills/brand/references/coherence-rules.md`
+5. `skills/brand/references/coherence-rules.md` (8 gates)
 6. `skills/brand/references/reveal-script.md`
 7. `skills/brand/references/scope-analysis-rubric.md`
 8. `skills/brand/references/failure-protocols.md`
@@ -158,122 +172,130 @@ hardcore/ (repo root)
 11. `skills/brand/references/interaction-flow.md`
 12. `skills/brand/references/budget-tracking.md`
 13. `skills/brand/references/version-compatibility.md`
+14. `skills/brand/references/tier-system.md`
 
-**Scope Analysis**:
-14. `skills/brand/scope-analysis/ALGORITHM.md`
+**Scope Analysis** (1):
+15. `skills/brand/scope-analysis/ALGORITHM.md`
 
-**Strategy dept**:
-15. `skills/brand/strategy/SKILL.md`
-16. `skills/brand/strategy/references/data-schema.md`
-17. `skills/brand/strategy/references/positioning-frameworks.md`
+**Strategy dept** (3):
+16. `skills/brand/strategy/SKILL.md`
+17. `skills/brand/strategy/references/data-schema.md`
+18. `skills/brand/strategy/references/positioning-frameworks.md`
 
-**Verbal dept**:
-18. `skills/brand/verbal/SKILL.md`
-19. `skills/brand/verbal/references/data-schema.md`
-20. `skills/brand/verbal/references/verification-protocol.md`
-21. `skills/brand/verbal/references/naming-strategies-by-profile.md`
-22. `skills/brand/verbal/references/copy-asset-matrix.md`
-23. `skills/brand/verbal/references/voice-application-examples.md`
+**Verbal dept** (6):
+19. `skills/brand/verbal/SKILL.md`
+20. `skills/brand/verbal/references/data-schema.md`
+21. `skills/brand/verbal/references/verification-protocol.md`
+22. `skills/brand/verbal/references/naming-strategies-by-profile.md`
+23. `skills/brand/verbal/references/core-copy-matrix.md`
+24. `skills/brand/verbal/references/voice-application-examples.md`
 
-**Visual dept**:
-24. `skills/brand/visual/SKILL.md`
-25. `skills/brand/visual/references/data-schema.md`
-26. `skills/brand/visual/references/archetype-palette-seeds.md`
-27. `skills/brand/visual/references/archetype-typography-map.md`
-28. `skills/brand/visual/references/wcag-utility.md`
-29. `skills/brand/visual/references/mood-prompt-templates.md`
+**Visual dept** (6):
+25. `skills/brand/visual/SKILL.md`
+26. `skills/brand/visual/references/data-schema.md`
+27. `skills/brand/visual/references/archetype-palette-seeds.md`
+28. `skills/brand/visual/references/archetype-typography-map.md`
+29. `skills/brand/visual/references/wcag-utility.md`
+30. `skills/brand/visual/references/mood-prompt-templates.md`
+31. `skills/brand/visual/references/unsplash-query-templates.md` — NEW Tier 1
 
-**Logo dept**:
-30. `skills/brand/logo/SKILL.md`
-31. `skills/brand/logo/references/data-schema.md`
-32. `skills/brand/logo/references/prompt-templates.md`
-33. `skills/brand/logo/references/direction-strategies-by-profile.md`
-34. `skills/brand/logo/references/quality-validation.md`
+**Logo dept** (6):
+32. `skills/brand/logo/SKILL.md`
+33. `skills/brand/logo/references/data-schema.md`
+34. `skills/brand/logo/references/claude-svg-templates.md` — NEW Tier 0
+35. `skills/brand/logo/references/recraft-prompt-templates.md` — Tier 1+
+36. `skills/brand/logo/references/direction-strategies-by-profile.md`
+37. `skills/brand/logo/references/quality-validation.md`
+38. `skills/brand/logo/references/auto-elevation-rules.md` — NEW
 
-**Activation dept**:
-35. `skills/brand/activation/SKILL.md`
-36. `skills/brand/activation/references/data-schema.md`
-37. `skills/brand/activation/references/design-md-template.md`
-38. `skills/brand/activation/references/screen-prompts.md`
-39. `skills/brand/activation/references/package-structure-by-profile.md`
-40. `skills/brand/activation/references/readme-template.md`
+**Handoff Compiler dept** (9):
+39. `skills/brand/handoff-compiler/SKILL.md`
+40. `skills/brand/handoff-compiler/references/data-schema.md`
+41. `skills/brand/handoff-compiler/references/brand-document-template.md` — NEW core file
+42. `skills/brand/handoff-compiler/references/prompts-library-templates.md` — NEW core file
+43. `skills/brand/handoff-compiler/references/tokens-templates/tokens.css.template`
+44. `skills/brand/handoff-compiler/references/tokens-templates/tokens.json.template`
+45. `skills/brand/handoff-compiler/references/tokens-templates/tailwind.config.js.template`
+46. `skills/brand/handoff-compiler/references/tokens-templates/examples/{button,card,hero}.html.template` (3 files)
+47. `skills/brand/handoff-compiler/references/package-structure-by-profile.md`
+48. `skills/brand/handoff-compiler/references/readme-template.md`
 
-### Shared updates
+### Shared updates (2):
 
-41. `skills/_shared/brand-contract.md` (NEW)
-42. `skills/_shared/glossary.md` (UPDATE — agregar términos Brand)
+49. `skills/_shared/brand-contract.md` — NEW
+50. `skills/_shared/glossary.md` — UPDATE (add Brand terms)
 
-### Testing
+### Testing (5):
 
-43. `testing/brand-PROTOCOL.md` (NEW)
-44. `testing/brand-suite.yaml` (NEW)
-45. `testing/brand-human-eval-template.md` (NEW)
-46. `testing/brand-runs/REGISTRY.md` (NEW placeholder)
-47. `testing/analysis/brand-coverage.md` (NEW placeholder)
+51. `testing/brand-PROTOCOL.md` — NEW
+52. `testing/brand-suite.yaml` — NEW (8 ideas)
+53. `testing/brand-human-eval-template.md` — NEW
+54. `testing/brand-runs/REGISTRY.md` — NEW placeholder
+55. `testing/analysis/brand-coverage.md` — NEW placeholder
 
-### Optional (if decided in open-decisions)
+### Optional (deferred)
 
-48. `calibration/brand-scenarios.md` (NEW — optional)
+- `calibration/brand-scenarios.md` — OPTIONAL (decide Sprint 1/2)
 
-### Root-level updates
+### Root-level updates (2)
 
-49. `CLAUDE.md` (UPDATE — agregar sección Brand completa)
-50. `.mcp.json` (UPDATE — agregar new MCPs config)
+56. `CLAUDE.md` — UPDATE (Brand section + Claude Design workflow)
+57. `.mcp.json` — UPDATE (new MCPs)
 
-**Total files creados/updateados en Sprint 0: ~50 archivos** (muchos referenced-only hasta Sprint 1)
+**Total Sprint 0: ~55 archivos**.
 
-## 21.4 Archivos que crece en Sprint 1 (implementation)
+**Total: ~55 archivos** en Sprint 0 entre specs + references + testing protocol + config updates.
 
-Sprint 1 no crea muchos archivos nuevos — escribe contenido executable en los SKILL.md creados en Sprint 0. Cambios principales:
+## 21.4 Archivos que crece en Sprint 1
 
-- Refinamiento de SKILL.md basado en dogfooding real
-- Additions de examples trabajados en references docs
-- Testing artifacts (test run results)
-- Bug fixes y edge case additions
+Sprint 1 implementa + refines. Cambios:
+- Refinamiento SKILL.md basado en dogfooding
+- Examples trabajados en references
+- Testing artifacts (run results)
+- Bug fixes + edge cases
 
-Sprint 1 también implementa el **setup de MCPs** en user's entorno:
-- User installs Stitch MCP (outside repo)
-- User installs Image Gen MCP (outside repo)
-- User installs Domain MCP (outside repo)
-- `.mcp.json` del repo configura references
+Sprint 1 también implementa **setup de MCPs** en user environment:
+- User installs Domain MCP (Tier 0 mandatory)
+- User installs Image Gen MCP (Tier 1+ optional)
+- User verifies Claude Design access (for testing downstream)
+- `.mcp.json` configura references
 
-## 21.5 Archivos de runtime (creados per user run)
+## 21.5 Archivos de runtime (per user run)
 
 Cada brand run crea:
-
 ```
 output/{idea-slug}/brand/
-├── [full package structure — see 18-output-package-structure.md]
+├── [4 deliverables + README + AUDIT]
 ```
 
-Engram creates:
+Engram:
 ```
 brand/{idea-slug}/scope
 brand/{idea-slug}/strategy
 brand/{idea-slug}/verbal
 brand/{idea-slug}/visual
 brand/{idea-slug}/logo
-brand/{idea-slug}/activation
+brand/{idea-slug}/handoff           # Was "activation"
 brand/{idea-slug}/final-report
 brand/{idea-slug}/snapshot/v{N}
 ```
 
-Estos NO están versioned en git (están en `.gitignore` or `output/` + Engram DB).
+NO versioned en git.
 
 ## 21.6 Convenciones de naming
 
 ### Markdown files
-- kebab-case: `archetype-palette-seeds.md`
-- Descriptive: names explain content
-- Numbered prefix en plan/ para orden de reading
+- kebab-case
+- Descriptive
+- Numbered prefix en plan/
 
 ### Directory structure
-- Mirror department structure de Validation (consistency)
-- `references/` siempre subfolder para reference docs
-- `SKILL.md` always at directory root del dept
+- Mirror department structure (consistency)
+- `references/` subfolder
+- `SKILL.md` at dept root
 
-### Inside SKILL.md files
-- Title + brief description
+### Inside SKILL.md
+- Title + description
 - Core Principle
 - Inputs
 - Step-by-step process
@@ -281,89 +303,77 @@ Estos NO están versioned en git (están en `.gitignore` or `output/` + Engram D
 - Persistence
 - Critical Rules
 
-(Pattern existente en Validation orchestrator SKILL.md)
-
 ## 21.7 Build order (Sprint 0 sequencing)
 
-Order sugerido para escribir los 50 archivos:
-
-### Week 1 of Sprint 0 — Foundations
-1. `skills/_shared/brand-contract.md` (primera — downstream contract clarity)
+### Semana 1 — Foundations
+1. `skills/_shared/brand-contract.md`
 2. `skills/_shared/glossary.md` update
-3. `skills/brand/SKILL.md` (orchestrator)
+3. `skills/brand/SKILL.md`
 4. `skills/brand/references/pipeline-contract.md`
-5. `skills/brand/references/brand-profiles.md` (the 8 profiles)
+5. `skills/brand/references/brand-profiles.md`
 6. `skills/brand/references/archetype-guide.md`
-7. `skills/brand/scope-analysis/ALGORITHM.md`
-8. `skills/brand/references/scope-analysis-rubric.md`
+7. `skills/brand/references/tier-system.md`
+8. `skills/brand/scope-analysis/ALGORITHM.md`
+9. `skills/brand/references/scope-analysis-rubric.md`
 
-### Week 2 of Sprint 0 — Deptos
-9-13. Strategy dept + references
-14-19. Verbal dept + references
-20-25. Visual dept + references
-26-30. Logo dept + references
-31-36. Activation dept + references
+### Semana 2 — Deptos
+10-12. Strategy + refs
+13-18. Verbal + refs
+19-25. Visual + refs
+26-32. Logo + refs
+33-48. Handoff Compiler + refs + tokens-templates
 
-### Week 3 of Sprint 0 — Cross-cutting
-37. `skills/brand/references/coherence-rules.md`
-38. `skills/brand/references/reveal-script.md`
-39. `skills/brand/references/failure-protocols.md`
-40. `skills/brand/references/versioning.md`
-41. `skills/brand/references/edge-cases.md`
-42. `skills/brand/references/interaction-flow.md`
-43. `skills/brand/references/budget-tracking.md`
-44. `skills/brand/references/version-compatibility.md`
+### Semana 3 — Cross-cutting
+49-56. Coherence, reveal, failure, versioning, edge cases, interaction flow, budget, version compat
 
-### Week 4 of Sprint 0 — Testing + integration
-45. `testing/brand-PROTOCOL.md`
-46. `testing/brand-suite.yaml`
-47. `testing/brand-human-eval-template.md`
-48. `CLAUDE.md` update (Brand section)
-49. `.mcp.json` update
+### Semana 4 — Testing + integration
+57-61. Testing protocol + suite + templates + registry
+62-63. CLAUDE.md + .mcp.json updates
 
-Total estimated time para Sprint 0: ~1-2 weeks de escritura focalizada (depending on quality bar + iteration rounds).
+Total estimated: **1-2 semanas** de escritura focalizada.
 
 ## 21.8 Reference from plan/ to skills/
 
-Los archivos en `plan/brand/` son documentos de **design**; los archivos en `skills/brand/` son **specs executable**.
+`plan/brand/` = **design docs**. `skills/brand/` = **executable specs**.
 
-**Diferencia**:
-- `plan/brand/05-dept-verbal.md` explica **por qué** Verbal está diseñado así + todas las decisiones
-- `skills/brand/verbal/SKILL.md` es el **qué** hacer — instrucciones para el sub-agente
+Diferencia:
+- `plan/brand/05-dept-verbal.md` explica **por qué** Verbal está diseñado así + decisiones
+- `skills/brand/verbal/SKILL.md` es **qué** hacer — instrucciones para el sub-agente
 
-Sprint 0 toma decisiones de `plan/` y las convierte a `skills/` specs.
+Sprint 0 toma decisiones de `plan/` y convierte a `skills/` specs.
 
-Post-Sprint 0, `plan/brand/` queda como referencia histórica/design rationale. Bug fixes + iteraciones menores son en `skills/brand/`.
+Post-Sprint 0, `plan/brand/` queda como historical reference.
 
 ## 21.9 Gitignore considerations
 
-Archivos a NOT commitear:
-- `output/{slug}/brand/*` — artifacts per-run (cada user tiene suyos)
-- `testing/brand-runs/*/brand-book.pdf` — binaries grandes (aunque testing runs podrían ser OK committear según protocolo)
+NOT commitear:
+- `output/{slug}/brand/*` — artifacts per-run
+- `testing/brand-runs/*/brand-design-document.pdf` — binary grande (aunque testing runs podrían commitearse según protocol)
 
-Archivos SÍ commitear:
-- Todos los specs de `skills/brand/`
-- Todos los planning en `plan/brand/`
-- Todos los testing protocols y suite definitions
+Commitear:
+- All specs en `skills/brand/`
+- All planning en `plan/brand/`
+- All testing protocols y suite
 - CLAUDE.md, .mcp.json, README
 
 ## 21.10 Post-v1 evolution
 
-File structure design para permitir additions sin breaking changes:
-
 ### Adding new brand profile
-Only need to edit: `skills/brand/references/brand-profiles.md` + update matrices en deptos relevant.
+Edit `skills/brand/references/brand-profiles.md`.
 
 ### Adding new archetype
-Edit `skills/brand/references/archetype-guide.md` + add to compatibility tables.
+Edit `skills/brand/references/archetype-guide.md`.
 
-### Adding new asset type
-Edit relevant dept reference matrix (ej: `copy-asset-matrix.md` for verbal) + template.
+### Adding new prompt type (for Prompts Library)
+Edit `skills/brand/handoff-compiler/references/prompts-library-templates.md`.
 
-### Adding new dept (future module)
-Create `skills/brand-extension/{new-dept}/` o preferir un módulo separado (`skills/brand-physical/`, `skills/brand-motion/`).
+### Adding new token format
+Agregar template en `skills/brand/handoff-compiler/references/tokens-templates/`.
 
 ### Adding new tool
 Edit `skills/brand/references/version-compatibility.md` + relevant SKILL.md.
 
-Design philosophy: **additive changes are cheap, breaking changes require v2**.
+### Integrating Claude Design MCP (when Anthropic ships)
+Update Handoff Compiler con `--auto-setup` flag. No changes elsewhere.
+
+Design philosophy: additive cheap, breaking requires v2.

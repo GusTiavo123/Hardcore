@@ -2,24 +2,27 @@
 
 ## 14.1 Propósito
 
-Cómo validar que el módulo Brand produce outputs correctos, robustos, y usables. Paralelo a `testing/PROTOCOL.md` existente para Validation, adaptado para las particularidades de Brand (outputs menos cuantificables que scoring).
+Cómo validar que Brand produce outputs correctos, robustos, y usables. Paralelo a `testing/PROTOCOL.md` de Validation.
+
+Testing focus en los 4 deliverables + compatibility con Claude Design downstream.
+
+**Nota**: thresholds en este doc (ej: "human eval ≥ 7.5/10", "variance ≥ 80%", "confidence ≥ 0.7") son baselines razonables — Sprint 1 los calibra con resultados reales.
 
 ## 14.2 Fundamental challenge
 
-Validation tiene outputs fácilmente verificables: scores numéricos, verdicts GO/PIVOT/NO-GO, knockouts rules. Brand tiene outputs que son **más subjetivos**: ¿el archetype es "correcto"? ¿el copy "suena bien"? ¿el logo es "bueno"?
+Validation tiene outputs fácilmente verificables (scores, verdicts, knockouts). Brand tiene outputs más subjetivos. Strategy:
 
-**Estrategia de testing**:
+1. **Structural** — outputs completos y conforming al schema (automated)
+2. **Coherence** — 8 gates pass (automated)
+3. **Scope-appropriateness** — outputs correctos para el brand profile (semi-automated)
+4. **Claude Design compatibility** — Brand Document PDF parseable por Claude Design (manual testing)
+5. **Human evaluation** — final subjective quality (manual)
+6. **Variance** — consistency entre runs (automated comparison)
+7. **Regression** — Brand no rompe Validation/Profile (automated)
 
-1. **Structural** — outputs completos y conforming al schema (fácil, automated)
-2. **Coherence** — gates pasan (automated via the 9 gates)
-3. **Scope-appropriateness** — outputs correctos para el brand profile detected (semi-automated)
-4. **Human evaluation** — final subjective quality (manual, por idea)
-5. **Variance** — consistency entre runs (automated comparación)
-6. **Regression** — Brand no rompe Validation ni Profile (automated)
+## 14.3 Test suite
 
-## 14.3 Test suite — estructura
-
-Paralelo a `testing/suite.yaml` existente. Nuevo archivo: `testing/brand-suite.yaml`.
+Nuevo archivo: `testing/brand-suite.yaml` (paralelo a `testing/suite.yaml`).
 
 ### Test ideas curadas (8 ideas, una por brand profile)
 
@@ -31,265 +34,300 @@ brand_test_ideas:
     text: "Enterprise security platform for Fortune 500 financial institutions, providing real-time compliance monitoring across regulatory frameworks (SOX, GDPR, PCI-DSS)"
     expected_brand_profile: "b2b-enterprise"
     expected_archetype_range: ["Sage", "Ruler", "Hero"]
-    required_outputs_include: ["pitch_deck", "case_study_template", "security_page"]
+    required_outputs_include: ["pitch_deck_prompt", "case_study_prompt", "security_page_prompt"]
     must_skip: ["tiktok_bio", "app_icon_full_set"]
-    
+    default_tier: 0
+  
   - id: "brand-test-b2b-smb"
     text: "Software de facturación y gestión de cobros automatizado para freelancers de tecnología en LATAM, con integración tributaria MX/CO/AR"
     expected_brand_profile: "b2b-smb"
     expected_archetype_range: ["Sage", "Everyman", "Creator"]
-    required_outputs_include: ["pricing_page", "linkedin_bio", "email_templates"]
+    required_outputs_include: ["pricing_page_prompt", "linkedin_bio", "email_welcome_prompt"]
     must_skip: ["tiktok_bio", "pitch_deck_full"]
+    default_tier: 0
   
   - id: "brand-test-b2d-devtool"
-    text: "CLI tool that auto-generates interactive API docs from TypeScript codebases, with team collaboration and hosted docs portal for mid-size eng teams"
+    text: "CLI tool that auto-generates interactive API docs from TypeScript codebases, with team collaboration and hosted docs portal"
     expected_brand_profile: "b2d-devtool"
     expected_archetype_range: ["Creator", "Magician", "Sage", "Explorer"]
-    required_outputs_include: ["github_readme", "docs_landing", "code_snippet_styling"]
+    required_outputs_include: ["github_readme_prompt", "docs_landing_prompt", "code_snippet_styling_prompt"]
     must_skip: ["pitch_deck_full", "tiktok_bio", "app_icon_full_set"]
+    default_tier: 0
+    may_auto_elevate_tier: true  # si logo_primary_form: symbolic-first
   
   - id: "brand-test-b2c-consumer-app"
     text: "Mobile app para habit tracking con gamification, targeted a young professionals que quieren build routines"
     expected_brand_profile: "b2c-consumer-app"
     expected_archetype_range: ["Jester", "Hero", "Everyman", "Creator"]
-    required_outputs_include: ["app_icon_full_set", "app_store_copy", "instagram_templates", "tiktok_concepts"]
-    must_skip: ["pitch_deck_full", "case_study_template"]
+    required_outputs_include: ["app_store_listing_prompt", "instagram_templates_prompt", "app_icon_full_set"]
+    must_skip: ["pitch_deck_full", "case_study_prompt"]
+    default_tier: 1  # app icon requires Tier 1+
+    auto_elevate_reason: "app_asset_criticality: primary"
   
   - id: "brand-test-b2c-consumer-web"
-    text: "Web platform for curated vintage clothing resale, connecting verified sellers with fashion-conscious buyers"
+    text: "Web platform for curated vintage clothing resale"
     expected_brand_profile: "b2c-consumer-web"
     expected_archetype_range: ["Creator", "Lover", "Explorer"]
-    required_outputs_include: ["instagram_templates", "newsletter_template", "referral_copy"]
+    required_outputs_include: ["instagram_templates_prompt", "newsletter_template_prompt", "referral_copy"]
     must_skip: ["app_icon_full_set", "pitch_deck_full"]
+    default_tier: 0
   
   - id: "brand-test-b2local-service"
-    text: "Barbershop premium en Palermo, Buenos Aires, con servicios de corte, afeitado tradicional, y workshop de skincare masculino"
+    text: "Barbershop premium en Palermo, Buenos Aires"
     expected_brand_profile: "b2local-service"
     expected_archetype_range: ["Everyman", "Ruler", "Caregiver", "Sage"]
-    required_outputs_include: ["whatsapp_templates", "google_my_business", "printable_flyers", "phone_script"]
+    required_outputs_include: ["whatsapp_templates", "google_my_business_copy", "printable_flyer_prompt"]
     must_skip: ["pitch_deck", "tiktok_bio", "developer_assets"]
+    default_tier: 0
   
   - id: "brand-test-content-media"
-    text: "Weekly newsletter + podcast sobre product strategy y growth for startup founders in LATAM, monetized via sponsorships"
+    text: "Weekly newsletter + podcast sobre product strategy y growth for startup founders LATAM"
     expected_brand_profile: "content-media"
     expected_archetype_range: ["Sage", "Creator", "Explorer"]
-    required_outputs_include: ["podcast_cover", "newsletter_template", "social_post_series"]
+    required_outputs_include: ["podcast_cover_prompt", "newsletter_template_prompt", "social_post_series_prompt"]
     must_skip: ["pitch_deck_full", "pricing_page_formal"]
+    default_tier: 0
   
   - id: "brand-test-community-movement"
-    text: "Comunidad online de mujeres founders tech en LATAM, con Discord + eventos monthly + mentoring 1:1"
+    text: "Comunidad online de mujeres founders tech en LATAM, Discord + eventos mensuales + mentoring 1:1"
     expected_brand_profile: "community-movement"
     expected_archetype_range: ["Hero", "Caregiver", "Rebel", "Everyman"]
-    required_outputs_include: ["manifesto_document", "symbolic_assets", "discord_branding", "recruiting_copy"]
+    required_outputs_include: ["manifesto_opening", "symbolic_assets_prompt", "discord_branding_prompt"]
     must_skip: ["pricing_page_enterprise", "app_icon_full_set"]
+    default_tier: 0
 ```
-
-Estas 8 ideas cubren los 8 brand profiles canónicos.
-
-**Requirements**: cada idea debe tener previamente:
-- Run de Validation completo (idealmente verdict GO o PIVOT)
-- Opcionalmente un Profile para variance testing
 
 ## 14.4 Test categories
 
 ### Category 1 — Unit tests por dept
 
-**Strategy**:
-- [ ] Input B2B SaaS + Sage-compatible profile → output Sage con confidence alta
-- [ ] Input consumer app + Explorer-compatible profile → output Explorer
-- [ ] Input sin profile → `decided_without_profile: true`, archetype basado solo en idea
-- [ ] Mismo input, 2 runs → archetype consistent (misma decisión dado mismo input)
-- [ ] Voice attributes derivadas del archetype + register
-- [ ] Schema completo — todos los campos presentes
-- [ ] Evidence trace poblado
+**Scope Analysis**:
+- [ ] B2B SaaS clara → `b2b-smb` confidence ≥ 0.8
+- [ ] Consumer mobile app clara → `b2c-consumer-app` confidence ≥ 0.8
+- [ ] Híbrida B2D + community → primary/secondary ambos
+- [ ] Ambigua → triggers user confirmation
+- [ ] Local service → `b2local-service`
+- [ ] Sin profile → proceeds with flag
+- [ ] User override respetado
+- [ ] Auto-eleva tier para `b2c-consumer-app` (app icon requires Tier 1)
 
-**Verbal Identity**:
-- [ ] Naming: genera 15-20 candidatos inicial, reduce a 10-12 verified, presenta top 5-7
-- [ ] Naming: all TM red candidates excluidos del top
-- [ ] Naming: scope b2b-smb prefiere descriptive/compound strategies
-- [ ] Naming: scope b2c-consumer-app prefiere short/memorable
-- [ ] Copy: scope b2b-enterprise genera pitch deck copy, NO TikTok bio
-- [ ] Copy: scope b2c-consumer-app genera app store descriptions, NO pitch deck
+**Strategy**:
+- [ ] B2B SaaS + Sage-compatible profile → Sage
+- [ ] Consumer app + Explorer profile → Explorer
+- [ ] Sin profile → `decided_without_profile: true`
+- [ ] Mismo input 2 runs → archetype consistent
+- [ ] Voice attributes derivadas del archetype + register
+
+**Verbal**:
+- [ ] 15-20 candidatos inicial, reduce a 10-12 verified, top 5-7 presentados
+- [ ] Naming: all TM red excluidos
+- [ ] Scope b2b-smb prefiere descriptive
+- [ ] Scope b2c-consumer-app prefiere short/memorable
+- [ ] Copy: scope b2b-enterprise genera pitch deck cover copy, NO TikTok bio
 - [ ] Voice self-check: assets exhibit voice detectably
 - [ ] Domain MCP integration functional
-- [ ] TM screening returns results interpretables
+- [ ] TM screening interpreted correctly
 
-**Visual System**:
-- [ ] Archetype Sage + formality medium → palette conservadora con accent sutil
-- [ ] Archetype Jester + formality low → palette vibrant multi-accent
-- [ ] WCAG check detecta contrast failures y ajusta
-- [ ] Typography era matchea pairing correcto
-- [ ] Mood imagery generada coherent entre las 6-8 imágenes
-- [ ] Huemint integration functional
-- [ ] Recraft integration functional
-- [ ] Scope sin `mood_imagery` en required → skip generation
+**Visual**:
+- [ ] Tier 0: Claude-generated palette + typography, no mood imagery
+- [ ] Tier 1: Huemint palette + Unsplash mood refs
+- [ ] Tier 2: Huemint paid + Recraft mood
+- [ ] Archetype Sage + formality medium → palette conservadora
+- [ ] Archetype Jester + formality low → palette vibrant
+- [ ] WCAG check ajusta si falla
+- [ ] Typography era matchea pairing
 
 **Logo**:
-- [ ] `logo_primary_form: wordmark-preferred` → 3 wordmarks + 1 combination generados
-- [ ] `logo_primary_form: icon-first` → 4 symbolic, legible a 16×16
-- [ ] SVG output válido (parseable, no corrupto)
-- [ ] Variants (mono, inverse) preservan structure del primary
-- [ ] Derivations (favicon, OG card) rendean correctamente
-- [ ] `app_asset_criticality: primary` → set completo iOS + Android
-- [ ] User regen con feedback → feedback applied
+- [ ] Tier 0 + wordmark-preferred → 4 Claude-SVG wordmarks, valid
+- [ ] Tier 0 + symbolic-first → user prompted to elevate
+- [ ] Tier 1 + symbolic-first → Recraft symbolic + Claude wordmark mixed
+- [ ] Tier 2 + any → Recraft todo
+- [ ] SVG output válido
+- [ ] Variants preservan structure
+- [ ] Derivations rendean
+- [ ] `app_asset_criticality: primary` (Tier 1+) → iOS + Android set
 
-**Activation**:
-- [ ] DESIGN.md parseable by Stitch
-- [ ] Stitch genera screens correctos según scope
-- [ ] Coherence gates detectan incoherencias y regeneran
-- [ ] Brand book PDF completo con todas las sections
-- [ ] Package structure dinámica correct per profile
-- [ ] README.md refleja incluidos + excluidos accurately
-- [ ] Microsite HTML opens correctly
-
-**Scope Analysis**:
-- [ ] Idea B2B SaaS clara → clasifica `b2b-smb` con confidence ≥ 0.8
-- [ ] Idea consumer mobile app clara → clasifica `b2c-consumer-app` con confidence ≥ 0.8
-- [ ] Idea híbrida B2D + community → primary/secondary ambos
-- [ ] Idea ambigua → triggers user confirmation
-- [ ] Idea local service → clasifica `b2local-service` correctamente
-- [ ] Idea sin profile → proceeds with flag
-- [ ] User override previo → manifest respeta hints
+**Handoff Compiler**:
+- [ ] Brand Design Document PDF generado completo
+- [ ] Prompts Library markdown valid con prompts customizados
+- [ ] Brand Tokens: JSON/CSS/Tailwind/HTML parseable + valid
+- [ ] Reference Assets folder structured
+- [ ] Coherence gates 8/8 enforced
+- [ ] README.md accurate
+- [ ] AUDIT.md con full trace
 
 ### Category 2 — Coherence tests
 
-Inject inputs con incoherencias deliberadas y verify que gates detectan + resolven:
+Inject inputs con incoherencias, verify gates detect + resolve:
 
-- [ ] Palette incoherente injected (Sage + neon colors) → Gate 3 detects, Visual regenerates, passes
-- [ ] Voice incoherente (Sage + voice "playful irónico") → Gate 2 detects, resolves
-- [ ] Logo illegible sobre palette → Gate 6 detects, resolves
-- [ ] Missing required screen → Gate 9 detects, re-invokes Stitch
-- [ ] 3+ persistent failures → escalation to user triggered
-- [ ] User decision "accept mismatch" → flag permanente en brand book
+- [ ] Palette incoherente (Sage + neon) → Gate 3 detects, Visual regenerates
+- [ ] Voice incoherente (Sage + playful irónico) → Gate 2 detects
+- [ ] Logo illegible → Gate 6 detects
+- [ ] Logo wordmark en scope symbolic-first → Gate 8 detects
+- [ ] 3+ persistent failures → escalation triggered
+- [ ] User "accept mismatch" → flag permanente
 
-### Category 3 — Integration tests
+### Category 3 — Claude Design compatibility tests
 
-**Happy path test**:
-- [ ] Run complete Brand against Hardcore itself (primer test real — dogfooding)
-- [ ] Run complete Brand against 3 ideas from testing/suite.yaml con distintos profiles
-- [ ] Verify end-to-end: Scope → Strategy → Verbal+Visual → Logo → Activation → Package delivered
+**Manual testing** — requires Claude Design account:
 
-**Cross-dept integration**:
-- [ ] Strategy output consumed correctly by Verbal, Visual
-- [ ] Visual palette applied in Logo dept
-- [ ] Logo + Visual + Verbal all integrated in Activation DESIGN.md
-- [ ] All paths in Engram and filesystem consistent
+- [ ] Brand Design Document PDF uploads to Claude Design onboarding without errors
+- [ ] Claude Design extracts design system correctly:
+  - Colors match palette from our Visual output
+  - Typography matches fonts from our Visual output
+  - Logo displayed correctly in design system
+- [ ] Design system validated with test project produces brand-consistent output
+- [ ] Prompts from Prompts Library produce deliverables matching brand
+- [ ] Brand Tokens folder linkable as codebase works (si user tests this path)
+- [ ] Reference Assets uploadables as visual references
 
-### Category 4 — Variance tests
+**Automated checks on PDF/markdown**:
+- [ ] PDF has all required sections per brand profile
+- [ ] PDF not corrupted (opens in standard PDF viewers)
+- [ ] Prompts library has correct structure (goal + layout + content + audience per prompt)
+- [ ] Each prompt customized with brand name, palette, voice
 
-Misma idea + profile, múltiples runs. Verificar:
+### Category 4 — Integration tests
 
-- [ ] Archetype: mismo O adjacent (Sage↔Ruler OK, Sage↔Jester fail)
+**Happy path**:
+- [ ] Dogfood contra Hardcore mismo (run Brand for Hardcore idea)
+- [ ] 3 ideas validadas del suite con distintos profiles
+- [ ] End-to-end: Scope → Strategy → Verbal+Visual → Logo → Handoff → Package delivered
+- [ ] **End-to-end con Claude Design**: user runs Brand → uploads PDF → Claude Design generates landing → matches brand expectations
+
+**Cross-dept**:
+- [ ] Strategy consumed correctly by Verbal, Visual
+- [ ] Visual palette applied in Logo
+- [ ] All integrated in Handoff brand-tokens/
+- [ ] Engram + filesystem paths consistent
+
+### Category 5 — Variance tests
+
+Misma idea + profile, múltiples runs (mismo tier):
+
+- [ ] Archetype: same o adjacent (Sage↔Ruler OK, Sage↔Jester fail)
 - [ ] Palette: same family, matices pueden variar
-- [ ] Logo concepts: distintos (esperado, creatividad)
-- [ ] Copy tagline: distinto text, mismo voice detectable
-- [ ] Weighted "coherence score" entre runs ≥ 80%
+- [ ] Logo concepts: distintos (creativity expected)
+- [ ] Copy tagline: distinto, mismo voice detectable
+- [ ] Coherence score entre runs ≥ 80% (baseline — calibrar Sprint 1)
 
-**Target**: variance aceptable porque Brand tiene componente creative, pero NO debe ser wildly different (eg: Sage → Jester) para mismo input.
+### Category 6 — Human evaluation
 
-### Category 5 — Human evaluation
-
-Subjective quality assessment — no automatable but systematic:
-
-Crear `testing/brand-human-eval-template.md`:
+`testing/brand-human-eval-template.md`:
 
 ```markdown
 # Brand Human Eval — {idea-id} — {date}
 
-## Archetype feel
-- Does the archetype feel right for this founder + idea? (1-10)
-- Specific notes:
+## Strategy quality
+- Archetype fits founder + idea? (1-10)
+- Voice attributes coherent with archetype? (1-10)
 
-## Name quality  
-- Memorable? (1-10)
-- Pronounceable? (1-10)
-- Fits the brand? (1-10)
-- Specific notes:
+## Verbal quality  
+- Name memorable? (1-10)
+- Copy exhibits voice consistently? (1-10)
 
-## Voice coherence
-- Voice feels consistent across copy? (1-10)
-- Matches the archetype? (1-10)
-- Authentic vs generic? (1-10)
-
-## Visual system
-- Palette evokes the intended mood? (1-10)
+## Visual quality
+- Palette evokes intended mood? (1-10)
 - Typography pairs well? (1-10)
-- Mood imagery representative? (1-10)
 
-## Logo
-- Logos feel like a brand? (1-10)
-- Variants work in context? (1-10)
-- SVG editability confirmed? (Y/N)
+## Logo quality
+- Feels like a brand? (1-10)
+- SVG editable? (Y/N)
+- Tier used: 0 / 1 / 2
 
-## Activation
-- Microsite looks like a real brand? (1-10)
-- Brand book professional? (1-10)
-- Package structure usable? (1-10)
+## Claude Design handoff
+- PDF uploaded to Claude Design successfully? (Y/N)
+- Design system extracted matches brand? (1-10)
+- Prompts from Library produced usable Claude Design outputs? (1-10)
 
 ## Overall
-- Would you ship this as a real brand? (Y/N)
+- Would ship this? (Y/N)
 - Specific issues:
 - What's missing?
-- What surprised positively?
 
-## Score: {average}/10
+Score: {average}/10
 ```
 
-Ejecutar human eval para cada test idea. Target: promedio ≥ 7.5/10 para pass.
+Target: promedio ≥ 7.5/10 para pass. Baseline razonable — Sprint 1 calibra con primeros 5-10 runs.
 
-### Category 6 — Regression tests
+### Category 7 — Regression tests
 
-Verify Brand no rompe otros módulos:
-
-- [ ] Validation module unaffected (suite tests siguen pasando)
+- [ ] Validation module unaffected
 - [ ] Profile module unaffected
-- [ ] Engram reads/writes consistent con conventions
-- [ ] No contamination cross-módulo (brand artifacts don't leak into validation topic keys)
+- [ ] Engram reads/writes consistent
+- [ ] No contamination cross-módulo
+
+### Category 8 — Tier-specific tests
+
+**Tier 0**:
+- [ ] All 8 profiles testable en Tier 0 (aunque degraded quality para symbolic logos)
+- [ ] Zero image gen cost verified
+- [ ] Claude SVG wordmarks quality acceptable
+- [ ] Claude-palette + Google Fonts typography quality acceptable
+
+**Tier 1**:
+- [ ] Auto-elevation triggers correctly (symbolic-first, icon-first, primary app icon)
+- [ ] User can manually elevate via --tier=1
+- [ ] Recraft integration functional
+- [ ] Unsplash integration functional
+- [ ] Huemint integration functional
+- [ ] Cost per run ~$0.10-0.20
+
+**Tier 2**:
+- [ ] User can manually set --tier=2
+- [ ] All gens via Recraft
+- [ ] Higher quality outputs verified
+- [ ] Cost per run ~$0.40-0.80
+
+**Tier degradation**:
+- [ ] Tier 2 → Tier 1 if Recraft down for mood
+- [ ] Tier 1 → Tier 0 if Recraft down entirely
+- [ ] User notified of degradation
 
 ## 14.5 Test execution process
-
-Paralelo a `testing/PROTOCOL.md` existente:
 
 ### Per-idea run
 
 1. Ensure prerequisites:
-   - Validation de la idea corrida y persistida
+   - Validation de la idea corrida
    - Profile opcional creado
-2. Run Brand in **fast mode** inicialmente (más rápido para iteration)
-3. Export results a `testing/brand-runs/{date}_{machine}_{idea-id}/`
-4. Run automated checks (structural, coherence, scope-appropriateness)
-5. Run human eval
-6. Commit run results
-7. Track in `testing/brand-runs/REGISTRY.md`
+2. Run Brand in fast mode initially
+3. Export a `testing/brand-runs/{date}_{machine}_{idea-id}/`
+4. Run automated checks (categories 1-2, 7-8)
+5. Run Claude Design compatibility tests (category 3) — manual
+6. Run human eval (category 6)
+7. Commit run results
+8. Track en `testing/brand-runs/REGISTRY.md`
 
 ### Aggregated reporting
 
 `testing/analysis/brand-coverage.md`:
-
-- Which brand profiles tested
-- Average human eval score per profile
+- Profiles tested
+- Human eval scores per profile
 - Variance metrics
+- Tier distribution
 - Failure modes encountered
 - Coverage gaps
 
-## 14.6 Test outputs directory structure
+## 14.6 Test outputs directory
 
 ```
 testing/
-├── brand-suite.yaml                          # Test ideas curadas (existing pattern)
-├── brand-human-eval-template.md              # Template para eval
-├── brand-runs/                               # Runs ejecutados
+├── brand-suite.yaml
+├── brand-PROTOCOL.md
+├── brand-human-eval-template.md
+├── brand-runs/
 │   ├── 2026-04-25_desktop_b2b-enterprise-test/
 │   │   ├── scope.json
 │   │   ├── strategy.json
 │   │   ├── verbal.json
 │   │   ├── visual.json
 │   │   ├── logo.json
-│   │   ├── activation.json
+│   │   ├── handoff.json
 │   │   ├── final-report.json
 │   │   ├── human-eval.md
+│   │   ├── claude-design-compatibility.md (manual test results)
 │   │   └── test-results.yaml
-│   ├── 2026-04-25_desktop_b2c-consumer-app-test/
 │   └── ...
 └── analysis/
     └── brand-coverage.md
@@ -298,62 +336,49 @@ testing/
 ## 14.7 Phase gates
 
 ### Pre-Sprint 1 gate
-- [ ] Plan files completos (este plan)
-- [ ] User approved plan (no major cambios pending)
-- [ ] Tool stack setup complete (Sprint 0 task)
+- [ ] Plan files completos y consistentes
+- [ ] User approved plan
+- [ ] Tool stack Tier 0 setup (minimal)
 
-### Sprint 1 → Sprint 2 gate (ready for external use)
-- [ ] All 5 depts funcionan end-to-end
+### Sprint 1 → Sprint 2 gate
+- [ ] All 5 depts funcionan end-to-end en Tier 0
 - [ ] All 8 brand profiles testable con ≥ 1 run
-- [ ] 3+ completed runs con human eval ≥ 7/10
-- [ ] Dogfooding against Hardcore itself successful
-- [ ] Coherence gates all working
-- [ ] All failure modes tested con fallbacks validated
+- [ ] 3+ runs con human eval ≥ 7/10
+- [ ] Dogfooding against Hardcore successful (Brand generado para Hardcore mismo)
+- [ ] Brand Design Document PDF testable en Claude Design account
+- [ ] Coherence gates working
+- [ ] Failure modes tested con fallbacks
 
 ### Sprint 2 → Launch gate
-- [ ] 10+ completed runs across varied ideas
+- [ ] 10+ completed runs across varied ideas + tiers
 - [ ] Human eval average ≥ 8/10
+- [ ] Claude Design compatibility verified on all 8 profiles
 - [ ] 0 critical failure modes unhandled
-- [ ] Calibration scenarios ejecutados (si decidimos crearlos — ver [22-open-decisions.md](./22-open-decisions.md))
 - [ ] Documentation complete
-- [ ] brand-contract.md stable y used por al menos 1 consumer module (future Launch module)
+- [ ] brand-contract.md stable
 
-## 14.8 Calibration scenarios (decisión pending)
+## 14.8 Calibration scenarios (deferred)
 
 Validation tiene `calibration/scenarios.md` con 13 scenarios. Brand podría tener equivalent.
 
-**Propuesta**: 8 calibration scenarios (uno per brand profile) con:
-- Fixed inputs (scope decision, validation output stub, profile stub)
-- Expected archetype range
-- Expected coherence behavior
-- Expected output structure
+**Propuesta**: 5 coherence-focused scenarios (inject incoherencias específicas, verify gates behavior). Total trabajo ~4 horas de fixture creation.
 
-**Pros**: high confidence en correctness
-**Cons**: considerable trabajo de creación (8 complete fixtures)
+**Decisión**: diferir a Sprint 1/2 — ver después de primeros runs reales si calibration necesario.
 
-**Decisión**: pending ver [22-open-decisions.md](./22-open-decisions.md).
+## 14.9 Reference file a escribir en Sprint 0
 
-## 14.9 Testing en producción (post-launch)
+`testing/brand-PROTOCOL.md` — protocolo detallado.
 
-Future considerations (out of scope v1 plan pero worth noting):
+## 14.10 Acceptance criteria final
 
-- **A/B testing infrastructure**: generate 2 archetypes for same idea, user picks preferred, learn preferences
-- **Satisfaction tracking**: post-delivery survey, score por idea
-- **Usage analytics**: track qué deliverables se usan realmente
-- **Auto-improvement**: flagged outputs inform prompt tuning
+Brand "production-ready" cuando:
 
-## 14.10 Reference file a escribir en Sprint 0
-
-`testing/brand-PROTOCOL.md` — protocolo detallado paralelo al `testing/PROTOCOL.md` existente.
-
-## 14.11 Acceptance criteria final del módulo
-
-Brand se declara "production-ready" cuando:
-
-- [ ] Todos los unit tests pass (Categories 1-2)
-- [ ] Integration tests (Category 3) pass on all 8 brand profiles
-- [ ] Variance tests (Category 4) muestran consistency aceptable
-- [ ] Human eval (Category 5) promedio ≥ 8/10 across 10+ runs
-- [ ] Regression tests (Category 6) pass — no break de Validation/Profile
-- [ ] Failure modes documentados y tested (Category dedicada)
-- [ ] Dogfooding: Brand generado para Hardcore mismo, se usa para el lanzamiento real
+- [ ] Unit tests pass (Cats 1-2)
+- [ ] Integration tests pass on all 8 profiles (Cat 4)
+- [ ] Claude Design compatibility confirmed (Cat 3)
+- [ ] Variance tests OK (Cat 5)
+- [ ] Human eval ≥ 8/10 across 10+ runs (Cat 6)
+- [ ] Regression tests pass (Cat 7)
+- [ ] All tiers tested (Cat 8)
+- [ ] Failure modes documented y tested
+- [ ] Dogfooding: Brand generado para Hardcore, usado para lanzamiento real

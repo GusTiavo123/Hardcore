@@ -2,276 +2,163 @@
 
 ## 5.1 Propósito
 
-Todo lo **verbal** — naming con verificación externa + todo el copy aplicado. Una sola voice expresada en formatos distintos.
+Todo lo **verbal** que nuestro módulo produce — **naming con verificación externa + core copy assets** que alimentan el Brand Document + viajan a los prompts del Prompts Library.
 
-**Por qué naming + copy están juntos**: ambos son expresiones de la misma voice. Separarlos significa dos agentes interpretando voice distinto → disonancia entre nombre y copy. La verificación de naming (domain + TM) es un subprocess interno del depto.
+Verbal Identity genera solo lo necesario para alimentar el brief:
+
+- Naming (completo con verification)
+- Core copy: tagline, hero headline/sub, value props, about short, CTAs, pitch one-liner
+- Voice examples (do/don'ts rendered con copy samples)
+
+**El copy específico long-form** (emails completos, sample social posts long-form, press releases completas, long-form about) lo **genera Claude Design** cuando el user ejecuta los prompts del Prompts Library, usando nuestros voice attributes como guía.
 
 ## 5.2 Inputs
 
 ### Obligatorios
-- `brand/{slug}/scope` (manifest — determina qué copy assets generar)
+- `brand/{slug}/scope` (manifest — determina qué core copy assets generar)
 - `brand/{slug}/strategy` (archetype, voice_attributes, positioning, target, brand_values, promise)
 
 ### Opcionales
 - Profile (idioma primario, cultural context, target_geographies)
 - Validation Problem + Competitive (categoría del mercado, terminología del industry)
 
-## 5.3 Proceso — 5 fases
+## 5.3 Proceso — 4 fases
 
 ### Fase A — Naming generation
 
-**Paso 1: Generar 15-20 candidatos** usando múltiples estrategias, con preferencia modulada por `scope.intensity_modifiers.logo_primary_form` y brand profile:
+**Paso 1: Generar 15-20 candidatos** usando múltiples estrategias, modulado por scope:
 
-| Estrategia | Descripción | Preferido en |
-|---|---|---|
-| Descriptive | Explica qué hace | `b2b-enterprise`, `b2b-smb` |
-| Compound | Dos conceptos fusionados | B2B, dev tools |
-| Abstract | No describe, se convierte en marca | Consumer, movements, luxury |
-| Invented | Palabra nueva pronunciable | Consumer apps, dev tools |
-| Metaphorical | Imagen evocativa | Community, content, movements |
-| Acronym functional | Siglas con significado | B2B dev tools |
-| Founder-derived | Usa nombre del founder | Consultoría, content-creator |
-| Place-derived | Referencia lugar | Local services, regional brands |
-| Number/word-play | Juegos con números o palabras | Consumer apps, creator brands |
-
-Cada estrategia produce 2-4 candidatos. Mix balanceado entre las 3-4 más relevantes según scope.
+| Estrategia | Preferida en |
+|---|---|
+| Descriptive | `b2b-enterprise`, `b2b-smb` |
+| Compound | B2B, dev tools |
+| Abstract | Consumer, movements, luxury |
+| Invented | Consumer apps, dev tools |
+| Metaphorical | Community, content, movements |
+| Acronym functional | B2B dev tools |
+| Founder-derived | Consultoría, content-creator |
+| Place-derived | Local services, regional |
+| Number/word-play | Consumer apps, creator brands |
 
 **Paso 2: Filtro inicial** (Claude reasoning):
-
-- Pronunciable en target_geographies (inglés default + idiomas de las geografías)
-- Spelling-forgiving (si alguien escucha el nombre, puede escribirlo correctamente)
-- No colisión con términos técnicos del space
-- Memorable en 3 segundos (subjetivo pero evaluable)
-- 4-10 caracteres idealmente (flexible, pero <12 para consumer)
+- Pronunciable en target_geographies
+- Spelling-forgiving
+- No colisión con términos técnicos
+- Memorable en 3 segundos
+- 4-12 caracteres idealmente
 
 Reducir de 15-20 a **10-12 candidates** para verification.
 
-### Fase B — Verification (paralelo para todos los candidatos)
+### Fase B — Verification (paralelo)
 
-**Paso 3: Domain availability check**
+**Paso 3: Domain availability** vía `imprvhub/mcp-domain-availability`:
+- TLDs: `.com`, `.io`, `.ai`, `.app`, `.co` + geografías de profile
+- Bulk request para los 10-12 candidatos
 
-Tool: `imprvhub/mcp-domain-availability` (ver [11-tools-stack.md](./11-tools-stack.md))
+**Paso 4: Trademark screening** vía `open-websearch`:
+- Queries dirigidas por jurisdicción (USPTO, EUIPO, INPI, IMPI, SIC)
+- Flags: green / yellow / red
+- **Disclaimer obligatorio**: "Screening preliminar. No sustituye consulta legal."
 
-TLDs a chequear:
-- Always: `.com`, `.io`, `.ai`, `.app`, `.co`
-- Por profile.target_geographies: `.mx`, `.co`, `.ar`, `.cl`, `.uy`, `.br`, `.pe`, `.us` (LATAM), `.de`, `.fr`, `.es`, `.uk` (EU), etc.
+**Paso 5: Linguistic check**:
+- Connotaciones negativas en target_geographies
+- Existing brand collisions
 
-Bulk request para los 10-12 candidatos simultáneamente.
+### Fase C — Ranking + Selection
 
-Response esperada:
-```json
-{
-  "Auren": {
-    ".com": "available",
-    ".io": "taken",
-    ".ai": "available",
-    ".app": "available",
-    ".mx": "available"
-  },
-  "RegClarity": {...}
-}
-```
+**Paso 6: Weighted scoring**:
+- Availability (domain + TM): 40%
+- Strategic fit (archetype + positioning): 30%
+- Memorability/pronunciability: 20%
+- Linguistic safety: 10%
 
-**Paso 4: Trademark screening**
+**Paso 7: User selection**:
+- Top 5-7 presentados
+- User pick o auto-pick en fast mode / dominant candidate
 
-Tool: `open-websearch` (ver [11-tools-stack.md](./11-tools-stack.md))
+### Fase D — Core copy generation (con nombre locked)
 
-Queries dirigidas por jurisdicción:
+**Paso 8: Generar core copy assets** definidos en `scope.output_manifest` para Verbal:
 
-- USPTO: `"{candidato}" site:tsdr.uspto.gov`
-- EUIPO: `"{candidato}" site:tmview.europa.eu`
-- INPI Argentina: `"{candidato}" site:inpi.gob.ar` (si geography incluye AR)
-- IMPI México: `"{candidato}" site:gob.mx/impi` (si MX)
-- SIC Colombia: `"{candidato}" site:sic.gov.co` (si CO)
-- INAPI Chile: si CL
-- INPI Brasil: si BR
+#### Core assets (casi todos los scopes)
 
-Por cada candidato, Claude analiza resultados:
-
-- **Green**: sin hits, o hits en categoría claramente no relacionada (ej: nombre de marca de comida vs software)
-- **Yellow**: hits en categoría adjacente o no definitivo — precaución
-- **Red**: hit exacto en misma categoría — bloqueante
-
-**Disclaimer obligatorio en output**: *"Screening preliminar. Los resultados dependen de la precisión de la búsqueda web y no sustituyen una consulta con un profesional de propiedad intelectual."*
-
-**Paso 5: Linguistic check**
-
-Claude reasoning sobre cada candidato:
-
-- Connotaciones negativas en idiomas de target_geographies
-- Malas traducciones / cognados peligrosos
-- Existing brand collisions en el space (brands conocidas con nombre similar)
-
-Output: green / yellow / red per candidate, con explanation si flag.
-
-### Fase C — Ranking
-
-**Paso 6: Weighted scoring** de los 10-12 candidatos:
-
-| Factor | Weight | Scoring |
+| Asset | Descripción | Variants |
 |---|---|---|
-| Availability (domain + TM green) | 40% | `.com` libre = 10; `.com` taken pero alternatives libres = 6; all taken = 2; TM red = 0 |
-| Strategic fit (archetype + positioning) | 30% | Claude reasoning 0-10 |
-| Memorability / pronunciability | 20% | Claude reasoning 0-10 |
-| Linguistic safety | 10% | Binary (red = 0, else 10) |
-
-Total: 0-10 score por candidato.
-
-### Fase D — Selection
-
-**Paso 7: Present top 5-7 al user**:
-
-```
-Nombre         .com  .io  .ai  .mx   TM   Fit  Mem  Score
-Auren           ✓    ✓    ✓    ✓    ✓    9    9    9.1  ← top
-RegClarity      ✗    ✓    ✓    ✓    ✓    9    8    8.2
-Auditora        ✓    ✗    ✓    ✓    ⚠    7    7    6.5
-Halo            ✗    ✗    ✗    ✗    ⚠    8    9    4.8
-Watchtower      ✓    ✓    ✓    ✗    ✓    8    7    7.8
-Veritas         ✗    ✗    ✓    ✓    ⚠    8    8    6.3
-
-Recomendado: Auren
-  - Todos dominios libres
-  - TM clean en screening preliminar
-  - Fit fuerte con archetype Sage (abstract, memorable)
-  - Fácil pronunciar y escribir en ES/EN
-
-¿Elegís Auren, otro, o querés más opciones?
-```
-
-**Decisión**:
-- User pick explícito
-- Auto-pick en fast mode O si top candidato domina (score > 2nd by 15%)
-- Si user pide más opciones: regenerate con feedback ("quiero algo más corto" / "menos abstracto")
-
-### Fase E — Copy generation
-
-Con nombre locked, generar **todos los copy assets definidos en `scope.output_manifest.required` + `optional_recommended` para Verbal**.
-
-**Paso 8: Generar cada asset** aplicando:
-- Voice attributes del Strategy
-- Register de intensity_modifiers
-- Copy_depth modulation
-- Idioma primario del scope
-
-**Asset list expandida** (qué se genera según scope):
-
-#### Core (casi todos los scopes)
-| Asset | Descripción | Variants típicas |
-|---|---|---|
-| Tagline | Frase icónica de la marca | 3 versiones (corta 2-4 words, media 5-7 words, aspiracional 8+ words) |
-| Hero headline | Primera impresión de landing | 1 primary + 2 alternatives |
+| Tagline | Frase icónica | 3 (corta 2-4w, media 5-7w, aspiracional 8+w) |
+| Hero headline | Primera impresión landing | 1 primary + 2 alternatives |
 | Hero subheadline | Support al headline | 1 |
 | Value propositions | Por qué elegir | 3 versiones (1-line, paragraph, 3-bullet-list) |
-| About section short | 1 párrafo | 1 |
-| About section medium | 3 párrafos | 1 |
+| About short | 1 párrafo | 1 |
+| About medium | 3 párrafos | 1 |
 | CTA copy | Primary + secondary | 2 |
 | Pitch one-liner | Elevator | 1 |
-| FAQ seed | 10 Q&As en voice | 10 |
+| FAQ seed | 10 Q&As seed | 10 |
 
-#### Social presence
+#### Social bios core (por scope)
+
 | Asset | Scope que lo triggerea |
 |---|---|
-| LinkedIn bio company | B2B, B2D, content-creator con LinkedIn |
-| LinkedIn bio personal | B2B, B2D, content-creator |
-| LinkedIn sample posts (5) | B2B, B2D |
-| Twitter/X bio (160 chars) | B2D, content-media, consumer-web |
-| Twitter/X sample posts (5-10) | B2D, content-media |
+| LinkedIn bio company + personal | B2B, B2D |
+| Twitter/X bio (160 chars) | B2D, content-media, b2c-web |
 | Instagram bio (150 chars) | consumer-app, consumer-web, content-media, local |
-| Instagram sample posts (10) | consumer-app, consumer-web, content-media |
-| TikTok bio (80 chars) | consumer-app, content-media (if younger target) |
-| TikTok post concepts (5) | consumer-app |
+| TikTok bio (80 chars) | consumer-app, content-media (young target) |
 
-#### Email & communications
+#### Pitch materials core (condicional)
+
+| Asset | Scope |
+|---|---|
+| Pitch 30s | `b2b-enterprise`, `b2b-smb`, some `b2c` |
+| Pitch deck cover slide copy | `b2b-enterprise` required |
+
+#### Communication core
+
 | Asset | Scope |
 |---|---|
 | Email signature | Most scopes |
-| Welcome email | SaaS scopes |
-| Transactional emails (set) | SaaS scopes |
-| Onboarding email sequence (5 emails) | `b2b-smb`, `b2c-consumer-web` |
-| Press release boilerplate | `b2b-enterprise`, `b2b-smb` optional |
-| WhatsApp greeting | `b2local-service` |
-| WhatsApp FAQ | `b2local-service` |
-| WhatsApp booking confirmation | `b2local-service` |
+| WhatsApp greeting seed | `b2local-service` |
 | Phone greeting script | `b2local-service` |
 
-#### Pitch materials
-| Asset | Scope |
-|---|---|
-| Pitch 30s (investor) | `b2b-enterprise`, `b2b-smb`, some `b2c` |
-| Pitch deck cover slide copy | `b2b-enterprise` required, others optional |
-| Pitch deck 10-slide template | `b2b-enterprise` |
-
-#### Sales materials (B2B)
-| Asset | Scope |
-|---|---|
-| Case study template | `b2b-enterprise` required, `b2b-smb` optional |
-| Whitepaper boilerplate | `b2b-enterprise` |
-| Comparison vs competitors | `b2b-smb` |
-
-#### Content
-| Asset | Scope |
-|---|---|
-| Blog post template | `b2b-smb`, `b2d-devtool`, `content-media` |
-| Newsletter template | `content-media`, some `b2c-consumer-web` |
-| Podcast show notes template | `content-media` (if podcast) |
-| Video description template | `content-media` (if video) |
-| Podcast cover copy | `content-media` |
-
 #### Developer-specific (b2d-devtool)
+
 | Asset | Scope |
 |---|---|
-| GitHub README template | `b2d-devtool` |
-| Docs homepage copy | `b2d-devtool` |
-| CLI help text style | `b2d-devtool` |
-| Code snippet comments style | `b2d-devtool` |
+| GitHub README excerpt | `b2d-devtool` |
+| CLI help text seed | `b2d-devtool` |
+
+#### Community (community-movement)
+
+| Asset | Scope |
+|---|---|
+| Manifesto opening + structure | `community-movement` |
+| Recruiting copy core | `community-movement` |
 
 #### Consumer app (b2c-consumer-app)
+
 | Asset | Scope |
 |---|---|
 | App store description short | `b2c-consumer-app` |
 | App store description long | `b2c-consumer-app` |
-| Onboarding screen copy | `b2c-consumer-app` |
-| Push notification templates | `b2c-consumer-app` |
-| Referral/share copy | `b2c-consumer-app` |
 
-#### Community (community-movement)
-| Asset | Scope |
-|---|---|
-| Manifesto document (structured) | `community-movement` |
-| Member onboarding sequence | `community-movement` |
-| Recruiting copy | `community-movement` |
-| Code of conduct template | `community-movement` |
-| Discord/Slack welcome | `community-movement` |
+**Lo que NO generamos aquí (delegado a Claude Design)**:
+- Emails completos (welcome sequence, onboarding sequence) — prompt va en Library
+- Sample social posts 5-10 long-form — prompt va en Library
+- Press release completo — prompt va en Library
+- Full case study — prompt va en Library
+- Blog post completo — prompt va en Library
+- Email template HTML aplicado — Claude Design
 
-#### Local (b2local-service)
-| Asset | Scope |
-|---|---|
-| Google My Business copy | `b2local-service` |
-| Printable flyer copy | `b2local-service` |
-| Menu copy (if food) | `b2local-service` food subset |
-| Business card copy | `b2local-service` |
-| Signage copy direction | `b2local-service` |
+### Paso 9: Voice self-check
 
-### Paso 9: Self-check de voice
-
-Cada asset generado pasa por self-check interno:
-
-```
-for each copy_asset:
-  does_exhibit_voice = claude_check(copy_asset, voice_attributes)
-  if not does_exhibit_voice:
-    regenerate with explicit voice reminder
-    max 2 retries
-```
-
-Si después de 2 retries no exhibe voice, flag pero incluir (el user puede ajustar manualmente).
+Cada asset pasa por self-check interno:
+- ¿Exhibe detectably los voice attributes?
+- Si no: regenerate con voice reminder, max 2 retries
+- Si persiste: include con flag
 
 ## 5.4 Tools
 
-- **`imprvhub/mcp-domain-availability`** — domain verification (ver [11-tools-stack.md](./11-tools-stack.md))
-- **`open-websearch`** — trademark screening + linguistic research
-- **Claude native** — toda la generación verbal (naming + copy)
+- `imprvhub/mcp-domain-availability` — domain verification
+- `open-websearch` — trademark + linguistic research
+- Claude native — toda la generación verbal
 
 ## 5.5 Output schema
 
@@ -280,87 +167,68 @@ Si después de 2 retries no exhibe voice, flag pero incluir (el user puede ajust
   "schema_version": "1.0",
   "status": "ok",
   "department": "verbal",
-  "scope_ref": "brand/{slug}/scope",
-  "strategy_ref": "brand/{slug}/strategy",
+  "scope_ref": "...",
+  "strategy_ref": "...",
   
   "naming_artifact": {
-    "candidates_all": [
-      {
-        "name": "Auren",
-        "strategy": "abstract",
-        "rationale": "evocativo, corto, pronunciable ES/EN, no-descriptive permite category expansion"
-      },
-      ...18 more
-    ],
-    "candidates_verified": [
-      {
-        "name": "Auren",
-        "domain_availability": {
-          ".com": "available",
-          ".io": "available",
-          ".ai": "available",
-          ".app": "available",
-          ".mx": "available"
-        },
-        "trademark_screening": {
-          "uspto": "green (no hits)",
-          "euipo": "green",
-          "impi": "green",
-          "flag": "green"
-        },
-        "linguistic_check": {
-          "flag": "green",
-          "notes": "Sin connotaciones negativas detectadas en ES, EN, PT"
-        },
-        "strategic_fit_score": 9,
-        "memorability_score": 9,
-        "total_score": 9.1
-      },
-      ...6 more
-    ],
+    "candidates_all": [...20 candidates],
+    "candidates_verified": [...7 top candidates con verification matrix],
     "chosen": "Auren",
     "chosen_rationale": "...",
     "user_selection_method": "user-picked | auto-picked | dominant-auto-picked",
-    "disclaimer": "Screening preliminar. No sustituye consulta legal profesional."
+    "disclaimer": "Screening preliminar. No sustituye consulta legal."
   },
   
-  "copy_artifact": {
+  "core_copy_artifact": {
     "taglines": [
       {"length": "short", "text": "Audit the audits."},
-      {"length": "medium", "text": "Regulatory audits, simplified."},
-      {"length": "aspirational", "text": "Because compliance should be clear, not cryptic."}
+      {"length": "medium", "text": "..."},
+      {"length": "aspirational", "text": "..."}
     ],
     "hero": {
-      "primary": {
-        "headline": "Stop drowning in compliance spreadsheets.",
-        "subheadline": "Auren converts 40-hour regulatory audits into 2 supervised hours."
-      },
+      "primary": {"headline": "...", "subheadline": "..."},
       "alternatives": [...]
     },
     "value_props": {
-      "one_line": "Cut audit time from 40h to 2h without sacrificing rigor.",
+      "one_line": "...",
       "paragraph": "...",
       "three_bullets": ["...", "...", "..."]
     },
-    "about": {
-      "short": "...",
-      "medium": "..."
-    },
-    "cta": {
-      "primary": "See it on your own data →",
-      "secondary": "Watch 2-min demo"
-    },
+    "about": {"short": "...", "medium": "..."},
+    "cta": {"primary": "...", "secondary": "..."},
     "pitch": {
       "one_liner": "...",
       "thirty_seconds": "..."
     },
-    "social": {
-      "linkedin_bio_company": "...",
-      "linkedin_bio_personal": "...",
-      "linkedin_sample_posts": [...5 posts]
+    "social_bios": {
+      "linkedin_company": "...",
+      "linkedin_personal": "...",
+      "twitter": "...",
+      "instagram": "...",
+      "tiktok": "..."
     },
-    "emails": {...},
-    ...more assets según scope
+    "communications_core": {
+      "email_signature": "...",
+      "whatsapp_greeting_seed": "..." (si b2local-service),
+      "phone_greeting_script": "..." (si b2local-service)
+    },
+    "specialized_by_scope": {
+      // b2d-devtool:
+      "github_readme_excerpt": "...",
+      "cli_help_seed": "...",
+      // b2c-consumer-app:
+      "app_store_short": "...",
+      "app_store_long": "...",
+      // community-movement:
+      "manifesto_opening": "...",
+      "recruiting_copy": "...",
+      // b2b-enterprise:
+      "pitch_deck_cover_slide": "..."
+    },
+    "faq_seed": [
+      {"q": "...", "a": "..."},
+      ...10 total
+    ]
   },
   
   "self_check_results": {
@@ -384,92 +252,90 @@ Si después de 2 retries no exhibe voice, flag pero incluir (el user puede ajust
 ```
 [7:14] ② Verbal Identity — verificando 12 candidatos...
 
-    [Progress: domain check ✓ · trademark screening ✓ · linguistic check ✓]
+[Progress: domain check ✓ · trademark screening ✓ · linguistic check ✓]
 
 [9:14] Top 7 nombres
 
-    Nombre         .com  .io  .ai  .mx   TM   Fit  Mem  Score
-    Auren           ✓    ✓    ✓    ✓    ✓    9    9    9.1  ← top
-    ...
+Nombre         .com  .io  .ai  .mx   TM   Fit  Mem  Score
+Auren           ✓    ✓    ✓    ✓    ✓    9    9    9.1  ← top
+RegClarity      ✗    ✓    ✓    ✓    ✓    9    8    8.2
+...
 
-    Recomendado: Auren — todos dominios libres, TM clean, fit fuerte Sage.
+Recomendado: Auren — todos dominios libres, TM clean, fit Sage fuerte.
 
-    ¿Auren, otro, o más opciones?
+¿Auren, otro, o más opciones?
 ```
 
-User pick. Entonces:
-
-### Reveal final (copy)
+### Reveal final (core copy)
 
 ```
-[11:02] Copy generado
+[11:02] Core copy generado
 
-  Voice applied: {claro · autorizante · directo · empático-técnico}
+Voice applied: {claro · autorizante · directo · empático-técnico}
 
-  HERO
-    "Stop drowning in compliance spreadsheets."
-    "Auren converts 40-hour regulatory audits into 2 supervised hours."
-    [See it on your own data →]
+HERO
+  "Stop drowning in compliance spreadsheets."
+  "Auren converts 40-hour regulatory audits into 2 supervised hours."
+  CTA: "See it on your own data →"
 
-  TAGLINE
-    "Audit the audits."
+TAGLINE
+  "Audit the audits."
 
-  + 18 assets más (value props, about, emails, LinkedIn, press release, ...)
-     [Ver todos en brand/verbal output]
++ 12 assets más (value props, about, social bios, ...)
 
-  Disclaimer: TM screening preliminar. Consultá abogado antes de registrar.
+Note: copy específico por deliverable (emails completos, posts largos)
+se genera via Claude Design usando los prompts del Library.
 ```
 
 ## 5.8 Relación con otros deptos
 
-**Logo consume** el nombre para wordmarks + OG card design
-**Activation consume** todo el copy para llenar el microsite generado por Stitch
+**Logo consume**:
+- Nombre elegido para wordmarks + OG card
+- Tagline para OG card
+
+**Handoff Compiler consume**:
+- Naming artifact → sección naming del Brand Document + metadata del package
+- Core copy → Brand Document samples + inyectado en prompts del Library
+- Voice examples → Brand Document voice section + referenced por cada prompt
 
 ## 5.9 Failure modes específicos
 
 ### 0 candidatos pasan verification
-Todos tienen domain taken + TM red. Raro pero posible en spaces saturados (ej: fintech US).
-
-- Acción: presentar candidatos con conflicts matrix al user
-- User decide: agregar TLDs alternativos (`.tech`, `.finance`), usar modifier prefijo/suffix ("Get{Name}", "{Name}HQ"), o regenerate completamente con constraint "must be >6 chars" o "must be invented word"
+- Present raw candidates con conflicts matrix
+- User decide: accept risk, regenerate con constraints, manual name
 
 ### Domain MCP down
-- Retry 3×
-- Si persiste: skip verification, present candidatos con flag "verification no completada — chequear manualmente"
+- Retry 3× → skip verification con flag explícito
 
 ### Trademark search ambiguo
-Muchos yellow flags (posibles conflicts no definitivos).
-- Flag en output
-- User decide si proceder (disclaimer obligatorio)
+- Muchos yellow flags → flag, user decide (disclaimer obligatorio)
 
-### User rechaza todas las opciones
-Ej: 3 rounds de regeneration, user no le gusta ninguna.
-- Tras 3 rounds, ofrecer modo "user provides name directly" — user da su nombre preferido y el dept lo verifica + genera copy
+### User rechaza 3+ rounds
+- Offer "manual name" mode
 
 ### Copy self-check falla persistently
-Asset generado no exhibe voice tras 2 retries.
-- Flag el asset
-- Incluir en output con annotation "voice compliance low — revisar manualmente"
+- Include con annotation "voice compliance low — review manually"
 
 ## 5.10 SKILL.md a escribir en Sprint 0
 
-`skills/brand/verbal/SKILL.md` con las 5 fases detalladas, asset list completa, self-check logic.
+`skills/brand/verbal/SKILL.md` con las 4 fases detalladas + asset list completa + self-check logic.
 
 ## 5.11 Reference files a escribir en Sprint 0
 
 - `skills/brand/verbal/references/data-schema.md`
-- `skills/brand/verbal/references/verification-protocol.md` — queries precisas por jurisdicción, interpretation rules
-- `skills/brand/verbal/references/naming-strategies-by-profile.md` — mapping profile → preferred naming strategies
-- `skills/brand/verbal/references/copy-asset-matrix.md` — qué assets por brand profile (matriz completa)
-- `skills/brand/verbal/references/voice-application-examples.md` — ejemplos per voice attribute de do/don'ts en cada asset type
+- `skills/brand/verbal/references/verification-protocol.md` — queries precisas por jurisdicción
+- `skills/brand/verbal/references/naming-strategies-by-profile.md`
+- `skills/brand/verbal/references/core-copy-matrix.md` — qué core assets por brand profile (reduced version)
+- `skills/brand/verbal/references/voice-application-examples.md` — ejemplos do/don'ts
 
 ## 5.12 Testing
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Given Strategy con voice específico → todos los assets exhibit voice detectably
+1. Given Strategy con voice específico → todos los core assets exhibit voice detectably
 2. Naming con `.com` todos taken → presenta alternatives gracefully
-3. Trademark screening con hits rojos → los excluye del top 5
+3. Trademark screening con hits rojos → excluye del top 5
 4. Fast mode → auto-picks correctamente
-5. Scope b2b-enterprise → genera pitch deck copy, NO genera TikTok bio
-6. Scope b2c-consumer-app → genera app store descriptions, NO pitch deck formal
+5. Scope b2b-enterprise → genera pitch deck cover copy, NO generate TikTok bio
+6. Scope b2c-consumer-app → genera app store descriptions
+7. Scope community-movement → genera manifesto opening

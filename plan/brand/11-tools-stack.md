@@ -1,176 +1,190 @@
-# 11 — Stack de Tools
+# 11 — Stack de Tools (Tier-based)
 
 ## 11.1 Propósito
 
-Documentar cada tool/API/skill que el módulo Brand usa, con justificación explícita de por qué esa y no otra.
+Documentar cada tool/API/skill que Brand usa, con justificación explícita. Claude Design como downstream, image generation en 3 tiers para cost control.
 
-**Principio de decisión**: "agregar una herramienta cuando existe una operación genuinamente distinta, o un diferencial de calidad grande. No agregar porque es mejor marginal para su nicho."
+**Principio de decisión**: agregar una herramienta cuando existe una operación genuinamente distinta, o un diferencial de calidad grande. No agregar "porque es mejor marginal".
 
-## 11.2 Resumen del stack
+## 11.2 Stack por tier
 
-| Capacidad | Tool | Tipo | Costo | Quién lo usa |
-|---|---|---|---|---|
-| Persistencia memoria | Engram MCP | Existing | Free | Orchestrator + todos los deptos |
-| Web search general | open-websearch MCP | Existing | Free | Verbal (TM screening) |
-| PDF generation | `ms-office-suite:pdf` skill | Existing | Free | Activation |
-| UI generation | Stitch MCP | **Nuevo** | Free 350/mes | Activation |
-| Image generation (logos + mood) | Recraft V4 via `merlinrabens/image-gen-mcp-server` | **Nuevo** | $0.04/img | Visual, Logo |
-| Color palette ML | Huemint API | **Nuevo** (HTTP directo) | Free non-commercial | Visual |
-| Domain availability | `imprvhub/mcp-domain-availability` | **Nuevo** | Free | Verbal |
-| Claude native (reasoning, NL) | N/A | Existing | — | Todos |
+### Tier 0 — DEFAULT (zero cost)
+
+Para: dogfooding, early stage, vos mismo usando Hardcore.
+
+| Capacidad | Tool | Costo |
+|---|---|---|
+| Persistencia memoria | Engram MCP | Free |
+| Web search (TM screening) | open-websearch MCP | Free |
+| PDF generation | `ms-office-suite:pdf` skill | Free |
+| Domain availability | `imprvhub/mcp-domain-availability` | Free |
+| Logo SVG generation (wordmarks) | Claude native | Free |
+| Palette generation | Claude native (color theory reasoning) | Free |
+| Typography pairing | Claude native + Google Fonts catalog | Free |
+| Mood imagery | **Skipped** (usa description en Brand Document) | Free |
+| Claude reasoning | Claude subscription | Included |
+| **Downstream execution** | **Claude Design** (requires Pro/Max/Team/Enterprise) | Included in subscription |
+
+**Total cost/run: ~$0.00**
+
+### Tier 1 — Leveled up (cuando scope lo requiere o user opta)
+
+Agrega (vs Tier 0):
+
+| Capacidad | Tool | Costo |
+|---|---|---|
+| Symbolic logo generation | **Recraft V4** via `merlinrabens/image-gen-mcp-server` | $0.04/img × 3-5 = $0.12-0.20 |
+| Mood imagery references | **Unsplash API** (free 50req/h demo) | Free |
+| Palette ML | **Huemint API** (free non-commercial) | Free en early stage |
+
+**Total cost/run: ~$0.10-0.20**
+
+**Cuándo se activa**:
+- Auto-elevation: `scope.logo_primary_form: symbolic-first` o `icon-first`
+- User override: `/brand:new --tier=1`
+
+### Tier 2 — Premium
+
+Agrega (vs Tier 1):
+
+| Capacidad | Tool | Costo |
+|---|---|---|
+| Logo completo via Recraft | Recraft V4 para todos los logos + variants + derivations | $0.04 × 10-20 = $0.40-0.80 |
+| Mood imagery generated | Recraft V4 | $0.04 × 6-8 = $0.24-0.32 |
+| Huemint paid tier | Commercial license | ~$10-50/mo estimated |
+
+**Total cost/run: ~$0.40-0.80 + subscription Huemint**
+
+**Cuándo se activa**: user override `/brand:new --tier=2`
 
 ## 11.3 Tools existentes (ya en Hardcore)
 
 ### Engram MCP
 - **Uso**: persistencia cross-session, retrieval de Validation + Profile
-- **Justificación**: core del ecosistema Hardcore, no se cuestiona
-- **Reference**: existing `skills/_shared/engram-convention.md`
+- **Justificación**: core del ecosystem Hardcore
+- **Reference**: `skills/_shared/engram-convention.md`
 
 ### open-websearch MCP
-- **Uso**: trademark screening (Verbal Identity Fase B Paso 4)
+- **Uso**: trademark screening (Verbal Fase B Paso 4)
 - **Justificación**: existente en el repo, suficiente para screening preliminar
-- **Limitación**: búsqueda web no sustituye trademark search API profesional (disclaimer obligatorio)
+- **Limitación**: no sustituye trademark search API profesional (disclaimer obligatorio)
 
 ### `ms-office-suite:pdf` skill
-- **Uso**: generación del brand book PDF (Activation Paso 4)
-- **Justificación**: skill existente disponible en el harness, no hay necesidad de agregar otro tool
-- **Alternativa considerada**: Pandoc + LaTeX — rejected porque más complejo, requires setup, el skill nativo es suficiente
+- **Uso**: generación del Brand Design Document PDF (Handoff Compiler Paso 2)
+- **Justificación**: skill existente, no hay necesidad de agregar otro tool
 
-## 11.4 Tools nuevas (a agregar al stack)
+## 11.4 Tools nuevas — Tier 0
 
-### Stitch MCP (`@_davideast/stitch-mcp`)
+### Claude native SVG generation (logo + mood description)
 
-**Uso**: generación de UI (landing pages, social post templates, email templates, pitch deck cover) en Activation.
-
-**Justificación**:
-- Google Stitch es estado del arte en 2026 para UI generation
-- Gemini 3 Flash / 3.1 Pro — mejor que lo que podríamos construir con templates HTML manuales
-- MCP oficial para Claude Code — integration natural
-- 350 generations/mes free tier (suficiente para 50+ runs de Brand)
-- Output: HTML + CSS + Tailwind + React + Figma export — todos los formatos que necesitamos
-- DESIGN.md mechanism permite inyectar nuestras decisiones de marca
-
-**Trade-off aceptado**: dependencia de servicio externo Google Labs. User decidió Opción B (full-send sin hedge) — ver [22-open-decisions.md](./22-open-decisions.md).
-
-**Setup requerido** (user debe hacer en su entorno):
-1. `npx @_davideast/stitch-mcp init`
-2. Autenticar con cuenta Google
-3. Configurar MCP server en Claude Code settings
-
-**Ubicación en pipeline**: Paso 2 de Activation
-
-**Alternativas consideradas y rechazadas**:
-- Build HTML templates manualmente — lower quality, más maintenance, pierde wow factor
-- v0 (Vercel) — similar but less integrated with Claude Code ecosystem
-- Figma AI — más design-focused pero no genera código deployable
-
-**Reference docs**:
-- Setup guide: [sotaaz.com/post/stitch-mcp-guide-en](https://www.sotaaz.com/post/stitch-mcp-guide-en)
-- GitHub: [davideast/stitch-mcp](https://github.com/davideast/stitch-mcp)
-- 7 open skills: [google-labs-code/stitch-skills](https://github.com/google-labs-code/stitch-skills)
-
-### Recraft V4 via `merlinrabens/image-gen-mcp-server`
-
-**Uso**: 
-- Visual System: mood imagery generation (6-8 images por run)
-- Logo: logo generation (4-5 concepts + variants + derivations)
-
-**Justificación de Recraft V4**:
-- **#1 en benchmarks de HuggingFace para logos en 2026**
-- **SVG vector nativo** — esto es crítico. SVG editables, escalables, permanent; PNG raster es artefacto muerto para un logo
-- Logo-specialized training (built-in brand styling tools)
-- Costo: $0.04/imagen — mismo rango que DALL-E 3 pero specialized
-
-**Justificación del MCP multi-provider** (vs dedicated Recraft MCP):
-- `merlinrabens/image-gen-mcp-server` soporta múltiples providers via env vars
-- Permite swap sin cambiar código si en futuro queremos Flux 2 Pro o Ideogram para casos específicos
-- Mantener flexibilidad arquitectónica
-
-**Setup requerido** (user):
-1. Crear cuenta en Recraft (platform.recraft.ai)
-2. Obtener API key
-3. Instalar MCP server: `npm install -g @merlinrabens/image-gen-mcp-server` (o similar command per README)
-4. Configurar env var `RECRAFT_API_KEY` y `IMAGE_GEN_PROVIDER=recraft`
-
-**Alternativas consideradas y rechazadas**:
-- DALL-E 3 — older (2023), raster only (vs SVG), less logo-specialized
-- Flux 2 Pro — excellent for photorealism but overkill + no native SVG
-- Ideogram 3.0 — best for text rendering but overlap con Recraft para wordmarks
-- Midjourney — no API real, no viable
-
-**Costo estimado por run**:
-- Mood imagery: 6-8 images × $0.04 = $0.24-0.32
-- Logo concepts: 4-5 × $0.04 = $0.16-0.20
-- Logo variants: 3-4 × $0.04 = $0.12-0.16
-- Logo derivations: 4-8 × $0.04 = $0.16-0.32 (si app icon full set es más)
-- **Total Recraft per run: $0.50-1.00**
-
-**Reference docs**:
-- Recraft V4 specs: [recraft.ai](https://www.recraft.ai/)
-- MCP server: [merlinrabens/image-gen-mcp-server](https://github.com/merlinrabens/image-gen-mcp-server)
-
-### Huemint API
-
-**Uso**: palette generation ML-powered (Visual System Paso 2).
+**Uso**: Logo dept (wordmarks y simple combinations), Visual dept (palette reasoning, typography, principles).
 
 **Justificación**:
-- ML-based (Transformer AI + Diffusion AI models) — estado del arte para palettes
-- Modo "brand-intersection" específicamente optimizado para branding
-- Free tier para uso non-commercial (para v1 dogfooding + pre-launch funciona)
-- HTTP API simple — no MCP necesario
-- Permite seed colors + palette completion
+- Claude escribe SVG markup válido directamente
+- Zero cost — uses existing Claude subscription
+- Editable output (SVG is text)
+- Sufficient quality para wordmarks y simple geometric marks
 
-**Uso específico**:
-- Endpoint: `POST https://api.huemint.com/color`
-- Input: mode + seed colors + config
-- Output: 3-5 palettes completas
+**Limitación**: complex abstract symbols son más difíciles — Tier 1+ usa Recraft para symbolics.
 
-**Alternativas consideradas y rechazadas**:
-- Colormind API — pre-LLM era, less sophisticated ML
-- TheColorAPI — color theory math, no ML
-- Adobe Color — no clean public API
-- Manual palette from Claude — OK como fallback pero less rigorous
-
-**Consideración de licencia**: free tier es "non-commercial". Para Hardcore commercial launch, necesitaremos:
-- Upgrade a paid tier de Huemint, o
-- Fallback a Claude-generated palettes en modo commercial (documentado en failure modes)
-- Revisit en [22-open-decisions.md](./22-open-decisions.md)
-
-**Setup requerido**: no API key necesaria para free tier. HTTP request directo.
-
-**Reference docs**:
-- API docs: [colormind.io/api-access](http://colormind.io/api-access/) (Colormind también tiene API — fallback option)
-- Huemint: [huemint.com](https://huemint.com/)
+**Implementation**: prompt structure con ejemplos + templates (see `skills/brand/logo/references/claude-svg-templates.md` a escribir en Sprint 0).
 
 ### `imprvhub/mcp-domain-availability`
 
-**Uso**: verificación de disponibilidad de dominios (Verbal Identity Fase B Paso 3).
+**Uso**: Verbal Identity Fase B Paso 3 (domain verification).
 
 **Justificación**:
-- 50+ TLDs soportados
-- Verificación dual (DNS + WHOIS) — más robusta que una sola
+- 50+ TLDs
+- Verificación dual (DNS + WHOIS)
 - Bulk checking (10-12 candidatos simultáneos)
-- Smart suggestions cuando un dominio está tomado
 - Zero-clone install via `uvx`
 - Free, sin API key
 
-**Setup requerido** (user):
-1. `uvx --from imprvhub/mcp-domain-availability domain-mcp` (o install method per README)
+**Setup user** (necesario antes de Sprint 1):
+1. `uvx --from imprvhub/mcp-domain-availability domain-mcp`
 2. Configurar MCP en Claude Code settings
 
-**Alternativas consideradas y rechazadas**:
-- `vinsidious/whodis-mcp-server` — less comprehensive
-- `patrickdappollonio/domaintools-whois-dns` — complex setup
-- Manual DNS + curl — functional pero requiere build propio
-- Namecheap / Domainr commercial APIs — cost + overkill
+**Reference**: [imprvhub/mcp-domain-availability](https://github.com/imprvhub/mcp-domain-availability)
 
-**Reference docs**:
-- [imprvhub/mcp-domain-availability](https://github.com/imprvhub/mcp-domain-availability)
+## 11.5 Tools Tier 1
 
-## 11.5 Stack summary en formato dependency
+### Recraft V4 via `merlinrabens/image-gen-mcp-server`
+
+**Uso** (Tier 1): logos simbólicos solo (cuando scope lo requiere).
+**Uso** (Tier 2): todos los logos + mood imagery.
+
+**Justificación Recraft V4**:
+- **#1 en benchmarks de HuggingFace para logos** en 2026
+- **SVG vector nativo** — crítico para logos editables
+- Logo-specialized training + built-in brand styling tools
+- Costo: $0.04/imagen — mismo rango que DALL-E 3 pero specialized
+
+**Justificación MCP multi-provider**:
+- Permite swap de providers via env vars sin cambiar código
+- Mantiene flexibilidad si en futuro queremos Flux 2 Pro para mood específico
+
+**Setup user** (necesario solo si elevates a Tier 1+):
+1. Crear cuenta en platform.recraft.ai
+2. Obtener API key ($10-20 de crédito inicial alcanza)
+3. Install: `npm install -g @merlinrabens/image-gen-mcp-server` (o similar)
+4. Env: `RECRAFT_API_KEY` + `IMAGE_GEN_PROVIDER=recraft`
+
+**Reference**: [merlinrabens/image-gen-mcp-server](https://github.com/merlinrabens/image-gen-mcp-server)
+
+### Unsplash API
+
+**Uso** (Tier 1): mood imagery references curated.
+
+**Justificación**:
+- 5M+ fotos HD
+- Free tier: 50 req/h demo, 5000 req/h production
+- No API key needed para demo tier (hack: direct public URLs)
+- Attribution fácil de documentar
+
+**Setup user**: no mandatory setup (direct URL fetching funciona). Si scale high, register app.
+
+**Alternativa**: Pexels API (similar, no attribution display required).
+
+### Huemint API
+
+**Uso** (Tier 1+): palette ML generation.
+
+**Justificación**:
+- ML-based (Transformer + Diffusion)
+- Modo "brand-intersection" específico para branding
+- API HTTP simple — no MCP needed
+- Free para uso non-commercial
+
+**Setup user**: no API key para free tier.
+
+**Consideración license**: free tier es non-commercial. Para launch comercial requiere upgrade (ver [22-open-decisions.md](./22-open-decisions.md)).
+
+**Reference**: [huemint.com](https://huemint.com/)
+
+## 11.6 Tools Tier 2 (premium)
+
+Mismas que Tier 1 pero con:
+- Huemint paid tier (commercial license)
+- Recraft V4 usado para mood imagery + logos wordmark además de symbolic
+- Mayor budget de image generations
+
+## 11.7 Downstream: Claude Design (no en nuestro stack técnico, pero crítico)
+
+**Claude Design no es un tool en nuestro stack**. Es el downstream layer que consume nuestro output.
+
+**Status en 2026-04**:
+- Web app en `claude.ai/design`
+- Incluido en Pro/Max/Team/Enterprise subscriptions
+- No expone API/MCP actualmente (Anthropic anunció integrations "coming in weeks")
+
+**Nuestra dependencia**:
+- V1: user hace handoff manual (upload PDF, paste prompts)
+- V2 (cuando Anthropic ship API): Handoff Compiler auto-invoca Claude Design
+
+## 11.8 Stack summary en formato dependency
 
 ```yaml
-# Existing (no new setup needed)
+# Tier 0 (default) — all that's strictly needed
 engram_mcp:
   required: yes
   already_setup: yes
@@ -183,121 +197,129 @@ pdf_skill:
   required: yes
   already_setup: yes
 
-# New — user must setup before Sprint 1 implementation
-stitch_mcp:
-  required: yes
-  setup_user:
-    - create Google account
-    - npx @_davideast/stitch-mcp init
-    - configure in Claude Code settings
-  free_tier_limit: 350 generations/month
-  cost_commercial: $10-15/month when exits Labs (estimated Q4 2026)
+domain_availability_mcp:
+  required: yes (for naming verification)
+  setup_user: uvx imprvhub/mcp-domain-availability
 
-image_gen_mcp:
+claude_subscription:
   required: yes
-  provider: recraft
-  setup_user:
-    - create account on platform.recraft.ai
-    - obtain API key
-    - install merlinrabens/image-gen-mcp-server
-    - configure env: RECRAFT_API_KEY, IMAGE_GEN_PROVIDER=recraft
-  cost_per_image: $0.04
-  cost_per_brand_run: $0.50-1.00
+  includes: Claude Design access (downstream), reasoning, SVG generation
+
+# Tier 1 — user opts in or scope requires
+recraft_via_image_gen_mcp:
+  required_if: tier >= 1 AND scope requires symbolic logo
+  setup_user: Recraft account + API key + npm MCP install
+
+unsplash_api:
+  required_if: tier >= 1 AND scope requires mood imagery
+  setup_user: none (free tier direct URL access)
 
 huemint_api:
-  required: yes
-  setup_user: none (HTTP direct)
-  license: free non-commercial (revisit for commercial)
-  commercial_consideration: upgrade path pending
+  required_if: tier >= 1 AND palette ML wanted
+  setup_user: none (non-commercial free)
 
-domain_availability_mcp:
-  required: yes
-  setup_user:
-    - install via uvx: uvx imprvhub/mcp-domain-availability
-    - configure in Claude Code
-  cost: free
+# Tier 2 — premium
+recraft_full_usage:
+  required_if: tier == 2
+  setup_user: same as Tier 1 + higher credit budget
+
+huemint_paid:
+  required_if: tier == 2 AND commercial launch
+  setup_user: contact Huemint for commercial license
 ```
 
-## 11.6 Tool usage per depto (resumen)
+## 11.9 Tool usage per depto
 
-| Depto | Tools usadas |
-|---|---|
-| Orchestrator | Engram |
-| Scope Analysis (inline) | Engram + Claude native |
-| Strategy | Engram + Claude native |
-| Verbal Identity | Engram + `imprvhub/mcp-domain-availability` + open-websearch + Claude native |
-| Visual System | Engram + Huemint API + Recraft V4 (via image-gen MCP) + Claude native |
-| Logo & Key Visuals | Engram + Recraft V4 (via image-gen MCP) + Claude native |
-| Activation | Engram + Stitch MCP + `ms-office-suite:pdf` + Claude native |
+| Depto | Tier 0 tools | Tier 1 tools (additive) | Tier 2 tools (additive) |
+|---|---|---|---|
+| Orchestrator | Engram | — | — |
+| Scope Analysis (inline) | Engram + Claude native | — | — |
+| Strategy | Engram + Claude native | — | — |
+| Verbal Identity | Engram + domain MCP + open-websearch + Claude native | — | — |
+| Visual System | Engram + Claude native (palette + type) | + Huemint (palette ML) + Unsplash (mood refs) | + Recraft (mood generated) + Huemint paid |
+| Logo & Key Visuals | Engram + Claude native (SVG) | + Recraft (symbolic) | + Recraft everywhere |
+| Handoff Compiler | Engram + pdf skill + Claude native (templating) | — | — |
 
-## 11.7 Total cost per run
+## 11.10 Total cost per run (resumen)
 
-Ver [17-cost-and-timing.md](./17-cost-and-timing.md). Resumen: **~$0.50-1.00 por run** dependiendo del scope (app icon full set vs no eleva costo).
+Ver [17-cost-and-timing.md](./17-cost-and-timing.md) para breakdown detallado.
 
-## 11.8 Fallbacks si un tool está down
+Resumen:
+- **Tier 0**: ~$0.00/run
+- **Tier 1**: ~$0.10-0.20/run
+- **Tier 2**: ~$0.40-0.80/run
 
-Ver [13-failure-modes.md](./13-failure-modes.md) para protocolo completo. Summary:
+## 11.11 Fallbacks si un tool está down
+
+Ver [13-failure-modes.md](./13-failure-modes.md). Summary:
 
 | Tool down | Fallback |
 |---|---|
-| Stitch MCP | Manual HTML templates (degraded quality, flagged en output) |
-| Recraft / image-gen MCP | Skip generations afectadas, flag en output, user puede `/brand:extend` después |
-| Huemint API | Claude-generated palette con color theory principles |
-| Domain MCP | Skip verification, warn user explícitamente |
-| open-websearch | Skip TM screening, flag "TM not verified en este run" |
+| Domain MCP | Skip verification, warn user |
+| open-websearch | Skip TM screening, flag |
+| pdf skill | Deliver package con markdown brand-book.md instead |
+| Recraft (Tier 1+) | Degrade to Claude native (Tier 0 behavior) |
+| Unsplash (Tier 1) | Skip mood imagery, use Brand Document description only |
+| Huemint (Tier 1+) | Fallback to Claude-generated palette |
 
-## 11.9 Tool version tracking
+## 11.12 Tool version tracking
 
 Cada run graba en `evidence_trace`:
 
 ```json
 {
   "tool_versions": {
-    "stitch_mcp": "0.3.2",
-    "image_gen_mcp": "1.0.5",
-    "recraft_model": "v4",
-    "huemint_api": "v1 (2026-04)",
-    "domain_availability_mcp": "2.1.0"
+    "tier_used": 0,
+    "recraft_model": null,
+    "huemint_api": null,
+    "unsplash_api": null,
+    "domain_availability_mcp": "2.1.0",
+    "pdf_skill": "1.2",
+    "claude_model": "claude-opus-4-7"
   }
 }
 ```
 
-Para reproducibility futura: si un run necesita ser reproducido, tool versions permiten detectar breaking changes.
-
-## 11.10 Cambios posibles en el stack post-v1
+## 11.13 Cambios posibles post-v1
 
 ### Candidatos para v2
 
-**Ideogram 3.0** para wordmarks text-heavy
-- Si detectamos que Recraft V4 genera wordmarks con mala tipografía en casos específicos
-- Ideogram es best in class para text rendering
+**Claude Design MCP** (when Anthropic ship it):
+- Integración automática de Handoff → Claude Design
+- Zero user friction
+- Major upgrade del workflow
+
+**Ideogram 3.0** para wordmarks text-heavy:
+- Solo si detectamos Recraft V4 wordmarks subpar en casos específicos
 - Costo adicional ~$0.04/img
 
-**Flux 2 Pro** para fotorealismo si aparece demand
-- Si futuros módulos (Brand-Physical, Product-Mockups) necesitan fotorealism
-- Complementario a Recraft (specialized), no reemplaza
+**USPTO TSDR API** para rigor legal:
+- Cuando Hardcore tenga users pagos
+- API key gratis, 60 req/min
 
-**USPTO TSDR API** si se comercializa
-- Cuando Hardcore tenga usuarios pagos y legal rigor matters más
-- Obtener API key (gratis pero rate-limited 60/min)
-- Integrar como supplement al open-websearch screening preliminar
+**Módulos futuros con capabilities nuevas**:
+- Brand-Physical (packaging + print CMYK)
+- Brand-Motion (after-effects templates)
+- Brand-Sonic (Suno/Stable Audio integration)
 
-**Motion design tool** (future módulo Brand-Motion)
-- Runway, Kaiber, otros — cuando querramos agregar motion
-- Out of scope v1
+## 11.14 Acceptance criteria del stack (para Sprint 1)
 
-**Audio AI** (future módulo Brand-Sonic)
-- Suno, Stable Audio, otros — cuando querramos agregar sonic branding
-- Out of scope v1
-
-## 11.11 Acceptance criteria del stack (para Sprint 1)
-
-Antes de declarar "stack ready", verificar:
-
-- [ ] Stitch MCP installed + authenticated + tested con request básico
-- [ ] Recraft API key funcional + image gen MCP installed + tested con request básico
-- [ ] Huemint API HTTP accesible (curl test)
+### Tier 0 readiness
 - [ ] Domain availability MCP installed + tested
-- [ ] Todos los MCPs registrados en Claude Code settings
-- [ ] Tool versions documented en AUDIT.md template
-- [ ] Failure mode tests pasaron (ver [14-testing-strategy.md](./14-testing-strategy.md))
+- [ ] Claude Design account accessible (for testing downstream workflow)
+- [ ] pdf skill functional
+- [ ] open-websearch tested for TM queries
+- [ ] Failure mode tests Tier 0
+
+### Tier 1 readiness (if user opts in)
+- [ ] Recraft account + API key
+- [ ] Image gen MCP installed
+- [ ] Unsplash API accessible
+- [ ] Huemint API accessible
+- [ ] Failure mode tests Tier 1
+
+### Downstream integration (Claude Design manual v1)
+- [ ] Brand Design Document PDF upload tested en Claude Design onboarding
+- [ ] Prompts Library usable en Claude Design chat
+- [ ] Brand Tokens folder recognized when linked (if user tests codebase linking)
+- [ ] Reference Assets subibles como visual references

@@ -2,9 +2,9 @@
 
 ## 18.1 Propósito
 
-Definir la estructura del **paquete entregable** — el directorio que el user recibe como output final del módulo. Dinámico según scope, pero con invariantes claros.
+Estructura del **paquete entregable** — los 4 deliverables optimizados para Claude Design.
 
-El paquete es el **artefacto primario** del módulo. Debe ser autoexplicativo, completo, usable sin instrucciones externas.
+El paquete es autoexplicativo, completo, usable sin instrucciones externas.
 
 ## 18.2 Ubicación
 
@@ -12,415 +12,354 @@ El paquete es el **artefacto primario** del módulo. Debe ser autoexplicativo, c
 {repo-root}/output/{idea-slug}/brand/
 ```
 
-Dentro del repo existente (consistente con `testing/runs/` pattern para Validation).
+Dentro del repo (consistente con patterns existentes).
 
 ## 18.3 Invariantes (siempre presentes)
 
-Independiente de scope, estos archivos SIEMPRE existen:
+Independiente de scope/tier, SIEMPRE:
 
 ```
 output/{idea-slug}/brand/
-├── README.md              ← Auto-generated, explica qué contiene y cómo usar
-├── brand-book.pdf         ← Manual completo de marca
-├── DESIGN.md              ← Source of truth machine-readable (Stitch-compatible)
-├── AUDIT.md               ← Evidence trace, tool versions, decisions, costs
-├── logo/                  ← Al menos variants básicas + rationale
-├── copy-library.md        ← Todo el copy organizado
-└── communications/        ← Al menos pitch one-liner + bios
+├── README.md                               ← Always — instructions para Claude Design
+├── AUDIT.md                                ← Always — evidence + versioning + cost tracking
+├── brand-design-document.pdf               ← Always — DELIVERABLE 1 (Claude Design upload)
+├── prompts-for-claude-design.md            ← Always — DELIVERABLE 2 (Claude Design prompts)
+├── brand-tokens/                           ← Always — DELIVERABLE 3 (codebase integration)
+│   ├── tokens.css
+│   ├── tokens.json
+│   ├── tailwind.config.js
+│   ├── fonts.css
+│   ├── README.md
+│   └── examples/
+│       ├── button.html
+│       ├── card.html
+│       └── hero.html
+└── reference-assets/                       ← Always — DELIVERABLE 4 (visual refs)
+    ├── logo/
+    │   ├── primary.svg
+    │   ├── primary.png (800px rasterized)
+    │   ├── mono.svg
+    │   ├── inverse.svg
+    │   ├── icon-only.svg
+    │   └── derivations/
+    │       ├── favicon-16.png
+    │       ├── favicon-32.png
+    │       ├── favicon-48.png
+    │       ├── favicon.ico
+    │       ├── apple-touch-180.png
+    │       ├── og-card-1200x630.png
+    │       └── profile-pic-400.png
+    └── README.md
 ```
 
-## 18.4 Estructura dinámica por scope
+## 18.4 Elementos dinámicos — según scope + tier
 
-### Full estructura possible
+### Brand Design Document PDF — sections dinámicas
 
+Siempre tiene:
+- Cover
+- Brand essence (archetype + positioning + values)
+- Voice & tone
+- Palette
+- Typography
+- Logo section
+- Visual principles
+- Copy library samples
+- Scope declaration + limitations
+
+Tier 1+ añade:
+- Mood & atmosphere section con imagery grid (Unsplash Tier 1, Recraft Tier 2)
+
+Scope-dependent sections:
+- **b2d-devtool**: Developer aesthetic preview page (code snippet styling, CLI colors)
+- **b2local-service**: Print applications preview (flyer mockup, business card)
+- **content-media**: Content application preview (podcast cover mock, thumbnail series)
+- **community-movement**: Symbolic assets preview (emblem variations, merch direction)
+- **b2c-consumer-app**: App icon showcase + screenshot templates preview
+
+Detallado en [24-brand-design-document-structure.md](./24-brand-design-document-structure.md).
+
+### Prompts Library Markdown — dinámica per scope
+
+Structure fija:
+```markdown
+# Prompts for Claude Design — {Brand Name}
+
+## How to use
+[Instructions]
+
+## Design System Reference
+[Quick reference palette + typography + voice]
+
+## Project prompts
+
+### {Deliverable 1}
+Prompt: ...
+
+### {Deliverable 2}
+Prompt: ...
+...
 ```
-output/{idea-slug}/brand/
-│
-├── README.md                           ← ALWAYS — auto-generated
-├── brand-book.pdf                      ← ALWAYS
-├── DESIGN.md                           ← ALWAYS — machine-readable
-├── AUDIT.md                            ← ALWAYS — versioning + evidence
-├── copy-library.md                     ← ALWAYS — todo el copy organizado
-│
-├── microsite/                          ← IF landing in required (todos los profiles)
-│   ├── index.html
-│   ├── pricing.html                    ← IF pricing in required
-│   ├── about.html                      ← IF about in required
-│   ├── docs.html                       ← IF b2d-devtool
-│   ├── case-studies.html               ← IF b2b-enterprise
-│   ├── app-landing.html                ← IF b2c-consumer-app
-│   ├── community.html                  ← IF community-movement
-│   ├── contact.html                    ← ALWAYS
-│   ├── privacy.html                    ← ALWAYS (skeleton legal — needs review)
-│   ├── terms.html                      ← ALWAYS (skeleton)
-│   ├── security.html                   ← IF b2b-enterprise or fintech
-│   ├── assets/
-│   │   ├── logo.svg
-│   │   ├── favicon.ico
-│   │   ├── og-card.png
-│   │   └── mood/ (subset de mood imagery)
-│   ├── styles.css                      ← Tailwind build OR inline
-│   ├── netlify.toml                    ← IF decided in 22-open-decisions
-│   ├── vercel.json                     ← IF decided
-│   └── stitch-source/
-│       ├── figma-export.fig
-│       └── react/ (if applicable)
-│
-├── pitch-deck/                         ← IF b2b-enterprise
-│   ├── cover-slide.html
-│   └── template-slides/
-│       ├── problem.html
-│       ├── solution.html
-│       ├── market.html
-│       ├── competition.html
-│       ├── traction.html
-│       ├── team.html
-│       └── ask.html
-│
-├── app-assets/                         ← IF b2c-consumer-app
-│   ├── app-icons/
-│   │   ├── ios/
-│   │   │   ├── icon-20.png
-│   │   │   ├── icon-29.png
-│   │   │   ├── icon-40.png
-│   │   │   ├── icon-60.png
-│   │   │   ├── icon-87.png
-│   │   │   ├── icon-120.png
-│   │   │   ├── icon-180.png
-│   │   │   └── icon-1024.png
-│   │   └── android/
-│   │       ├── foreground.svg
-│   │       ├── background.svg
-│   │       ├── adaptive-icon.png
-│   │       ├── ic_launcher_round.png
-│   │       └── ic_launcher.png
-│   ├── screenshots-templates/
-│   │   ├── screen-1-hero.html
-│   │   ├── screen-2-feature.html
-│   │   ├── screen-3-social-proof.html
-│   │   ├── screen-4-cta.html
-│   │   └── screen-5-closing.html
-│   ├── onboarding-templates/
-│   │   ├── onboarding-1-welcome.html
-│   │   ├── onboarding-2-permissions.html
-│   │   └── onboarding-3-ready.html
-│   └── share-visuals/
-│       ├── referral-card.png
-│       └── achievement-share.png
-│
-├── local/                              ← IF b2local-service
-│   ├── maps-listing-copy.md
-│   ├── whatsapp-templates/
-│   │   ├── greeting.md
-│   │   ├── faq.md
-│   │   ├── booking-confirmation.md
-│   │   └── reminder.md
-│   ├── phone-scripts.md
-│   ├── printable/
-│   │   ├── flyer-template.pdf
-│   │   ├── business-card.pdf
-│   │   ├── menu-template.pdf            ← If food
-│   │   └── signage-direction.md
-│   └── google-my-business.md
-│
-├── logo/                               ← ALWAYS (some subset)
-│   ├── source/
-│   │   ├── primary.svg
-│   │   ├── primary-mono.svg
-│   │   ├── primary-inverse.svg
-│   │   └── icon-only.svg               ← IF symbolic or combination form
-│   ├── derivations/
-│   │   ├── favicon-16.png
-│   │   ├── favicon-32.png
-│   │   ├── favicon-48.png
-│   │   ├── favicon.ico                 ← Multi-size combined
-│   │   ├── apple-touch-180.png
-│   │   ├── og-card-1200x630.png
-│   │   ├── profile-pic-400.png
-│   │   ├── profile-pic-400-bg.png
-│   │   ├── cover-x-1500x500.png        ← IF social X in scope
-│   │   └── cover-linkedin-1584x396.png ← IF social LinkedIn in scope
-│   ├── app-icons/                      ← IF b2c-consumer-app (redundant with app-assets, cross-ref)
-│   ├── merch/                          ← IF community-movement or content-media
-│   │   ├── tshirt-layout.pdf
-│   │   ├── sticker-designs.svg
-│   │   ├── mug-layout.pdf
-│   │   └── README.md
-│   ├── rationale.md                    ← ALWAYS — por qué el logo se ve así
-│   └── usage-guidelines.md             ← ALWAYS — do/don'ts, clearspace, min size
-│
-├── social/                             ← IF social_presence_priority is not "enterprise-linkedin-only"
-│   ├── avatars/
-│   │   ├── avatar-x.png
-│   │   ├── avatar-linkedin.png
-│   │   ├── avatar-instagram.png
-│   │   └── avatar-tiktok.png           ← IF TikTok in scope
-│   ├── banners/
-│   │   ├── banner-x.png
-│   │   ├── banner-linkedin.png
-│   │   ├── banner-facebook.png         ← IF Facebook in scope
-│   │   └── banner-youtube.png          ← IF YouTube in scope
-│   ├── post-templates-instagram/       ← IF Instagram in scope
-│   │   ├── template-square.html
-│   │   ├── template-carousel-1.html
-│   │   ├── template-carousel-2.html
-│   │   └── template-story.html
-│   ├── post-templates-x/               ← IF X/Twitter in scope
-│   │   ├── template-post.html
-│   │   └── template-thread-card.html
-│   ├── post-templates-linkedin/        ← IF LinkedIn in scope
-│   │   └── template-post.html
-│   ├── post-templates-tiktok/          ← IF TikTok in scope
-│   │   └── template-cover.html
-│   └── sample-posts.md                 ← ALWAYS (if social_presence)
-│
-├── communications/                     ← ALWAYS (subset)
-│   ├── email-signature.html            ← ALWAYS
-│   ├── pitch-one-liner.txt             ← ALWAYS
-│   ├── elevator-30s.txt                ← IF pitch_30s in scope
-│   ├── press-release-boilerplate.md    ← IF b2b-enterprise or scope includes
-│   ├── email-templates/
-│   │   ├── welcome.html                ← IF SaaS scopes
-│   │   ├── transactional.html          ← IF SaaS scopes
-│   │   ├── newsletter.html             ← IF content-media or marketing scope
-│   │   └── onboarding-sequence/        ← IF b2b-smb or b2c-consumer-web
-│   │       ├── email-1-welcome.html
-│   │       ├── email-2-onboarding.html
-│   │       ├── email-3-value.html
-│   │       ├── email-4-upgrade.html
-│   │       └── email-5-retention.html
-│   ├── whatsapp-templates/             ← IF b2local-service (redundant with local/)
-│   ├── bios/                           ← ALWAYS (for scopes with social)
-│   │   ├── linkedin-company.md
-│   │   ├── linkedin-personal.md
-│   │   ├── twitter.md
-│   │   ├── instagram.md
-│   │   ├── tiktok.md                   ← IF TikTok in scope
-│   │   └── personal-brand.md
-│   ├── manifesto.md                    ← IF community-movement
-│   └── recruiting-copy.md              ← IF community-movement
-│
-├── mood-references/                    ← IF mood_imagery in scope required
-│   ├── mood-01-energy.png
+
+Cada prompt customizado al brand (name, palette HEX, typography, voice) + formato Claude Design best-practice (goal + layout + content + audience).
+
+Prompts que se incluyen según scope — ver matriz en [03-brand-profiles.md](./03-brand-profiles.md#311-cross-profile---output-matrix-summary).
+
+Templates detallados en [25-prompts-library-templates.md](./25-prompts-library-templates.md).
+
+### Brand Tokens — contenido constante, valores dinámicos
+
+Structure siempre igual. Valores (HEX, font names, spacing) customized desde outputs de Visual + Logo.
+
+### Reference Assets — adicionales dinámicos
+
+**Base (siempre)**:
+```
+reference-assets/
+├── logo/
+└── README.md
+```
+
+**Tier 1+ añade**:
+```
+reference-assets/
+├── mood/
+│   ├── mood-01-energy.{png|jpg}
 │   ├── mood-02-texture.png
-│   ├── mood-03-composition.png
-│   ├── mood-04-light.png
-│   ├── mood-05-motion.png
-│   ├── mood-06-focus.png
-│   └── README.md (description per image)
-│
-└── developer/                          ← IF b2d-devtool
-    ├── github-readme-template.md
-    ├── docs-homepage-copy.md
-    ├── cli-help-text-style.md
-    └── code-snippet-theme.json         ← Syntax highlighting theme aligned with palette
+│   ├── ... (6-8 total)
+│   └── README.md (con attribution si Unsplash)
 ```
 
-## 18.5 README.md del package — estructura
+**Scope-dependent añade** (cuando applicable):
 
-Ya cubierto en [08-dept-activation.md#63-paso-6](./08-dept-activation.md#63-paso-6). Resumen:
+#### If `b2c-consumer-app` (Tier 1+ auto-elevated)
+```
+reference-assets/
+├── app-icons/
+│   ├── ios/ (multiple sizes 20, 29, 40, 58, 60, 80, 87, 120, 180, 1024)
+│   └── android/ (foreground.svg, background.svg, adaptive-icon.png, masks)
+```
 
-- Identity summary (name, archetype, profile)
+#### If `b2local-service`
+```
+reference-assets/
+├── print-templates/
+│   ├── flyer-template.pdf
+│   ├── business-card.pdf
+│   └── menu-template.pdf (si food)
+```
+
+#### If `community-movement` or `content-media`
+```
+reference-assets/
+├── merch-direction/
+│   ├── tshirt-layout.pdf
+│   ├── sticker-designs.svg
+│   └── README.md
+```
+
+## 18.5 Estructura completa (maximum)
+
+Para context, mostrando TODA la estructura posible (solo para b2c-consumer-app Tier 2 con max features):
+
+```
+output/{slug}/brand/
+├── README.md
+├── AUDIT.md
+├── brand-design-document.pdf
+├── prompts-for-claude-design.md
+├── brand-tokens/
+│   ├── tokens.css
+│   ├── tokens.json
+│   ├── tailwind.config.js
+│   ├── fonts.css
+│   ├── README.md
+│   └── examples/
+│       ├── button.html
+│       ├── card.html
+│       └── hero.html
+└── reference-assets/
+    ├── logo/
+    │   ├── primary.svg
+    │   ├── primary.png
+    │   ├── mono.svg
+    │   ├── inverse.svg
+    │   ├── icon-only.svg
+    │   └── derivations/
+    │       ├── favicon-16.png
+    │       ├── favicon-32.png
+    │       ├── favicon-48.png
+    │       ├── favicon.ico
+    │       ├── apple-touch-180.png
+    │       ├── og-card-1200x630.png
+    │       └── profile-pic-400.png
+    ├── mood/                          # Tier 1+
+    │   ├── mood-01-energy.png
+    │   ├── mood-02-texture.png
+    │   ├── mood-03-composition.png
+    │   ├── mood-04-light.png
+    │   ├── mood-05-motion.png
+    │   ├── mood-06-focus.png
+    │   └── README.md
+    ├── app-icons/                     # b2c-consumer-app only
+    │   ├── ios/
+    │   │   ├── icon-20.png
+    │   │   ├── icon-29.png
+    │   │   ├── icon-40.png
+    │   │   ├── icon-60.png
+    │   │   ├── icon-80.png
+    │   │   ├── icon-120.png
+    │   │   ├── icon-180.png
+    │   │   └── icon-1024.png
+    │   └── android/
+    │       ├── foreground.svg
+    │       ├── background.svg
+    │       ├── adaptive-icon.png
+    │       └── launcher-masks/
+    └── README.md
+```
+
+## 18.6 README.md del package — estructura
+
+Ver template detallado en [08-dept-handoff-compiler.md](./08-dept-handoff-compiler.md#66-paso-6-generar-readme-del-package).
+
+Resumen sections:
+- Identity summary (name, archetype, profile, tier used)
 - Scope identified + confidence
-- Lo que SÍ incluye (por category)
+- **Step-by-step Claude Design workflow** (critical para user)
+- Lo que SÍ incluye (por category + deliverable)
 - Lo que NO incluye (skipped + out-of-scope con reasons)
-- How to use (deployment instructions, editing guides)
+- How to use each deliverable
 - Disclaimers
 - Versioning info
 
-## 18.6 AUDIT.md — estructura
+## 18.7 AUDIT.md — estructura
 
-Graba trazabilidad completa del run:
+Ver detalles en [15-versioning-reproducibility.md](./15-versioning-reproducibility.md#audit-log).
 
-```markdown
-# AUDIT — {idea-slug} Brand Run
+Summary sections:
+- Run metadata (ID, version, mode, tier, duration)
+- Tool versions
+- Input hashes
+- Decisions made per dept
+- Coherence trace (8 gates)
+- Failures encountered
+- Cost tracking
+- User interactions
+- Claude Design integration status
 
-## Run Metadata
+## 18.8 Entregables por scope × tier — cuadro resumen
 
-- Run ID: {UUID}
-- Brand module version: 1.0
-- Mode: normal
-- Started: 2026-04-20T14:30:00Z
-- Completed: 2026-04-20T14:57:42Z
-- Duration: 27m 42s
+| Scope | Tier 0 base | Tier 1 adds | Tier 2 adds |
+|---|---|---|---|
+| `b2b-enterprise` | 4 deliverables + logo wordmark SVG | Mood refs (Unsplash) | Mood generated + Recraft wordmark |
+| `b2b-smb` | 4 deliverables + logo wordmark | Mood refs | Mood generated |
+| `b2d-devtool` | 4 deliverables + wordmark; symbolic NOT recommended | Recraft symbolic + mood | All Recraft |
+| `b2c-consumer-app` | **Not recommended** (elevates to T1) | **Default** — App icons + Recraft symbolic | App icons + full Recraft + mood generated |
+| `b2c-consumer-web` | 4 deliverables + combination logo | Mood refs | Mood generated |
+| `b2local-service` | 4 deliverables + combination + printable templates | Mood refs | Mood generated + premium printables |
+| `content-media` | 4 deliverables + symbolic (limited Tier 0 quality) | Recraft symbolic + mood + podcast cover quality | Full premium |
+| `community-movement` | 4 deliverables + symbolic (limited Tier 0) | Recraft symbolic + merch direction | Full premium |
 
-## Tool Versions
+## 18.9 Cross-references en el package
 
-- Stitch MCP: 0.3.2
-- Image Gen MCP: 1.0.5
-- Recraft Model: v4
-- Huemint API: v1
-- Domain Availability MCP: 2.1.0
-- PDF Skill: 1.2
+Algunos assets aparecen con references cruzadas:
+- Logo SVG primary: `reference-assets/logo/primary.svg` (canonical) referenced from `brand-design-document.pdf` (embedded) + `brand-tokens/examples/*.html` (linked) + `README.md` (mentioned)
+- Palette HEX: `brand-tokens/tokens.json` (source of truth) + `tokens.css` (CSS version) + `tailwind.config.js` (Tailwind version) + referenced in Brand Document PDF palette section + each prompt in Prompts Library
 
-## Input Hashes
+Todos los duplicates son copies/references, no symlinks, para portabilidad (user zip + send, no broken links).
 
-- Validation: sha256:abc123...
-- Profile: sha256:def456...
-- Idea text: sha256:ghi789...
+## 18.10 Deployability
 
-## Decisions Made
+Package es **immediately usable**:
 
-### Scope Analysis
-- Brand profile: b2b-smb (confidence 0.84)
-- Classification signals: [...]
-- Intensity modifiers: [...]
-
-### Strategy
-- Archetype: Sage
-- Alternatives considered: [Ruler rejected (competitors ocupan), Hero rejected (profile incompat)]
-- Voice attributes: [...]
-- Brand values: [...]
-
-### Verbal
-- Name chosen: Auren (from 7 top candidates)
-- Reason chosen: Top score 9.1, all domains free, TM clean
-- User selection method: user-picked
-- Copy assets generated: 18
-
-### Visual
-- Palette: Navy/Off-white/Amber
-- Palette narrative: "Navy grounds, off-white breathes, amber humanizes"
-- Typography: Fraunces + Inter + JetBrains Mono
-- Mood imagery: 6 generated
-
-### Logo
-- Chosen: B2 (wordmark hybrid)
-- Directions generated: 4 (3 wordmark + 1 combination)
-- User selection: user-picked
-- Variants: 4 (primary, mono, inverse, icon-only)
-- Derivations: 12
-
-### Activation
-- Screens generated: 4 (landing, pricing, about, security)
-- Coherence gates: 9/9 passed (1 retry on gate 3)
-- PDF generated: yes (28 pages)
-
-## Coherence Trace
-
-See detailed in activation.coherence_trace in Engram.
-
-Summary:
-- All 9 gates passed
-- Gate 3 required 1 retry: palette initially too saturated for Sage, regenerated
-
-## Failures Encountered
-
-- None critical
-- Gate 3 retry as noted
-
-## Cost Tracking
-
-- Total USD: $0.73
-- Image gen: 18 images (mood 6, logo 5, variants 4, derivations 3)
-- Stitch generations used: 5
-- Detailed breakdown in audit.cost_tracking
-
-## User Interactions
-
-- Scope confirmation: not prompted (confidence high)
-- Strategy review: accepted default (Sage)
-- Naming selection: user picked "Auren" from top 5
-- Logo selection: user picked "B2"
-- Coherence escalation: not triggered
+### Via Claude Design workflow
+```
+1. Abrir claude.ai/design
+2. Design system setup → Upload brand-design-document.pdf
+3. Validate + publish
+4. Copy prompts from prompts-for-claude-design.md
+5. Run in Claude Design projects
+6. Export from Claude Design → Claude Code → deploy
 ```
 
-## 18.7 Entregables por scope — cuadro resumen
-
-| Scope | Directories activos en package |
-|---|---|
-| `b2b-enterprise` | microsite/, pitch-deck/, logo/, social/ (LinkedIn focus), communications/ (incl. press release, case studies), mood-references/ |
-| `b2b-smb` | microsite/, logo/, social/ (LinkedIn + X), communications/, mood-references/ |
-| `b2d-devtool` | microsite/ (con docs/), logo/, social/ (X + LinkedIn + GitHub), communications/, developer/, mood-references/ |
-| `b2c-consumer-app` | microsite/ (con app-landing), app-assets/, logo/ (with app-icons), social/ (Instagram + TikTok), communications/, mood-references/ |
-| `b2c-consumer-web` | microsite/, logo/, social/ (Instagram), communications/ (newsletter heavy), mood-references/ |
-| `b2local-service` | microsite/ (local landing), local/, logo/, social/ (Instagram local), communications/ (WhatsApp heavy), minimal mood-references/ |
-| `content-media` | microsite/, logo/, social/ (per creator channels), communications/ (newsletter + show notes), podcast or video-specific assets, mood-references/, merch/ |
-| `community-movement` | microsite/, logo/ (symbolic strong), social/ (discord-focused), communications/ (manifesto + recruiting), merch/, mood-references/ |
-
-## 18.8 Cross-references en el package
-
-Algunos assets aparecen en múltiples directorios por practicality:
-
-- **Logo**: primary está en `logo/source/` (canonical) pero copy en `microsite/assets/` (for microsite use)
-- **Favicon**: está en `logo/derivations/` (canonical) Y en `microsite/assets/` (para el HTML)
-- **OG card**: `logo/derivations/og-card-1200x630.png` + linked desde `microsite/index.html` meta tags
-- **App icons**: en `app-assets/app-icons/` (canonical para app scope) Y referenced en `logo/` README para discoverability
-
-Todos los duplications son copies, no symlinks, para portabilidad del package (user puede zip + send sin broken links).
-
-## 18.9 Deployability
-
-Package debe ser **inmediatamente usable**:
-
-### Microsite deployment
-
-```bash
-cd output/{idea-slug}/brand/microsite/
-# Vercel
-vercel
-
-# Netlify
-netlify deploy --prod
-
-# GitHub Pages (requires repo + push)
+### Via codebase integration (advanced)
+```
+1. Copy brand-tokens/ folder to your repo
+2. Import tokens.css in main CSS
+3. Link codebase to Claude Design
+4. Claude Design auto-extracts design system
+5. Use prompts from Library
 ```
 
-Con `netlify.toml` o `vercel.json` included (ver [22-open-decisions.md](./22-open-decisions.md)), deployment es zero-config.
+### Via manual use (no Claude Design)
+```
+1. Use brand-design-document.pdf as brief for human designer
+2. Use Reference Assets (logo SVGs) directly in design tools
+3. Use Brand Tokens in your own code
+4. Copy prompts from Library as guidance (adapt to other AI tools)
+```
 
-### Logo usage
+## 18.11 README template específico (excerpt)
 
-Source SVGs en `logo/source/` son editable directly en Figma, Illustrator, or any vector editor.
+Ver [08-dept-handoff-compiler.md](./08-dept-handoff-compiler.md#66) para template completo.
 
-### Copy integration
-
-`copy-library.md` es copy-pasteable. Organizado por use case. User copia + pega en su tool.
-
-## 18.10 README template específico (excerpt)
+Elementos clave:
 
 ```markdown
 # {Brand Name} — Brand Package
 
-...
+Generated by Hardcore Brand module · v1.0 · {date}
+For use with: **Claude Design** (primary downstream)
 
 ## Quick start
 
-1. **See your brand live**: open `microsite/index.html` in your browser
-2. **Deploy**: `cd microsite/ && vercel` (zero config)
-3. **Edit logo**: open `logo/source/primary.svg` in Figma
-4. **Use the copy**: `copy-library.md` has everything organized
+1. **Use with Claude Design** (recommended):
+   - Go to claude.ai/design
+   - Upload `brand-design-document.pdf` to design system setup
+   - Use prompts from `prompts-for-claude-design.md` in projects
+   
+2. **Use tokens in codebase**:
+   ```bash
+   cp -r brand-tokens/ your-repo/
+   ```
+   
+3. **Use assets directly**:
+   - Logo SVGs: `reference-assets/logo/*.svg`
+   - Reference images: `reference-assets/mood/` (if tier ≥ 1)
 
 ## Directory guide
 
-- `microsite/` — Your landing page + pages, ready to deploy
-- `logo/` — All logo variants + favicon + derivatives
-- `social/` — Profile pictures, banners, post templates
-- `communications/` — Email signature, bios, pitch lines, templates
-- `brand-book.pdf` — 28-page complete brand manual
-- `DESIGN.md` — Machine-readable design system (for future tools)
+[...]
 
 ## Scope
 
-Classified as: **B2B SMB SaaS** (confidence 84%)
+Classified as: **{profile}** (confidence {%})
+Tier used: {N} (cost: ${amount})
 
 Package optimized for:
-- Content-driven + outbound sales distribution
-- LATAM-focused cultural scope
-- Pre-launch stage
+- [characteristics based on scope]
+
+## What's included vs not
+
+[...]
 
 ## Disclaimers
 
-...
+[...]
 ```
 
-## 18.11 Testing del package structure
+## 18.12 Testing del package structure
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Package structure dinámica correcta por brand profile (b2b-enterprise tiene pitch-deck/, b2c-consumer-app tiene app-assets/, etc.)
+1. Package structure correcta por brand profile + tier
 2. README lista accurately lo incluido y excluido
-3. All invariant files present (README, brand-book.pdf, DESIGN.md, AUDIT.md, logo/, copy-library.md)
-4. Microsite opens correctly in browser
-5. SVGs editable en vector editors
-6. PDF renders correctly
-7. Deployment configs (netlify.toml, vercel.json) work if included
+3. All invariants present
+4. Brand Design Document PDF opens + uploadable to Claude Design
+5. Prompts Library markdown valid + prompts customized
+6. Brand Tokens parseable (JSON schema, CSS syntax, Tailwind config valid)
+7. SVGs editable en vector editors
+8. Tier 0 package smaller than Tier 1 (no mood folder)
+9. b2c-consumer-app package has app-icons folder (Tier 1+)
+10. b2local-service package has print-templates folder

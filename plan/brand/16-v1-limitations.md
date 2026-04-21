@@ -2,286 +2,183 @@
 
 ## 16.1 Propósito
 
-Declarar **explícitamente** lo que Brand v1 NO cubre. La transparencia aquí es una feature del producto, no una debilidad: un user que sabe los límites confía más que uno que descubre gaps por sorpresa.
+Declarar **explícitamente** lo que Brand v1 NO cubre. La transparencia es una feature del producto — un user que sabe los límites confía más que uno que descubre gaps.
 
-Cada limitation incluye:
-- Qué no se cubre
-- Por qué (technical / scope / cost reason)
-- Qué brand profiles más afectados
-- Workaround en v1
-- Consideración para futuras versiones
 
-## 16.2 Limitaciones físicas/industriales
+## 16.2 Limitaciones del approach
+
+### Dependencia de Claude Design para execution
+
+**Qué**: Brand v1 produce el brief optimizado, Claude Design produce los artefactos aplicados.
+
+**Implicación**: user necesita Claude Pro/Max/Team/Enterprise subscription para consumir nuestro output al 100%.
+
+**Workaround**:
+- User sin Claude subscription puede usar Brand Design Document PDF como brief para otros tools (Figma, Midjourney, human designer)
+- Brand Tokens folder funciona standalone (puede usarse en cualquier codebase)
+- Reference Assets son usables en cualquier tool
+
+**Long-term**: cuando Anthropic expanda Claude Design o agregue free tier, esta limitation se reduce.
+
+### Claude Design handoff es manual en v1
+
+**Qué**: user sube PDF + pega prompts manualmente. No hay integración programática automática.
+
+**Razón**: Claude Design no expone API/MCP aún (Anthropic dijo "coming weeks" en abril 2026).
+
+**Workaround**:
+- README con instructions claras paso a paso
+- Una vez configurado, prompts son copy-paste rápido
+
+**Long-term**: cuando Anthropic ship Claude Design MCP, Handoff Compiler auto-invoca. Feature flag `--auto-setup` disponible.
+
+### Tier 0 degradación para symbolic logos
+
+**Qué**: Claude native SVG generation es excelente para wordmarks pero limitado para symbolic marks abstractos complejos.
+
+**Implicación**: si scope requiere `symbolic-first` o `icon-first`, Tier 0 produce quality lower. System auto-eleva a Tier 1 con user confirmation.
+
+**Workaround**:
+- Auto-elevation prompt explicit
+- User puede declinar y proceder con Tier 0 acknowledging loss
+- User puede proveer own logo (manual mode)
+
+### No generamos UI (por diseño, no por limitation)
+
+**Qué**: No producimos microsite HTML/CSS, slides, mockups aplicados.
+
+**Razón**: Claude Design lo hace mejor en el ecosystem Anthropic. Evitamos duplicar.
+
+**Workaround**: ninguno necesario — es intentional.
+
+## 16.3 Limitaciones físicas/industriales
 
 ### Packaging 3D / dieline design
 
-**Qué no se cubre**: 3D packaging design, physical product packaging, dielines (cut + fold patterns for boxes, bags, labels).
-
-**Por qué**: Requeriría 3D modeling tools, CAD software, physical product expertise. Stack actual (Recraft + Stitch) no incluye capabilities 3D. Agregar tooling 3D sería un proyecto separado significativo.
-
-**Profiles afectados**: 
-- `b2c-consumer-app` (si tiene subscription box o physical merch — raro pero posible)
-- `b2local-service` (food/hospitality que necesitan packaging)
-- Physical product brands (no cubiertos por los 8 profiles canónicos actuales)
-
-**Workaround v1**: 
-- Generar "packaging direction" como brief escrito para diseñador humano
-- Mood imagery que evoca el estilo de packaging deseado
-- Especificaciones de paleta + typography que el diseñador físico aplica
-
-**Futuras versiones**: 
-- Módulo Brand-Physical separado con integration a CAD tools
-- Integration con Midjourney (que sabe generar packaging mockups) como complemento
+**Out of scope v1**. Requiere 3D modeling tools. Consider future Brand-Physical module.
 
 ### Print-ready CMYK specifications
 
-**Qué no se cubre**: CMYK color profiles, print specs (bleed, crop marks, pantone matching), pre-press quality outputs.
-
-**Por qué**: Stack visual es RGB digital-first. Conversion RGB→CMYK es destructive y depende del printer. Pantone matching requiere database licenciadas.
-
-**Profiles afectados**:
-- `b2local-service` (flyers, business cards, signage)
-- `content-media` con merch direction
-- `community-movement` con merch
-
-**Workaround v1**:
-- Entregamos colores con flag "RGB — convertir a CMYK antes de imprenta"
-- Recomendación explícita de profile a usar (ISOcoated_v2 para EU offset, US Web Coated SWOP for US)
-- Notas de "probable color shift in amber accent when CMYK-converted"
-- Aspect ratios correct para print sizes standard
-
-**Futuras versiones**:
-- Módulo Brand-Print separado
-- Integration con prepress tools
-- Pantone match suggestions
+**Out of scope v1**. Stack es RGB digital-first. Entregamos RGB con flag + recommendation de conversion.
 
 ### Motion design assets
 
-**Qué no se cubre**: video intros, logo animations, UI transition specifications, after-effects templates, motion graphics.
-
-**Por qué**: Motion design requiere tools completamente distintos (After Effects, Lottie, Framer). Stack actual genera imágenes estáticas + HTML/CSS estático.
-
-**Profiles afectados**:
-- `content-media` (video content, podcast video, YouTube channel)
-- `b2c-consumer-app` (app transitions, splash screens, onboarding motion)
-- Creative brand directions
-
-**Workaround v1**:
-- "Motion principles" como brief escrito (speed, easing preferences, dramatic moments)
-- Ejemplos de referencias existentes (linked)
-- Principios documentados para que motion designer humano interprete
-
-**Futuras versiones**:
-- Módulo Brand-Motion
-- Integration con Runway, Kaiber, Sora (cuando maduren)
-- Lottie template generation
+**Out of scope v1**. Requiere tools distintos (After Effects, Lottie). Consider future Brand-Motion.
 
 ### Sonic branding
 
-**Qué no se cubre**: audio logos, jingles, intro music for podcasts/videos, voice-over guidelines, sound effects branded.
+**Out of scope v1**. Requiere audio AI tools. Consider future Brand-Sonic.
 
-**Por qué**: Requiere AI audio tools (Suno, Stable Audio, ElevenLabs) not in current stack. Audio gen + evaluation es subjective en maneras distintas a visual.
-
-**Profiles afectados**:
-- `content-media` (especialmente podcasts)
-- `b2c-consumer-app` (app sounds, notification tones)
-- Video creators
-
-**Workaround v1**:
-- "Sonic attributes" como brief escrito ("warm, textured, 90 BPM, acústico")
-- References a existing sonic brands que evocan el mood
-- Recommendations to hire composer or use Suno/similar
-
-**Futuras versiones**:
-- Módulo Brand-Sonic
-- Integration con Suno, Stable Audio
-
-## 16.3 Limitaciones fotográficas
+## 16.4 Limitaciones fotográficas
 
 ### Real photography (products, team, locations)
 
-**Qué no se cubre**: photography real — product shots, team photos, lifestyle, location shoots.
+**Out of scope v1**. Mood imagery (si tier ≥ 1) es stylized o curated stock (Unsplash), no photography real.
 
-**Por qué**: 
-- Mood imagery generada por Recraft es stylized, no photorealistic
-- Photorealistic AI (Flux 2 Pro) podría aproximar but still AI-generated, not real
-- Real photography requires photographer + production
+### Product mockups complejos
 
-**Profiles afectados**:
-- Consumer profiles especially
-- Physical products
-- Local services
+**Limited**. Simple 2D mockups (OG card, business card mock, phone icon mock) están cubiertos. Complex 3D product mockups (logo on billboard, storefront, merchandise 3D render) requieren Claude Design o services externos.
 
-**Workaround v1**:
-- Mood imagery generated evoca direction
-- Stock photo recommendations (Unsplash links, curated by archetype)
-- Photography brief escrito para hire photographer
+## 16.5 Limitaciones de alcance cultural
 
-**Futuras versiones**:
-- Integration con high-quality photorealistic models cuando maduren
-- Pero "AI-generated photo" vs "real photo" tiene limitations éticas y de percepción
+### Multi-language brand simultáneo
 
-### Product mockups (logo en contextos complejos)
+**Limited**. Brand se genera en UN idioma primario. User puede re-run en otro language (separate snapshot) y merge manually.
 
-**Qué sí se cubre**: OG card, business card mock, phone icon mock (simples).
-**Qué no se cubre**: complex product mockups (logo on billboard, on storefront, on merchandise 3D render).
+**Long-term**: multi-language Brand pipeline en v2.
 
-**Workaround v1**:
-- Simple 2D mockups via composition (logo layer + template bg)
-- Recomendamos servicios externos para high-fidelity mockups (Placeit, Smartmockups)
+### Cultural sensitivity deep
 
-## 16.4 Limitaciones de alcance cultural
+**Limited**. Basic linguistic check cubierto (obvious negative connotations). Deep cultural sensitivity (religious, political, regional nuances) requires local consultant.
 
-### Multi-language brand (beyond primary)
+**Disclaimer obligatorio**: "Cultural sensitivity screening preliminar. Consultá local cultural consultant para mercados sensibles."
 
-**Qué no se cubre**: brand completo en múltiples idiomas simultaneously. Brand se genera en UN idioma primario.
+## 16.6 Limitaciones legales
 
-**Por qué**:
-- Naming verification en multiple languages multiplies complexity
-- Copy tone doesn't translate 1:1 — requires separate creative pass per language
-- Visual system generally language-independent but some elements (tagline rendering) need per-lang consideration
+### Trademark search no es legal opinion
 
-**Profiles afectados**:
-- Global brands que necesitan EN + ES + PT simultaneously
-- Multi-market launches
+**Permanent limitation**. Preliminary TM screening via web search. NO sustituye consulta con abogado IP.
 
-**Workaround v1**:
-- Brand generado en primary language
-- Copy library incluye tagline in 1-2 alternate languages (manual translation)
-- User puede re-run Brand en otro language (produce snapshot separate) y merge artifacts manually
+**Disclaimer obligatorio en cada output**.
 
-**Futuras versiones**:
-- Multi-language Brand pipeline
-- Cross-language coherence checks (same voice mantenido en traducciones)
+### Privacy / Terms content
 
-### Cultural sensitivity checks (deep)
+**Limited**. En el Brand Document podemos incluir skeleton sections, pero el microsite real (generado por Claude Design) tendrá Privacy/Terms skeletons que requieren legal review.
 
-**Qué sí se cubre**: basic linguistic check (negative connotations obvias en target_geographies).
-**Qué no se cubre**: deep cultural sensitivity — religious implications, political connotations, regional humor nuances, indigenous concepts.
-
-**Por qué**: Requiere expertise cultural específica per region. Claude reasoning puede catch obvious pero no subtle.
-
-**Workaround v1**:
-- Disclaimer en brand book: "Cultural sensitivity screening preliminar. Para mercados sensibles (religious, political), consultá local cultural consultant."
-
-**Futuras versiones**:
-- Cultural sensitivity MCP if develops
-- Human-in-the-loop review para certain markets
-
-## 16.5 Limitaciones legales
-
-### Trademark search no es legal
-
-**Qué sí se cubre**: preliminary TM screening via web search en USPTO, EUIPO, TMView, INPI/IMPI/SIC.
-**Qué no se cubre**: legal opinion, comprehensive trademark search, international filing strategy, prior art research.
-
-**Por qué**: 
-- Web search no cubre registered but not-yet-published marks
-- Doesn't include common law trademarks
-- Can't evaluate likelihood of confusion legally
-- Not licensed to give legal opinion
-
-**Afectados**: todos los profiles (naming es universal)
-
-**Workaround v1**:
-- **Disclaimer obligatorio en output + brand book**: "TM screening preliminar. No sustituye consulta con abogado de propiedad intelectual."
-- Recommend user consult lawyer before filing
-
-**Futuras versiones**: no planned — este es permanent limitation (we're not a law firm).
-
-### Privacy policy / Terms of Service content
-
-**Qué sí se cubre**: skeleton documents estructurados con header + sections + brand voice en prose introductoria.
-**Qué no se cubre**: legally binding language, GDPR compliance verification, CCPA compliance, jurisdiction-specific clauses.
-
-**Workaround v1**:
-- Skeleton PDF included en microsite
-- Header: "DRAFT — requires legal review"
-- Recommend user engage legal counsel
-
-## 16.6 Limitaciones de personalización
+## 16.7 Limitaciones de personalización
 
 ### Brand without Profile (degraded)
 
-**Qué sí se cubre**: Brand runs sin profile con reasonable defaults.
-**Qué pierde**: 
-- Archetype decision based only on idea (not founder fit)
-- Voice doesn't reflect founder personality
-- Target audience less specific (founder context absent)
-- Cultural considerations reduced (no target_geographies from profile)
+**Graceful degradation**. Brand runs sin profile con flag. Pierde:
+- Archetype fit validation basado en founder
+- Voice modulation basada en personality
+- Target audience refinement basada en founder context
 
-**Profiles afectados**: todos si user no tiene Profile.
-
-**Workaround v1**:
-- Flag `decided_without_profile: true` en all outputs
-- Suggest `/profile:new` al user con priority high
-- README del package explicitly notes "brand would benefit from profile — consider creating one"
+**Flag**: `decided_without_profile: true`
 
 ### Partial profile (low completeness)
 
-Si profile completeness < 0.4:
-- Brand runs con profile disponible
-- Flag "low completeness profile" 
-- Certain decisions skip profile check (e.g., risk_tolerance check if unclear)
+**Graceful**. Si profile.completeness < 0.4, Brand runs con flags.
 
-## 16.7 Limitaciones técnicas
+## 16.8 Limitaciones técnicas
 
-### SVG generation quality (Recraft)
+### SVG generation quality
 
-**Limitation**: Recraft genera SVG nativo, pero:
-- Complex illustrative logos may have artifacts
-- SVGs pueden tener paths muy complejos (miles de puntos) — difícil editar manually
-- Text rendering en wordmarks puede fallar a veces (Ideogram sería mejor but excluded from v1 stack)
+**Limited**:
+- Claude native SVG (Tier 0): great para wordmarks, limited para symbolic abstracts
+- Recraft V4 (Tier 1+): excellent but ocasional artifacts posibles
+- Quality validation built-in pero no perfect
 
-**Workaround**:
-- Quality validation pre-delivery
-- Flag "SVG may need manual cleanup in Figma/Illustrator"
-- Manual mode como fallback (user uploads own logo)
-
-### Stitch output consistency
-
-**Limitation**: Stitch depende de Gemini 3 quality. Output variance possible — same DESIGN.md en dos runs puede producir UI ligeramente diferente.
-
-**Workaround**:
-- Accept as creative variance (similar a image gen)
-- Variance tests documentan acceptable range
-- User puede regenerate via `/brand:extend activation.microsite`
+**Workaround**: manual mode available + regenerate options
 
 ### Free tier limits
 
-- Stitch: 350/mes free. Para 50+ runs/mes, sufficient.
-- Huemint: free non-commercial. Para commercial launch, upgrade needed.
-- Recraft: pay-per-use, no real limit beyond budget.
-- Domain MCP: free, no limit.
+- Stitch: N/A (salió del stack)
+- Huemint: free non-commercial → upgrade para launch comercial
+- Recraft: pay-per-use
+- Domain MCP: free, no limit
+- Claude Design: requires Pro+ subscription
 
-**Implication**: al escalar a 100+ runs/mes, budget + potential tier upgrades become considerations.
+**Implication**: escalar requiere commercial licenses en Huemint + possibly Recraft budget growth.
 
-## 16.8 Out-of-scope permanent (not planned for future)
+## 16.9 Out-of-scope permanent
 
-Estas NO son limitations "v1 — fix later" sino decisiones permanent:
+NO son "v1 — fix later" sino decisions permanentes:
 
-- **Legal opinion / TM registration service**: we're not a law firm, never will be
-- **Physical production (printing, manufacturing)**: we're a software tool, not a production agency
-- **Photoshooting services**: same — we don't do physical production
-- **Ongoing brand management**: Brand delivers a package, no continuous management service (though a future "Brand Maintenance" module could exist)
+- **Legal opinion / TM registration service**: we're not a law firm, never
+- **Physical production (printing, manufacturing)**: software tool, not agency
+- **Photography services**: no physical production
+- **Ongoing brand management 24/7**: Brand delivers package, no continuous service (future "Brand Maintenance" could be separate module)
 
-## 16.9 Cómo comunicar limitations
+## 16.10 Lo que NO es limitation
 
-### En el brand book PDF
+Cosas que pueden parecer limitations pero son **decisión arquitectónica intentional**:
 
-Sección dedicada "Scope & Limitations":
-- Lo que este brand book cubre
-- Lo que NO cubre y por qué
-- Recommended next steps for uncovered areas
+- **No microsite generation**: intentional — Claude Design lo hace mejor
+- **No mockups aplicados**: intentional — Claude Design
+- **No full copy library** (emails completos, long-form blog posts): intentional — Claude Design genera in-context per prompt
+- **No slides / pitch deck completo**: intentional — Claude Design
+
+Son **decisiones de scope** (nuestro output es brief + tokens), no limitations.
+
+## 16.11 Cómo comunicar limitations
+
+### En el Brand Design Document PDF
+
+Página dedicada "Scope & Limitations":
+- Lo que este document enables (via Claude Design)
+- Lo que NO cubre y por qué (physical, motion, sonic, CMYK)
+- Workarounds / future modules
 
 ### En el README.md del package
 
-Explicit lists (ver [08-dept-activation.md#63-paso-6](./08-dept-activation.md#63-paso-6)):
+Explicit sections (ver [08-dept-handoff-compiler.md](./08-dept-handoff-compiler.md#66-paso-6-generar-readme-del-package)):
 - Lo que incluye
-- Lo que NO incluye con reason
+- Skipped por scope con reasons
+- Out of scope v1 con reasons
 - Workarounds
 
-### En reveal al user
+### En reveal al user (post-delivery)
 
 Summary visible:
 ```
@@ -290,41 +187,50 @@ Out-of-scope v1:
   • Print CMYK heavy — usamos RGB
   • Motion design — brief escrito only
   • Sonic branding — brief escrito only
+  • Real photography — no generamos
 
-Para estas, considerar módulos futuros de Hardcore
-o hire specialists.
+Via Claude Design (downstream):
+  • Microsite aplicado, slides, mockups, copy completo
+  • Design system consistente across projects
+
+Para out-of-scope, considerar:
+  • Módulos futuros de Hardcore (Brand-Physical, Brand-Motion, Brand-Sonic)
+  • Hire specialists con nuestro Brand Document como brief
 ```
 
-## 16.10 Roadmap candidatos (future módulos)
+## 16.12 Roadmap candidatos (future módulos)
 
-Limitations que podrían resolverse con módulos separados:
+Limitations que podrían resolverse:
 
 | Módulo candidato | Resuelve | Prioridad |
 |---|---|---|
-| `brand-physical` | Packaging 3D, print CMYK, dielines | Media — cuando tengamos physical product users |
-| `brand-motion` | Motion design, video intros, transitions | Media — después del launch, demanda-driven |
-| `brand-sonic` | Audio branding, jingles, podcast audio | Baja — nice to have |
-| `brand-photography` | Real photography guidance + hire workflow | Baja |
-| `brand-multi-language` | Global brands en 3+ languages | Media — demanda-driven |
-| `brand-maintenance` | Ongoing brand updates, consistency checks | Baja — post-launch |
+| Claude Design MCP integration | Handoff manual → automatic | **Alta** — cuando Anthropic ship |
+| `brand-physical` | Packaging 3D, print CMYK | Media (physical product users) |
+| `brand-motion` | Motion design | Media (post-launch, demand-driven) |
+| `brand-sonic` | Audio branding | Baja |
+| `brand-photography` | Real photography guidance | Baja |
+| `brand-multi-language` | Global multi-lang | Media (demand-driven) |
+| `brand-maintenance` | Ongoing consistency | Baja (post-launch) |
 
-No all será built. Priorizar basado en demanda real de usuarios.
+Priorizar por demanda real.
 
-## 16.11 Honesty policy
+## 16.13 Honesty policy
 
 Brand v1 **siempre declara limitations**:
-- En README del package (section "Lo que NO incluye")
-- En brand book PDF (section dedicada)
-- En reveal al user al final del run
+- README del package
+- Brand Design Document PDF (scope & limitations section)
+- Reveal al user post-delivery
 
-No silently skip — always transparent about what's not covered. Esta es una decisión de producto, no solo técnica: confianza del user viene de transparency, no de fake completeness.
+No silently skip — always transparent.
 
-## 16.12 Testing
+## 16.14 Testing
 
-Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos relacionados con limitations:
+Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Brand run sin profile → `decided_without_profile: true` flag + explicit declaration
-2. Naming verification web search fails → flag "TM not verified" + disclaimer obligatorio
+1. Brand run sin profile → flag + declaration
+2. Naming verification fails → flag "TM not verified" + disclaimer
 3. Package README lista out-of-scope accurately per scope
-4. Brand book PDF contains "Scope & Limitations" section
-5. User asks for packaging 3D via override → graceful rejection + suggest alternatives
+4. Brand Document PDF contains "Scope & Limitations" section
+5. User asks for packaging 3D via override → graceful rejection + alternatives
+6. User sin Claude subscription → guidance displayed
+7. Tier 0 symbolic request → auto-elevation prompt + honest about quality

@@ -2,72 +2,68 @@
 
 ## 10.1 Propósito
 
-Definir cómo Brand persiste outputs en Engram + filesystem, y cómo módulos futuros (Launch, GTM, Ops) pueden consumir esos outputs vía contratos explícitos.
+Definir cómo Brand persiste outputs en Engram + filesystem, y cómo módulos futuros (Launch, GTM, Ops) consumen esos outputs vía contratos explícitos.
+
+El contrato refleja los **4 deliverables**: Brand Design Document PDF + Prompts Library + Brand Tokens + Reference Assets.
 
 ## 10.2 Persistence en Engram
 
 ### Topic keys estandarizados
 
-Todos los artifacts de Brand viven bajo el namespace `brand/{idea-slug}/*`:
+Todos los artifacts viven bajo `brand/{idea-slug}/*`:
 
 | Topic key | Qué contiene | Escribe | Lee (internamente) |
 |---|---|---|---|
 | `brand/{slug}/scope` | Scope manifest del Paso 0 | Orchestrator (Scope Analysis) | Todos los deptos |
-| `brand/{slug}/strategy` | Decisiones estratégicas (archetype, voice, positioning, values, promise) | Strategy | Verbal, Visual, Logo, Activation |
-| `brand/{slug}/verbal` | Naming artifact + copy artifact completo | Verbal Identity | Logo (wordmark+OG), Activation |
-| `brand/{slug}/visual` | Palette + typography + mood + principles | Visual System | Logo, Activation |
-| `brand/{slug}/logo` | Manifest de logos + paths a files | Logo & Key Visuals | Activation |
-| `brand/{slug}/activation` | Manifest del package entregado + coherence trace | Activation | Módulos futuros |
-| `brand/{slug}/final-report` | Executive summary completo del módulo | Activation | User (via `/brand:show`) + módulos futuros |
-| `brand/{slug}/snapshot/v{N}` | Frozen state completo post-delivery | Activation | Auditoría, `/brand:diff` |
+| `brand/{slug}/strategy` | Decisiones estratégicas | Strategy | Verbal, Visual, Logo, Handoff |
+| `brand/{slug}/verbal` | Naming + core copy | Verbal | Logo (wordmark+OG), Handoff |
+| `brand/{slug}/visual` | Palette + typography + mood + principles | Visual | Logo, Handoff |
+| `brand/{slug}/logo` | Manifest + paths a files | Logo | Handoff |
+| `brand/{slug}/handoff` | Package manifest + coherence trace | Handoff Compiler | Módulos futuros |
+| `brand/{slug}/final-report` | Executive summary | Handoff Compiler | User (via `/brand:show`) + módulos futuros |
+| `brand/{slug}/snapshot/v{N}` | Frozen state post-delivery | Handoff Compiler | Auditoría, `/brand:diff` |
 
 ### Convenciones de naming
 
-Siguen `skills/_shared/engram-convention.md` existente:
-
-- `{idea-slug}` es el mismo slug usado en Validation (consistency cross-módulo)
-- Snapshots versionan con `v1`, `v2`, `vN` — auto-increment cuando se re-run completo
-- Upsert behavior: si topic key ya existe, nuevo content sobrescribe + graba en revisions
+Siguen `skills/_shared/engram-convention.md`:
+- `{idea-slug}` consistente con Validation
+- Snapshots `v1`, `v2`, `vN`
+- Upsert behavior
 
 ### Estructura del content en Engram
 
-Cada Engram observation sigue el estándar:
-
 ```
-**What**: {summary line} [brand] [{dept_tag}] [{idea-slug-tag}]
-**Why**: {for downstream consumption + persistence of decision}
+**What**: {summary} [brand] [{dept_tag}] [{idea-slug-tag}]
+**Why**: {for downstream consumption}
 **Where**: {filesystem path si aplica} / {topic_key}
 **Data**:
-{JSON string of the full artifact}
+{JSON string of full artifact}
 ```
 
 ### Session lifecycle
 
-Similar a Validation pattern (ver `skills/_shared/engram-convention.md`):
-
+Similar a Validation:
 1. Orchestrator inicia session: `mem_session_start({name: "brand-{slug}-{timestamp}"})`
-2. Cada dept graba sus artifacts during execution
-3. Activation graba `final-report` + snapshot
+2. Cada dept graba artifacts
+3. Handoff Compiler graba final-report + snapshot
 4. Orchestrator cierra session: `mem_session_end()` + `mem_session_summary()`
-
-Session ID embebido en evidence_trace de cada output para reproducibility.
 
 ## 10.3 Filesystem persistence
 
-Brand persiste files reales en `output/{idea-slug}/brand/` (ver [08-dept-activation.md](./08-dept-activation.md#65) + [18-output-package-structure.md](./18-output-package-structure.md) para estructura completa).
+`output/{idea-slug}/brand/` contiene los 4 deliverables + README + AUDIT.
 
 **Principios**:
+- Filesystem para artifacts grandes (PDF, SVG logos, HTML examples)
+- Engram para metadata + manifest + machine-readable data
+- Engram referencia paths, NO duplica file contents
 
-- **Filesystem** para artifacts grandes (logos, mood imagery, PDF, HTML/CSS)
-- **Engram** para metadata + manifest + machine-readable data
-- Engram referencias paths del filesystem pero NO duplica file contents
-- Filesystem paths son relativos desde el repo root (portabilidad)
+Estructura completa en [18-output-package-structure.md](./18-output-package-structure.md).
 
 ## 10.4 Contratos de consumo (brand-contract.md)
 
-`skills/_shared/brand-contract.md` define cómo cualquier módulo futuro consume Brand artifacts.
+`skills/_shared/brand-contract.md` define cómo módulos futuros consumen Brand artifacts.
 
-Paralelo a `skills/_shared/profile-contract.md` existente para Profile module.
+Paralelo a `skills/_shared/profile-contract.md` existente.
 
 ### Interface del contrato
 
@@ -86,36 +82,39 @@ Dado un idea-slug, un módulo consumidor puede:
 
 3. ACCEDER A FILESYSTEM ARTIFACTS:
    path_base = f"output/{idea-slug}/brand/"
-   logo_svg = path_base + "logo/source/primary.svg"
-   palette_json = parse_json(path_base + "DESIGN.md")
+   brand_document_pdf = path_base + "brand-design-document.pdf"
+   prompts_library = parse_md(path_base + "prompts-for-claude-design.md")
+   tokens_json = parse_json(path_base + "brand-tokens/tokens.json")
+   logo_svg = path_base + "reference-assets/logo/primary.svg"
    ...
 
-4. ACCEDER A VERSION ESPECÍFICA (si múltiples snapshots):
-   latest_by_default = mem_search("brand/{idea-slug}/final-report", limit=1)
-   specific_version = mem_search("brand/{idea-slug}/snapshot/v2")
+4. ACCEDER A VERSION ESPECÍFICA:
+   latest = mem_search("brand/{idea-slug}/final-report", limit=1)
+   v2 = mem_search("brand/{idea-slug}/snapshot/v2")
 ```
 
-### Qué módulos consumidores pueden assume (invariantes)
+### Qué consumers pueden assume (invariantes)
 
-Los siguientes campos **siempre estarán disponibles** si Brand corrió successfully:
-
-- `archetype` (string, one of 12 Jung archetypes)
+**Siempre disponibles** si Brand corrió successfully:
+- `archetype` (string, one of 12 Jung)
 - `voice_attributes` (array of 3-5 objects)
 - `positioning_statement` (string)
 - `brand_name` (string)
-- `palette.primary` (object with 5+ colors HEX)
-- `typography` (heading + body fonts con Google Fonts imports)
-- `logo.primary` (path to SVG file)
+- `palette.primary` (object con 5+ colors HEX)
+- `typography` (heading + body + mono con Google Fonts imports)
+- `logo.primary` (path to SVG)
+- **Brand Design Document PDF** (for Claude Design upload)
+- **Prompts Library markdown** (for Claude Design projects)
+- **Brand Tokens folder** (for codebase integration)
+- **Reference Assets folder** (logos + optional mood imagery)
 
 ### Qué puede variar (scope-dependent)
 
-Los siguientes son **opcionales** — dependen del scope del original run:
-
-- `pitch_deck_cover` (solo si b2b-enterprise)
+- `pitch_deck_prompt` (solo si b2b-enterprise)
 - `app_icons_full_set` (solo si b2c-consumer-app)
-- `manifesto_document` (solo si community-movement)
-- `whatsapp_templates` (solo si b2local-service)
-- `podcast_cover` (solo si content-media con podcast)
+- `manifesto_opening` (solo si community-movement)
+- `whatsapp_templates_seed` (solo si b2local-service)
+- `podcast_cover_prompt` (solo si content-media con podcast)
 
 Los consumers deben:
 1. Consultar `scope.output_manifest` para saber qué está disponible
@@ -123,80 +122,48 @@ Los consumers deben:
 
 ### Versioning y freshness
 
-Los consumers deben:
-1. Por default, consumir el **latest snapshot** (highest vN)
-2. Detectar **staleness**: si `brand.last_updated` > 180 days, flag al user ("tu brand data tiene 6 meses — considerar regenerar")
-3. Respetar **invalidation**: si Validation o Profile se updatearon después de Brand, flag "brand may be stale relative to validation/profile"
+- Por default: latest snapshot
+- Staleness: si `brand.last_updated` > 180 days, flag
+- Invalidation: si Validation/Profile updated después de Brand, flag "brand may be stale"
 
 ### Downstream module use cases (futuros)
 
-Ejemplos de cómo Launch, GTM, Ops consumirían:
-
 **Launch module**:
-- Lee `activation.microsite` para deploy
-- Lee `activation.brand_book_pdf` para team onboarding
-- Lee `activation.social` para schedule launch posts
-- Lee `verbal.press_release_boilerplate` si scope lo incluye
+- Lee `handoff.brand_design_document_path` para package assembly
+- Lee `handoff.prompts_library_path` para auto-execute prompts en Claude Design
+- Lee `logo/primary.svg` para favicon del deploy
+- Lee `verbal.core_copy` para meta tags en generated pages
 
-**GTM module** (Go-to-Market):
-- Lee `strategy.target_audience_refined` para audience targeting
-- Lee `strategy.voice_attributes` para ad copy
-- Lee `verbal.value_props` para A/B test variants
+**GTM module**:
+- Lee `strategy.target_audience_refined` para audience targeting ads
+- Lee `strategy.voice_attributes` para ad copy consistency
+- Lee `verbal.core_copy.value_props` para A/B test variants
 - Lee `visual.palette` + `logo` para ad creative
 
 **Ops module**:
-- Lee `verbal.email_templates` para set up en email provider
-- Lee `verbal.whatsapp_templates` (si local) para WhatsApp Business
-- Lee `verbal.communications.bios` para consistency en profiles
+- Lee `prompts_library.email_prompts` para set up en email providers
+- Lee `verbal.communications.whatsapp_greeting_seed` (si local) para WhatsApp Business
+- Lee `verbal.social_bios` para consistency audit
+
+**Future Brand Maintenance module**:
+- Lee todo para monitor brand consistency en otros content over time
 
 ## 10.5 Snapshot model (versioning)
 
-Cada run completo de Brand produce un **snapshot** frozen:
+Cada run completo produce un snapshot frozen en `brand/{slug}/snapshot/v{N}`.
 
-```
-brand/{slug}/snapshot/v1 — primer run
-brand/{slug}/snapshot/v2 — segundo run (después de re-run completo)
-brand/{slug}/snapshot/v3 — etc.
-```
+Contiene full state del run: scope, strategy, verbal, visual, logo, handoff metadata, tool versions, timestamps, evidence traces.
 
-Un snapshot contiene **todo el state** del run:
-- Scope manifest
-- Strategy output
-- Verbal output
-- Visual output
-- Logo output (metadata — files siguen en filesystem)
-- Activation manifest
-- Tool versions, timestamps
-- Evidence traces completos
-
-Permite:
-- Reproducir exactamente el run (si tools/inputs disponibles)
-- Comparar entre runs (`/brand:diff v1 v2`)
-- Rollback (volver a v1 si v2 es peor)
-- Analytics históricos (cómo evolucionó la marca)
-
-### Partial re-runs (extend mode)
-
-`/brand:extend {depto}` regenera SOLO ese dept, keeping downstream aligned:
-
-- Ejemplo: `/brand:extend logo` regenera logo con nuevos prompts
-- Ejemplo: `/brand:extend verbal.naming` regenera solo naming (keeping copy)
-
-**Partial re-runs NO crean nuevo snapshot vN** — solo actualizan el topic key del dept afectado. El snapshot es para runs completos.
-
-**Tracking de partial re-runs**: Engram graba en `brand/{slug}/{dept}` con revision count incremented.
+Ver [15-versioning-reproducibility.md](./15-versioning-reproducibility.md) para detalles.
 
 ## 10.6 Relación con Validation + Profile
 
 Brand **lee pero no modifica** Validation ni Profile.
 
-- Validation artifacts: `validation/{slug}/*` (unchanged)
-- Profile artifacts: `profile/{user-slug}/*` (unchanged)
-
-Si Validation o Profile se actualizan después de Brand run:
-- No invalida el Brand run retroactivamente
-- Pero flagea staleness cuando futuro módulo consume Brand
-- User puede `/brand:new` para regenerar con inputs actualizados (crea vN+1)
+Si Validation/Profile se actualizan después de Brand run:
+- No invalida Brand retroactively
+- Flag staleness cuando future module consume
+- User puede `/brand:new` para regenerar (crea vN+1)
 
 ## 10.7 Evidence traces
 
@@ -208,15 +175,16 @@ Cada output de dept incluye `evidence_trace`:
   "validation_depts_used": [...],
   "scope_modifiers_applied": [...],
   "tool_versions": {
-    "stitch_mcp": "0.3.2",
-    "recraft_v4": "latest",
-    "huemint_api": "v1"
+    "recraft_v4": "latest or null if tier 0",
+    "huemint_api": "v1 or null if tier 0",
+    "domain_mcp": "2.1.0",
+    "pdf_skill": "1.2",
+    "claude_model": "claude-opus-4-7"
   },
+  "tier_used": 0 | 1 | 2,
   "timestamps": {...}
 }
 ```
-
-Esto permite auditoría: "¿Por qué el archetype es Sage? → evidence_trace dice fue derivado de profile.identity + validation.competitive white space + scope.archetype_constraints."
 
 ## 10.8 Snapshot file layout (Engram)
 
@@ -228,24 +196,26 @@ Esto permite auditoría: "¿Por qué el archetype es Sage? → evidence_trace di
   "timestamp_end": "2026-04-20T14:57:42Z",
   "idea_slug": "auren-compliance",
   "user_slug": "user-slug-example",
+  "tier_used": 0,
   "tool_versions": {...},
   "scope_ref": "brand/{slug}/scope",
   "strategy_ref": "brand/{slug}/strategy",
   "verbal_ref": "brand/{slug}/verbal",
   "visual_ref": "brand/{slug}/visual",
   "logo_ref": "brand/{slug}/logo",
-  "activation_ref": "brand/{slug}/activation",
+  "handoff_ref": "brand/{slug}/handoff",
   "filesystem_path": "output/auren-compliance/brand/",
   "cost_tracking": {
-    "image_gen_usd": 0.73,
-    "stitch_generations_used": 5,
-    "total_runtime_seconds": 1662
+    "image_gen_usd": 0.00,
+    "tier": 0,
+    "total_cost_usd": 0.00,
+    "total_runtime_seconds": 1122
   },
   "coherence_trace": {...}
 }
 ```
 
-## 10.9 brand-contract.md — lo que Sprint 0 debe escribir
+## 10.9 brand-contract.md — a escribir en Sprint 0
 
 Archivo: `skills/_shared/brand-contract.md`
 
@@ -256,19 +226,21 @@ Estructura esperada (paralela a `skills/_shared/profile-contract.md`):
 2. Retrieval protocol — how to fetch brand data
 3. Invariants — fields siempre disponibles
 4. Scope-dependent fields — cuáles varían
-5. Staleness detection — cómo detectar
-6. Multi-version — cómo elegir snapshot
-7. Edge cases — brand run failed, partial results
-8. Consumption examples — código/pseudocódigo
-9. Testing — cómo verificar que un módulo consuma correctamente
+5. Claude Design handoff integration — cómo consumer puede triggear Claude Design workflows
+6. Staleness detection
+7. Multi-version — cómo elegir snapshot
+8. Edge cases — brand run failed, partial results
+9. Consumption examples — código/pseudocódigo
+10. Testing — cómo verificar consumo correcto
 ```
 
 ## 10.10 Testing
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Full run completo → todos los topic keys creados correctamente
+1. Full run completo → todos los topic keys creados
 2. Partial re-run → solo dept afectado se actualiza
 3. Snapshot v1 + re-run → snapshot v2 creado preservando v1
 4. Consumer simulado (mock Launch module) → puede leer brand artifacts vía contract
-5. Staleness detection: brand run antiguo + validation updated → flagged
+5. Staleness: brand viejo + validation updated → flagged
+6. Contract includes path a Brand Design Document PDF (for Claude Design consumption)

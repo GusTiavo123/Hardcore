@@ -2,9 +2,7 @@
 
 ## 12.1 Propósito
 
-Definir los **modos** en que Brand puede ejecutarse + los **puntos de interacción** donde el user participa o pasa por default.
-
-El balance crítico: **control del user vs velocidad del flow**. Muchos prompts = friction; pocos = pérdida de voice del user en el output.
+Definir los **modos** en que Brand puede ejecutarse + los **puntos de interacción** donde el user participa.
 
 ## 12.2 Los 4 modos
 
@@ -13,314 +11,217 @@ El balance crítico: **control del user vs velocidad del flow**. Muchos prompts 
 Invocación: `"brandea esta idea"` / `/brand:new`
 
 **Características**:
-- 3 puntos de interacción con user (ver sección 12.3)
+- 3-4 puntos de interacción con user
 - Reveal progresivo después de cada dept
-- User puede aceptar default o redirigir en cada punto
-- Tiempo total: 25-35 min (con latencia de user responses)
-
-**Cuándo usarlo**:
-- Primera vez corriendo Brand en esta idea
-- User quiere involvement en decisiones clave (archetype, nombre, logo)
-- Producto final-production quality matters
+- Tiempo total: 18-22 min
 
 ### Modo Fast
 
 Invocación: `/brand:fast` / `"brandea rápido"`
 
-**Características**:
-- Skip todas las interacciones de user
+- Skip interacciones
 - Auto-pick top-ranked en cada decisión point
-- Reveal comprimido (solo summary al final de cada dept, no full visual)
-- Tiempo total: 15-20 min
+- Reveal comprimido
+- Tiempo total: 12-15 min
 
-**Cuándo usarlo**:
-- Dogfooding rápido (iterar sobre el módulo mismo)
-- Freemium first-run para reducir friction al usuario nuevo
-- Background regeneration automatizada
-- CI/testing
+### Modo Extend
 
-**Trade-off**: user no tiene control granular. Si no le gusta el output, extend mode o re-run.
+Invocación: `/brand:extend {depto}`
 
-### Modo Extend (partial re-run)
-
-Invocación: `/brand:extend {depto}` o `/brand:extend {depto.specific_output}`
-
-**Características**:
-- Regenera solo el dept especificado
-- Otros deptos reutilizados desde Engram (cache implícito)
-- Coherence gates re-ejecutados con el nuevo output
-- Si regenerating dept downstream requiere upstream reworking, flag al user
-
-**Ejemplos**:
-```
-/brand:extend logo                  # Regenera todo el dept Logo
-/brand:extend verbal.naming         # Solo naming de Verbal, keeping copy
-/brand:extend verbal.copy           # Solo copy, keeping nombre existente
-/brand:extend visual.palette        # Solo palette, keeping typography + mood
-/brand:extend activation.microsite  # Solo microsite, keeping brand book
-```
-
-**Feedback opcional**:
-```
-/brand:extend logo --feedback "más minimalista, menos ornamental"
-/brand:extend verbal.copy --feedback "menos formal, más punchy"
-```
-
-**Cuándo usarlo**:
-- User quiere iterar sobre una pieza sin regenerar todo (cost + time efficiency)
-- Testing de un cambio específico
-- Recovery de failure en un dept (si Recraft estuvo down, extend logo después)
-
-**Tracking**: partial re-runs NO crean nuevo snapshot vN completo — solo actualizan el topic key del dept. Revision count del dept incrementa.
+- Regenera solo dept específico
+- Otros deptos reutilizados (cache Engram)
+- Coherence gates re-ejecutados
+- Examples:
+  ```
+  /brand:extend logo
+  /brand:extend verbal.naming
+  /brand:extend verbal.core_copy
+  /brand:extend visual.palette
+  /brand:extend handoff (regenera los 4 deliverables pero no regens upstream)
+  ```
 
 ### Modo Override
 
-Invocación: `/brand:override {key}={value}` antes de run O durante interacción
-
-**Características**:
-- Fuerza decisión específica pre-run
-- Strategy respeta el override si no contradice `scope.archetype_constraints.blocked`
-- Si contradice, pide justification adicional (ver edge case sección 12.4)
+Invocación: `/brand:override {key}={value}` o `/brand:new --{key}={value}`
 
 **Overrides válidos**:
 
 | Key | Valores | Effect |
 |---|---|---|
-| `archetype` | any of 12 Jung archetypes | Strategy usa este archetype directamente (skip selection logic) |
-| `voice_register` | any of 5 register values | Overrides el default del brand profile |
-| `typography_era` | any of 4 era values | Overrides default |
-| `primary_color` | HEX color | Huemint usa este como seed primario obligatorio |
-| `name` | string | Verbal skip naming generation, usa este nombre + verification |
-| `language` | es, en, pt, ... | Override language del output |
-| `output_manifest.include` | array of asset keys | Agrega outputs que el scope skipearía |
-| `output_manifest.exclude` | array of asset keys | Remove outputs del required default |
+| `archetype` | any of 12 Jung | Strategy usa override directamente |
+| `voice_register` | any of 5 values | Overrides default |
+| `typography_era` | any of 4 values | Overrides default |
+| `primary_color` | HEX | Huemint uses as seed obligatorio |
+| `name` | string | Verbal skip generation, usa este + verify |
+| `language` | es, en, pt, ... | Override output language |
+| `tier` | 0, 1, 2 | Override image_gen_tier del scope |
+| `output_manifest.include` | array | Agrega outputs al required |
+| `output_manifest.exclude` | array | Remove outputs del required |
 
-**Ejemplo**:
-```
-/brand:new --override archetype=Hero --override primary_color=#FF3A5C --override language=es
-```
-
-O durante flow:
-```
-[Post-Strategy reveal]
-    Archetype: SAGE
-    ¿OK? [Enter=yes | otro nombre=override]
-
-[user: hero]
-    Re-ejecutando Strategy con archetype=Hero...
-```
-
-**Cuándo usarlo**:
-- User tiene visión clara y quiere skipear exploración
-- Constraint de brand existente (ya tienen nombre, solo quieren resto del package)
-- Experimentación (A/B testing de directions)
-
-## 12.3 Los 3 puntos de interacción (Modo Normal)
+## 12.3 Los 3-4 puntos de interacción (Modo Normal)
 
 ### Punto 1: Post Scope Analysis (condicional)
 
-**Cuándo ocurre**: solo si `confidence < 0.7` del brand profile matching.
+**Cuándo**: `confidence < 0.7` del brand profile matching.
 
-**Prompt**:
-```
-Clasifiqué tu idea como B2B SMB SaaS (confidence 0.62 — medio).
-
-Señales que me llevaron ahí:
-- Target audience: compliance officers de fintechs
-- Pricing model: subscription $200-500/mo
-- Distribution: content + outbound
-
-¿Te suena correcto?
-  1. ✓ Correcto (b2b-smb)
-  2. Es B2B enterprise (large companies, $50K+)
-  3. Es B2D (developer tool con component fintech)
-  4. Es B2C consumer (end users)
-  5. Otra (describila)
-```
-
-**User input**: número o texto libre.
+Ver [02-scope-analysis.md](./02-scope-analysis.md#27-user-interaction) para el prompt completo.
 
 **Skipped en**: Fast mode, confidence ≥ 0.7.
 
 ### Punto 2: Post Strategy (opcional)
 
-**Cuándo ocurre**: siempre en Normal mode, unless override previo.
+**Cuándo**: siempre en Normal mode, unless override previo.
 
-**Prompt**:
 ```
 [3:42] ① Strategy ready — Archetype: SAGE
 
-[Full reveal as described in 04-dept-strategy.md #7]
+[Full reveal]
 
-¿OK para continuar o preferís alternativa?
-  [Enter para continuar]
+¿OK o preferís alternativa?
+  [Enter] accept
   'ruler' | 'hero' | 'creator' — override archetype
   'voice' — ajustar voice attributes
-  'skip' — proceed anyway con un flag
+  'skip' — proceed con flag
 ```
-
-**User input**:
-- Enter / nothing → accept
-- Archetype name → Strategy re-runs con override
-- "voice" → ask user for voice adjustments
-- "skip" → proceed con flag (puede causar coherence gate issues downstream)
 
 **Skipped en**: Fast mode, override previo de archetype.
 
-### Punto 3: Post Verbal — Naming selection (OBLIGATORIO en Normal)
+### Punto 3: Post Verbal Naming (OBLIGATORIO)
 
-**Cuándo ocurre**: siempre en Normal mode, unless `name` override.
+**Cuándo**: siempre en Normal mode, unless `name` override.
 
-**Prompt**:
 ```
-[7:14] ② Verbal Identity — verificando 12 candidatos...
+[7:14] ② Verbal Identity — Top 7 nombres
 
-[Progress: domain check ✓ · trademark screening ✓ · linguistic check ✓]
+[Tabla con availability + fit + score]
 
-[9:14] Top 7 nombres (ranked):
+Recomendado: Auren
 
-    Nombre         .com  .io  .ai  .mx   TM   Fit  Mem  Score
-    Auren           ✓    ✓    ✓    ✓    ✓    9    9    9.1  ← top
-    RegClarity      ✗    ✓    ✓    ✓    ✓    9    8    8.2
-    ...
-
-    Recomendado: Auren (domains libres, TM clean, fit Sage fuerte)
-
-    Opciones:
-      [Enter] para aceptar Auren
-      '{otro nombre}' para elegir otro
-      'more' para regenerar con feedback
-      'manual {name}' si querés proponer tu propio nombre
+Opciones:
+  [Enter] accept Auren
+  '{otro nombre}' pick otro
+  'more' regenerate con feedback
+  'manual {name}' your own name
 ```
 
-**User input**:
-- Enter / nothing → auto-picks recommended
-- Name from list → use that
-- "more" → regenerate round con user feedback prompt
-- "manual {name}" → skip generation, usar ese nombre + verification
+**Skipped en**: Fast mode (auto-picks top), `name` override previo.
 
-**Skipped en**: Fast mode (auto-picks top-ranked), `name` override previo.
+### Punto 4: Post Logo (OBLIGATORIO)
 
-### Punto 4: Post Logo — Logo selection (OBLIGATORIO en Normal)
+**Cuándo**: siempre en Normal mode.
 
-**Cuándo ocurre**: siempre en Normal mode.
-
-**Prompt**:
 ```
-[17:45] ④ 4 logo concepts generated
+[17:45] ④ 4 logo concepts (Tier {N})
 
-    [B1 SVG rendered]  [B2 SVG rendered]  [B3 SVG rendered]  [C1 SVG rendered]
-    
-    Cada con rationale 1-line.
+[4 SVGs rendered en grid]
 
-    Opciones:
-      'B1' | 'B2' | 'B3' | 'C1' — pick one
-      'direction B' — regenerate más variants de wordmark direction
-      'direction C' — regenerate combination direction
-      'none' — regenerate todos con feedback
-      'manual' — upload tu propio logo
+Opciones:
+  'B1' | 'B2' | 'B3' | 'C1' — pick one
+  'direction B' — regenerate variants de esa direction
+  'none' — full regen con feedback
+  'manual' — upload your own logo
 ```
 
-**User input**:
-- Logo ID → use that
-- "direction X" → regenerate 3-4 variants of that direction
-- "none" → feedback prompt → regenerate all
-- "manual" → user uploads / provides logo, Logo dept skipea generation
+**Skipped en**: Fast mode (auto-picks highest-quality).
 
-**Skipped en**: Fast mode (auto-picks highest-quality based on internal scoring).
+### Punto 5: Tier elevation confirmation (condicional)
 
-### Punto 5 (condicional): Coherence gate escalation
+**Cuándo**: scope requires `symbolic-first` o `icon-first` pero current tier es 0.
 
-**Cuándo ocurre**: si un gate falla 2+ veces tras regeneration.
+```
+Tu scope requiere symbolic logos.
+Tier 0 (Claude native) produce wordmarks bien pero symbolic marks limitados.
 
-**Prompt**: ver [09-coherence-model.md#95](./09-coherence-model.md#95) para full escalation UI.
+Opciones:
+  1. Elevar a Tier 1 (~$0.20 Recraft para 3 symbolic concepts)
+  2. Cambiar a wordmark-preferred
+  3. Proceder con Tier 0 acknowledging quality loss
+```
 
-**User input**: elige entre opciones específicas al gate failing.
+**Skipped en**: user previously set `--tier=0` explicitly (assumes aware).
 
-**No skipeable**: Fast mode también lo enfrenta — aunque en Fast puede default a "accept mismatch" si user lo configuró así (TBD).
+### Punto 6 (condicional): Coherence gate escalation
+
+**Cuándo**: gate falla 2+ veces tras regeneration.
+
+Ver [09-coherence-model.md#96-escalation-ui-al-user](./09-coherence-model.md#96-escalation-ui-al-user) para prompt completo.
+
+### Punto 7: Post-delivery Claude Design handoff instructions
+
+**Cuándo**: siempre en Normal mode después de Handoff Compiler.
+
+```
+[27:42] ⑤ Handoff Compiler — Package completo
+
+📂 output/auren-compliance/brand/
+[Lista de deliverables]
+
+📋 Next steps para usar con Claude Design:
+
+  1. Abrir claude.ai/design
+  2. Design System Setup → Upload brand-design-document.pdf
+  3. Validar con test project
+  4. Publicar design system
+  5. Usar prompts de prompts-for-claude-design.md en nuevos projects
+  6. Claude Design handoff bundle → Claude Code → deploy
+
+¿Querés que abra el README con las instructions completas? [y/n]
+```
 
 ## 12.4 Edge cases en interacción
 
-### User provee override inválido
+Ver [19-edge-cases.md](./19-edge-cases.md) para detalles completos.
 
-Ej: scope `b2b-enterprise`, user override `archetype=Jester` (bloqueado).
-
-```
-Override rejected: archetype "Jester" está en archetype_constraints.blocked para scope b2b-enterprise.
-Razón: Jester tiene baja credibilidad en contextos B2B enterprise, puede alienar decision makers.
-
-Opciones:
-  1. Cambiar override a archetype compatible: Sage, Ruler, Hero, Creator, Caregiver, Everyman
-  2. Forzar con --force (NO recomendado, el brand book incluirá warning permanente)
-  3. Cancelar override, dejar a Strategy auto-seleccionar
-```
-
-User elige. Si usa `--force`, grabar warning permanente en Engram + brand book.
-
-### User no responde (timeout)
-
-Si user no responde por X minutos (configurable, default 10 min):
-- En Normal mode: grabar session state en Engram, pausar execution
-- User puede `/brand:resume` para continuar
-- Timeout 24h: cancel run, flag as incomplete
-
-### User cancela mid-flow
-
-Signal interrupt (user: "cancel" / Ctrl+C / `/brand:cancel`):
-- Persist state actual en Engram con `status: "partial"`
-- Show summary de qué se completó + qué faltó
-- `/brand:resume` para continuar donde dejó
-
-### User provee decisión ambigua
-
-Ej: "quiero algo entre Sage y Creator"
-
-- Claude interpreta si puede (mezcla — Strategy puede intentar blend)
-- Si ambiguo: ask clarification ("¿Sage primary con Creator influence, o Creator primary con Sage influence?")
+- Override inválido → rejection con explanation
+- Override conflict con scope → block con options
+- Timeout → persist state, `/brand:resume`
+- Cancel mid-flow → partial state persisted
 
 ## 12.5 Summary tabla — mode × interaction
 
 | Interaction point | Normal | Fast | Extend | Override |
 |---|---|---|---|---|
-| 1. Scope confirmation (if low conf) | ✓ | skip | n/a | skip (already set) |
-| 2. Post-Strategy review | ✓ | skip | Only if extending strategy | skip (override pre-set) |
-| 3. Naming selection | ✓ | skip | Only if extending verbal.naming | skip (if name override) |
-| 4. Logo selection | ✓ | skip | Only if extending logo | skip (if manual logo) |
-| 5. Coherence escalation (if gate fails 2×) | ✓ | ✓ | ✓ | ✓ |
+| 1. Scope confirmation (if low conf) | ✓ | skip | n/a | skip |
+| 2. Post-Strategy review | ✓ | skip | Only if extending strategy | skip |
+| 3. Naming selection | ✓ | skip | Only if extending verbal.naming | skip if name override |
+| 4. Logo selection | ✓ | skip | Only if extending logo | skip if manual logo |
+| 5. Tier elevation confirmation | conditional | skip (respects --tier) | conditional | skip if --tier set |
+| 6. Coherence escalation | ✓ | ✓ | ✓ | ✓ |
+| 7. Claude Design handoff instructions | ✓ | shown once (brief) | shown if handoff regen | ✓ |
 
 ## 12.6 UX del reveal progresivo
 
-Cada dept devuelve un reveal visual intermedio al user antes de continuar al siguiente. Esto es crítico para el wow factor (ver [01-overview-and-architecture.md#12](./01-overview-and-architecture.md#12) — "filosofía").
+Cada dept devuelve un reveal visual intermedio antes de continuar.
 
 ### Formato del reveal
 
-Cada dept reveal incluye:
 1. **Header con timestamp + depto number**:
    ```
    [3:42] ① Strategy ready — Archetype: SAGE
    ```
-2. **Core content** — qué se decidió/generó, en formato visual-friendly
+2. **Core content** — qué se decidió/generó
 3. **Evidence one-line** — por qué así
-4. **Interaction prompt** (si aplica) — qué puede hacer el user
+4. **Interaction prompt** (si aplica)
 
 ### Reveal estructurado por dept
 
 - Strategy: archetype + positioning + voice + values (compact)
-- Verbal naming: tabla de top 5 con availability + fit score
-- Verbal copy: selected copy samples (hero + tagline + 1-2 more)
-- Visual: palette swatches + typography samples rendered + mood grid
+- Verbal naming: tabla top 5 con availability + fit
+- Verbal copy: selected copy samples (hero + tagline + value props)
+- Visual: palette swatches + typography rendered + mood grid (si tier ≥ 1)
 - Logo: 4-5 SVGs rendered + rationales
-- Activation: final package path + microsite link + PDF link + cost
+- Handoff Compiler: package path + 4 deliverables listed + next steps for Claude Design
 
 ### Fast mode reveals
 
-Comprimidos — un solo line-summary por dept:
+Comprimidos:
 ```
 [15:20] ① Strategy: Sage + positioning + voice ✓
-[17:45] ② Verbal: Auren (Top 1, score 9.1) + 18 copy assets ✓
-[21:30] ③ Visual: Navy/Off-white/Amber palette + Fraunces/Inter + 6 mood imgs ✓
-[26:14] ④ Logo: B2 selected (highest quality score) + 12 derivations ✓
-[32:40] ⑤ Activation: Microsite + Brand book + 47 files delivered ✓
+[17:45] ② Verbal: Auren (Top 1, score 9.1) + 12 core copy assets ✓
+[21:30] ③ Visual: Navy/Off-white/Amber palette + Fraunces/Inter ✓
+[26:14] ④ Logo: B2 selected + 12 derivations ✓ (Tier 0)
+[32:40] ⑤ Handoff: 4 deliverables + PDF + Prompts Library + Tokens + Assets ✓
+        → Next: upload brand-design-document.pdf to Claude Design
 ```
 
 ## 12.7 Reference files a escribir en Sprint 0
@@ -333,11 +234,14 @@ Comprimidos — un solo line-summary por dept:
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Normal mode → 3-4 puntos de interacción triggered correctamente
-2. Fast mode → auto-picks en todos los puntos, no prompts al user
-3. Extend logo → solo logo dept re-runs, otros reused
+1. Normal mode → 4 puntos de interacción triggered correctamente
+2. Fast mode → auto-picks en todos los puntos
+3. Extend logo → solo logo dept re-runs
 4. Override archetype compatible → Strategy usa override
 5. Override archetype blocked → rejection + options
 6. User cancel mid-flow → partial state persisted
 7. Scope confidence low → Point 1 triggered
 8. Scope confidence high → Point 1 skipped
+9. Scope requires symbolic + Tier 0 → Point 5 tier elevation triggered
+10. Coherence gate fails 2× → Point 6 escalation triggered
+11. Post-delivery → Point 7 shows Claude Design instructions

@@ -6,33 +6,23 @@ Brand es el **tercer módulo** de Hardcore. Su rol en el ecosistema:
 
 - **Validation** → decide si una idea vale la pena perseguir (verdict GO/NO-GO/PIVOT)
 - **Profile** → entiende quién es el founder para personalizar
-- **Brand** → le da identidad ejecutable a una idea validada
+- **Brand** → **produce el brief óptimo para que Claude Design ejecute la marca**
 
-**Brand no entrega specs de marca — entrega una marca funcionando**. La diferencia es crítica: un PDF con "acá están tus colores y tu archetype" es lo que cualquier competidor AI puede producir. Brand de Hardcore produce un microsite HTML corriendo, logos editables, copy aplicado, assets en contextos. El founder cierra la sesión con algo que puede subir a internet mañana.
+## 1.2 Premisa fundamental
 
-## 1.2 Posicionamiento estratégico
+> **Brand module alimenta a Claude Design con el brief perfecto + prompts perfectos + tokens perfectos.**
 
-**Por qué este es el módulo que vende Hardcore**: Validation es el core mental — convence por rigor argumentativo. Brand es el core emocional — convence por tangibilidad. Al usuario típico le cuesta argumentar contra una validación (scoring, evidence, rubrics); NO le cuesta ignorarla si no siente algo. Brand cierra ese gap. Es el eslabón que convierte "tu idea tiene 73/100" en "y acá está tu marca funcionando".
+Nosotros producimos strategic intelligence + brand foundation. Claude Design produce los artefactos aplicados (landing, slides, mockups, etc.) con nuestro brief como input.
 
-**El moat**: cualquier herramienta AI puede generar cada pieza suelta. Hardcore genera un **sistema coherente** anclado a:
-1. El perfil real del founder (via Profile)
-2. La evidencia real del mercado (via Validation)
-3. Reglas de coherencia cross-dept enforced automáticamente
-4. Adaptación al tipo de idea (no output genérico)
+**Nuestro moat**:
+1. Integración con upstream context (Profile + Validation) que Claude Design no tiene
+2. Scope Analysis con 8 brand profiles canónicos (clasificación automática del tipo de idea)
+3. Strategy reasoning (archetype Jung, voice attributes anchored a evidence)
+4. Naming con verification externa (domain + trademark)
+5. Coherence gates cross-dept enforced
+6. Brief compilation en formato óptimo para Claude Design
 
-Los 4 juntos no los tiene nadie en 2026.
-
-## 1.3 Posicionamiento técnico dentro de Hardcore
-
-Brand es un módulo paralelo a Validation y Profile, no una extensión. Cada módulo es independiente pero se potencia con los demás:
-
-- Brand **consume** outputs de Validation (obligatorio) y Profile (opcional, opt-in)
-- Brand **produce** artifacts en Engram que módulos futuros (Launch, GTM, Ops) podrán consumir
-- Brand **no modifica** Validation ni Profile — solo lee
-
-El patrón de delegación es el mismo que Validation: hay un orchestrator que delega a 5 sub-agentes (los departamentos), cada uno es una skill con su SKILL.md.
-
-## 1.4 Invocación del módulo
+## 1.3 Invocación del módulo
 
 **Comandos primarios**:
 - `"brandea esta idea"` / `"brand this idea"` / `"armá la marca"` (español natural)
@@ -46,9 +36,9 @@ El patrón de delegación es el mismo que Validation: hay un orchestrator que de
 - `/brand:resume` — reanudar run interrumpido
 - `/brand:diff v1 v2` — comparar snapshots
 
-**Bloqueado si**: la idea tiene verdict `NO-GO` en Validation. Override explícito (`"brandea igual"`) disponible pero graba warning permanente en Engram.
+**Bloqueado si**: verdict `NO-GO` en Validation. Override explícito (`"brandea igual"`) disponible con warning permanente grabado.
 
-## 1.5 Arquitectura general — diagrama del pipeline
+## 1.4 Arquitectura general — diagrama del pipeline
 
 ```
           VALIDATION OUTPUT + FOUNDER PROFILE (Engram)
@@ -68,20 +58,38 @@ El patrón de delegación es el mismo que Validation: hay un orchestrator que de
          ┌─────────────────────┴─────────────────────┐
          ↓                                             ↓
 ② VERBAL IDENTITY                             ③ VISUAL SYSTEM
-   (paralelo)                                    (paralelo)
+   (naming + core copy)                          (palette + type + mood)
          └─────────────────────┬─────────────────────┘
                                ↓
                   ④ LOGO & KEY VISUALS
-                  (requiere Visual + Verbal)
+                  (Tier-based generation)
                                ↓
-                  ⑤ ACTIVATION
-                  (coherence gates + delivery)
+                  ⑤ HANDOFF COMPILER
+                  (coherence gates + 4 deliverables)
                                ↓
-                  Brand Package Entregable
-                  (estructura dinámica por scope)
+           ┌─────────────────────────────────────┐
+           │ Brand Package para Claude Design    │
+           │  ├─ Brand Design Document (PDF)     │
+           │  ├─ Prompts Library (Markdown)      │
+           │  ├─ Brand Tokens (CSS+JSON+TW)      │
+           │  └─ Reference Assets (logos+mood)   │
+           └─────────────────────────────────────┘
+                               ↓
+                               ↓
+                   [ Claude Design ]
+                   (downstream — no nos pertenece)
+                               ↓
+           Artifacts finales (microsite, decks, social, etc.)
+                               ↓
+                   [ Claude Code ] → deploy
 ```
 
-## 1.6 Justificación de cada decisión arquitectónica
+**Separación de responsabilidades**:
+- **Nosotros**: decisions + brief compilation
+- **Claude Design**: UI generation + applied design system
+- **Claude Code**: deployment
+
+## 1.5 Justificación de cada decisión arquitectónica
 
 ### ¿Por qué Scope Analysis como Paso 0?
 
@@ -101,17 +109,38 @@ Strategy es el único depto que **toma decisiones**. Archetype, voice, positioni
 
 Operan en dominios ortogonales (palabras vs diseño). Ambos dependen solo de Strategy, no entre sí. Paralelizar corta el tiempo total del pipeline ~40% sin sacrificar coherencia — ambos leen el mismo Strategy output como contrato.
 
-### ¿Por qué Logo después de Visual + Verbal?
+### ¿Por qué Logo después de Verbal + Visual?
 
-Necesita paleta para aplicar (del Visual) y nombre para wordmarks/variantes (del Verbal). Lanzarlo antes produce logos genéricos desalineados.
+Necesita paleta para aplicar (del Visual) y nombre para wordmarks/variantes (del Verbal). Lanzarlo antes produce logos desalineados.
 
-### ¿Por qué Activation al final?
+### ¿Por qué Handoff Compiler al final?
 
-Activation integra todos los outputs + enforza coherence gates + arma el paquete entregable. Es el equivalente al Synthesis de Validation. Si algo no es coherente cross-dept, Activation lo detecta antes de delivery.
+Integra todos los outputs + enforza coherence gates + compila los 4 deliverables en formato optimizado para Claude Design. Es el equivalente al Synthesis de Validation — sintetiza + empaqueta.
 
 ### ¿Por qué 5 departamentos y no otro número?
 
-Ver el razonamiento completo en el mockup. TL;DR: cada dept tiene un modo cognitivo y stack de tools distinto. Menos de 5 (ej: juntar Logo en Visual) rompe boundaries de costo/failure/testing. Más de 5 (ej: separar Copy de Naming) rompe coherencia interna sin ganancia.
+Cada dept tiene un modo cognitivo y stack de tools distinto:
+- Strategy: razonamiento estratégico puro
+- Verbal: creatividad verbal + verification externa
+- Visual: razonamiento de diseño + APIs de palette/mood
+- Logo: image generation (con tiers)
+- Handoff Compiler: templating + compilation + validation
+
+Menos deptos colapsa boundaries. Más deptos rompe coherencia interna sin ganancia.
+
+## 1.6 Image generation por tiers (cost-conscious)
+
+Claude Design cubre la mayoría de image generation pagada:
+
+| Tier | Image gen stack | Cost/run | Cuándo |
+|---|---|---|---|
+| **Tier 0 (default)** | Claude native SVG + Claude Design in-context | **~$0.00** | Dogfooding, early stage, vos mismo usándolo |
+| **Tier 1** | + Recraft V4 para logos simbólicos + Unsplash free API para mood refs | ~$0.10-0.20 | Primeros 50-100 users reales |
+| **Tier 2** | + Huemint paid + Recraft full | ~$0.40-0.60 | Escala con users pagos |
+
+**Control runtime**: feature flag `IMAGE_GEN_MODE` en env var o CLI arg.
+
+**Estrategia**: default Tier 0. User advanced puede escalar. Ver [07-dept-logo.md](./07-dept-logo.md) y [11-tools-stack.md](./11-tools-stack.md) para detalles.
 
 ## 1.7 Relación con Profile y Validation
 
@@ -120,55 +149,85 @@ Ver el razonamiento completo en el mockup. TL;DR: cada dept tiene un modo cognit
   - Problem: target audience real, pain points
   - Market: SOM, segmentos, geografías, CAGR
   - Competitive: incumbents, gaps, white space
-  - BizModel: pricing, modelo de revenue (informa voice: "premium price" vs "freemium")
-  - Risk: timing context (puede informar archetype — Rebel vs Sage según timing de mercado)
+  - BizModel: pricing, modelo de revenue
+  - Risk: timing context
   - Synthesis: verdict + scores + flags
 
 **Input opcional**:
-- `profile/{user-slug}/core` + `extended` — todo el profile del founder
+- `profile/{user-slug}/core` + `extended`
 
-**Cuando falta Profile**: Brand corre en modo "sin personalización". Archetype se elige basado solo en idea + scope. Copy no puede usar target_geographies del profile para linguistic check (usa market geographies en su lugar). Output flagged con `"decided_without_profile: true"` + suggestion para el user de crear profile.
+**Cuando falta Profile**: Brand corre en modo "sin personalización". Flag `"decided_without_profile: true"` en outputs. README + Brand Document suggest creating profile.
 
-**Cuando verdict es NO-GO**: bloqueado por default. Override explícito disponible (comando `"brandea igual aunque es NO-GO"`) — graba decisión + warning permanente en Engram + brand book incluye warning visible.
+**Cuando verdict es NO-GO**: bloqueado por default. Override explícito disponible con warning permanente.
 
 ## 1.8 Principio de adaptación (core del módulo)
 
 Ninguna idea necesita exactamente los mismos outputs que otra. El módulo decide qué generar basándose en el **tipo de idea** (clasificado en Scope Analysis), no en un template fijo.
 
-**Ejemplo concreto**: el output para un `b2b-enterprise` SaaS incluye pitch deck, case studies, formal email templates, LinkedIn presence — pero NO TikTok bios ni app icons. Para un `b2c-consumer-app`, app icon es CRÍTICO y primary, los pitch decks formales se omiten, la presencia en TikTok/IG es required.
+**Ejemplo concreto**: el output para un `b2b-enterprise` SaaS incluye pitch deck prompts + case study templates + formal LinkedIn bio. Para un `b2c-consumer-app`, incluye TikTok bio + Instagram prompts + app store copy. La estructura del Brand Design Document se adapta al profile.
 
-Esto está detallado en [03-brand-profiles.md](./03-brand-profiles.md) con los 8 profiles canónicos.
+Detallado en [03-brand-profiles.md](./03-brand-profiles.md) con los 8 profiles canónicos.
 
-## 1.9 Output primario del módulo
+## 1.9 Output primario del módulo — 4 deliverables
 
-Un directorio `output/{idea-slug}/brand/` que contiene (estructura dinámica — ver [18-output-package-structure.md](./18-output-package-structure.md)):
+Un directorio `output/{idea-slug}/brand/` que contiene **4 artefactos optimizados para Claude Design**:
 
-- Brand book PDF (siempre)
-- Microsite HTML/CSS/Tailwind corriendo (siempre — generado por Stitch MCP)
-- DESIGN.md machine-readable (siempre)
-- Logos SVG editables + derivations (siempre)
-- Copy library organizada por uso (siempre)
-- Social assets específicos al scope
-- Email/communication templates específicos al scope
-- Pitch deck / case studies / app assets si el scope lo requiere
-- README.md explicando qué incluye y qué NO (transparencia total)
-- AUDIT.md con evidence trace + versioning
+### 1. Brand Design Document PDF
+Branded document (no spec dump) que el user sube a Claude Design design system setup (Fase 1). Claude Design lo lee y extrae el design system completo.
 
-## 1.10 Timeline estimado (Sprint 0 + Sprint 1)
+Detallado en [24-brand-design-document-structure.md](./24-brand-design-document-structure.md).
 
-- **Sprint 0 (planning completo)**: 1 sesión focalizada para escribir los 22 SKILL.md + references del módulo. Total ~60-90 min de escritura densa.
-- **Sprint 1 (implementación)**: múltiples sesiones.
+### 2. Prompts Library Markdown
+Prompts pre-escritos, customizados al brand + scope, que el user pega en Claude Design para cada deliverable específico (landing, deck, social, etc.). Cada prompt sigue la estructura best-practice de Claude Design: goal + layout + content + audience.
+
+Detallado en [25-prompts-library-templates.md](./25-prompts-library-templates.md).
+
+### 3. Brand Tokens code folder
+Codebase-style folder que Claude Design puede linkear para extraer design tokens automáticamente. Incluye CSS custom properties, JSON (DTCG format), Tailwind config, examples.
+
+### 4. Reference Assets folder
+Logos SVG, mood imagery (tier-dependent), sample applications — archivos sueltos que el user puede subir como visual references en proyectos específicos de Claude Design.
+
+Estructura detallada en [18-output-package-structure.md](./18-output-package-structure.md).
+
+## 1.10 Workflow del user — end-to-end
+
+```
+1. User: /brand:new
+2. Hardcore Brand module runs (5 deptos, ~15-20 min)
+3. Output: 4 deliverables en output/{slug}/brand/
+4. User va a claude.ai/design
+5. Uploads Brand Design Document PDF en design system setup
+6. Claude Design extrae design system automáticamente
+7. User valida con test project, publica el design system
+8. User usa prompts del Prompts Library para generar cada deliverable específico
+9. Claude Design aplica el design system consistentemente en cada project
+10. Cuando termina, Claude Design genera handoff bundle para Claude Code
+11. Claude Code deploya
+```
+
+**Nuestro módulo aporta**: pasos 1-3 (el brief optimizado).
+**Claude Design aporta**: pasos 4-10 (UI generation).
+**Claude Code aporta**: paso 11 (deployment).
+
+## 1.11 Timeline estimado
+
+- **Sprint 0 (planning completo)**: 1-2 sesiones focalizadas para escribir los SKILL.md + references del módulo (~55 archivos)
+- **Sprint 1 (implementación)**: 2-3 semanas
   - Implementación del orchestrator + scope analysis
-  - Implementación de cada dept (Strategy, Verbal, Visual, Logo, Activation)
-  - Integración con MCPs (Stitch, Recraft, Huemint, domain)
+  - Implementación de cada dept (Strategy, Verbal, Visual, Logo, Handoff Compiler)
+  - Integración con MCPs (Recraft opcional via feature flag, Huemint opcional, Domain MCP, PDF skill)
   - Testing (8 brand profiles × dogfooding)
-  - Dogfooding contra Hardcore mismo
-- **Sprint 2**: iteración basada en lo aprendido, expansión de reference docs, calibración.
+  - Dogfooding contra Hardcore mismo (output sube a Claude Design para testing del flow completo)
+- **Sprint 2**: iteración + migration a Claude Design MCP cuando Anthropic lo ship.
 
-## 1.11 Lecturas relacionadas
+## 1.12 Lecturas relacionadas
 
 - Scope Analysis: [02-scope-analysis.md](./02-scope-analysis.md)
 - Brand profiles: [03-brand-profiles.md](./03-brand-profiles.md)
-- Deptos individuales: [04](./04-dept-strategy.md) a [08](./08-dept-activation.md)
+- Deptos individuales: [04](./04-dept-strategy.md) a [08](./08-dept-handoff-compiler.md)
 - Coherencia: [09-coherence-model.md](./09-coherence-model.md)
-- Stack de tools: [11-tools-stack.md](./11-tools-stack.md)
+- Stack de tools (con tiers): [11-tools-stack.md](./11-tools-stack.md)
+- Cost + timing por tier: [17-cost-and-timing.md](./17-cost-and-timing.md)
+- Structure del Brand Design Document: [23-brand-design-document-structure.md](./23-brand-design-document-structure.md)
+- Prompts Library templates: [24-prompts-library-templates.md](./24-prompts-library-templates.md)

@@ -2,41 +2,31 @@
 
 ## 15.1 Propósito
 
-Definir cómo Brand versiona runs, permite reproducción de runs pasados, y compara versiones. Crítico para:
+Cómo Brand versiona runs, permite reproducción, y compara versiones.
 
-- User iteration ("quiero ver cómo cambió mi marca entre v1 y v2")
-- Rollback (revertir a v1 si v2 es peor)
-- Auditoría (entender por qué un run produjo ciertos outputs)
-- Debugging (reproducir bugs en runs específicos)
+Snapshot incluye `tier_used`, tracking de Claude Design compatibility, y cost tracking tier-aware.
 
-## 15.2 Conceptos de versioning
+## 15.2 Conceptos
 
 ### Snapshot
 
-Un **snapshot** captura el state completo de un run de Brand exitoso.
-
-- Creado al completar Activation exitosamente
-- Inmutable (no se edita después de creado)
-- Identificado por `vN` (v1, v2, v3, ...)
-- Auto-increment: siguiente run completo crea `v{N+1}`
+- Captura state completo de run exitoso
+- Creado al completar Handoff Compiler
+- Inmutable
+- Identificado por `vN`
+- Auto-increment en full run
 
 ### Partial re-run (extend)
 
-`/brand:extend {depto}` NO crea nuevo snapshot. En su lugar:
+`/brand:extend {depto}` **NO** crea snapshot nuevo:
+- Updatea topic key del dept
+- Incrementa revision_count del dept
+- Files en filesystem sobrescriben
+- Se graba en `snapshot.extensions[]` del current
 
-- Actualiza el topic key del dept afectado en Engram
-- Incrementa `revision_count` de ese dept
-- Files en filesystem se sobrescriben
-- Se graba en `audit.extensions[]` del snapshot current
+### User-forced snapshot
 
-**Por qué no nuevo snapshot**: partial re-runs son iterative tweaks, no runs completos. Crear snapshots por cada extend inflaría storage.
-
-### User-forced new snapshot
-
-User puede forzar creation de nuevo snapshot con `/brand:snapshot` (freezes current state):
-
-- Útil si user hizo varios extends y quiere capturar el combined state
-- Incrementa version number
+`/brand:snapshot` fuerza nuevo snapshot con current state (útil después de varios extends).
 
 ## 15.3 Snapshot schema
 
@@ -46,15 +36,16 @@ Topic key: `brand/{slug}/snapshot/v{N}`
 {
   "schema_version": "1.0",
   "snapshot_version": "v1",
-  "snapshot_type": "full_run" | "user_forced",
+  "snapshot_type": "full_run | user_forced",
   "created_at": "ISO-8601",
   "completed_at": "ISO-8601",
-  "duration_seconds": 1662,
+  "duration_seconds": 1122,
   
   "idea_slug": "auren-compliance",
   "user_slug": "user-slug",
   
   "mode_used": "normal | fast | extend | override",
+  "tier_used": 0 | 1 | 2,
   "user_overrides": [...],
   
   "input_hashes": {
@@ -65,12 +56,11 @@ Topic key: `brand/{slug}/snapshot/v{N}`
   
   "tool_versions": {
     "brand_module_version": "1.0",
-    "stitch_mcp": "0.3.2",
-    "image_gen_mcp": "1.0.5",
-    "recraft_model": "v4",
-    "huemint_api": "v1 (2026-04)",
+    "recraft_model": "v4 or null if Tier 0",
+    "huemint_api": "v1 or null if Tier 0",
     "domain_mcp": "2.1.0",
-    "pdf_skill": "1.2"
+    "pdf_skill": "1.2",
+    "claude_model": "claude-opus-4-7"
   },
   
   "output_refs": {
@@ -79,26 +69,28 @@ Topic key: `brand/{slug}/snapshot/v{N}`
     "verbal": "brand/{slug}/verbal#revision_N",
     "visual": "brand/{slug}/visual#revision_N",
     "logo": "brand/{slug}/logo#revision_N",
-    "activation": "brand/{slug}/activation#revision_N"
+    "handoff": "brand/{slug}/handoff#revision_N"
   },
   
   "filesystem_path": "output/auren-compliance/brand/",
   "filesystem_manifest": [
-    {"path": "brand-book.pdf", "sha256": "..."},
-    {"path": "DESIGN.md", "sha256": "..."},
-    {"path": "microsite/index.html", "sha256": "..."},
-    {"path": "logo/source/primary.svg", "sha256": "..."}
+    {"path": "brand-design-document.pdf", "sha256": "..."},
+    {"path": "prompts-for-claude-design.md", "sha256": "..."},
+    {"path": "brand-tokens/tokens.json", "sha256": "..."},
+    {"path": "reference-assets/logo/primary.svg", "sha256": "..."}
   ],
   
   "cost_tracking": {
-    "image_gen_usd": 0.73,
-    "stitch_generations_used": 5,
-    "image_gen_count": 18,
-    "total_cost_usd": 0.73
+    "tier_used": 0,
+    "image_gen_usd": 0.00,
+    "image_gen_count": 0,
+    "claude_design_handoff_made": true,
+    "total_cost_usd": 0.00,
+    "total_runtime_seconds": 1122
   },
   
   "coherence_trace": {
-    "gates_executed": [...],
+    "gates_executed": [...8 gates],
     "escalations": [],
     "final_state": "all_gates_passed"
   },
@@ -107,212 +99,203 @@ Topic key: `brand/{slug}/snapshot/v{N}`
     "failures_encountered": [],
     "retries_per_tool": {...},
     "extensions": []
+  },
+  
+  "claude_design_integration": {
+    "handoff_method": "manual | auto (future when MCP exists)",
+    "brand_document_pdf_path": "...",
+    "user_upload_confirmed": null | true | false
   }
 }
 ```
 
 ## 15.4 Comando `/brand:diff v1 v2`
 
-Compara dos snapshots y muestra diferencias.
+Compara dos snapshots.
 
 **Ejemplo output**:
 
 ```
 /brand:diff v1 v2
 
-Comparing snapshot v1 (2026-04-20) ↔ v2 (2026-04-25)
+Comparing v1 (2026-04-20) ↔ v2 (2026-04-25)
 
 Inputs changed:
-  ⚠ validation_hash: diferente (Validation re-run entre snapshots)
+  ⚠ validation_hash: differente (re-run Validation entre snapshots)
   ✓ profile_hash: same
   ✓ idea_text_hash: same
 
-Scope:
-  brand_profile: b2b-smb → b2b-smb (same)
-  intensity_modifiers.verbal_register: professional-warm → formal-professional (changed)
+Tier:
+  v1: Tier 0 ($0.00)
+  v2: Tier 1 ($0.18) — auto-elevated for symbolic logo
 
 Strategy:
   archetype: Sage → Sage (same)
-  voice_attributes: 
+  voice_attributes:
     - added: "formal"
     - removed: "levemente irónico"
-  brand_values:
-    - added: "Institucional"
-    - removed: "Humanidad"
 
 Verbal:
   name: Auren → Auren (same)
-  tagline: "Audit the audits." → "Institutional-grade audit simplification." (changed)
-  copy assets changed: 14/18
+  tagline: "Audit the audits." → "Institutional-grade simplification." (changed)
+  copy assets changed: 8/12
 
 Visual:
-  palette_primary: (navy/off-white/amber) → (navy/cream/gold) — accent shifted
+  palette: (navy/off-white/amber) → (navy/cream/gold) — accent shifted
   typography: same
-  mood_imagery: 6 new images generated (no reuse)
+  mood_imagery: 
+    v1: none (Tier 0)
+    v2: 6 Unsplash curated (Tier 1)
 
 Logo:
   chosen: B2 → C1 (different direction — wordmark → combination)
-  variants: regenerated
+  generation_method: claude-native → mixed (Recraft + Claude)
 
-Activation:
-  microsite: regenerated (Stitch re-run)
-  brand_book_pdf: regenerated
+Handoff:
+  brand-design-document.pdf: regenerated
+  prompts-library.md: regenerated  
+  brand-tokens/: regenerated
+  reference-assets/: logos regenerated + mood added
 
-Cost delta:
-  v1: $0.73
-  v2: $0.82
-  Δ: +$0.09
+Cost delta: $0.00 → $0.18 (tier elevation)
 
-Overall impression: 
-  v2 shifted the brand toward more formal/institutional register.
-  Archetype stayed but voice modulation changed significantly.
-  Visual: similar palette but more institutional (cream + gold vs off-white + amber).
+Claude Design compatibility:
+  v1 upload: confirmed ✓
+  v2 upload: pending
+
+Overall: v2 shifted more institutional register, logo direction changed,
+mood imagery added.
 ```
-
-Implementation: parse ambos snapshots, diff per section, produce readable summary.
 
 ## 15.5 Comando `/brand:rollback v1`
 
 Revertir a snapshot v1:
+- Restore Engram topic keys
+- Backup current filesystem to `output/{slug}/brand-v2-backup/`
+- Restore filesystem from v1 state
 
-**Effect**:
-- Topic keys de deptos point back a revisions from v1
-- Filesystem: preserve current state pero copy v1 files to fresh location for review
-- User confirma antes de sobreescribir current
+User confirms antes de sobreescribir.
 
-**Use case**: user hizo v2 y no le gusta, quiere volver a v1.
-
-```
-/brand:rollback v1
-
-Current snapshot: v2
-Target: v1
-
-This will:
-  ✓ Restore Engram topic keys to v1 state
-  ✓ Backup current filesystem to output/{slug}/brand-v2-backup/
-  ✓ Restore filesystem from v1 state
-
-Continue? [y/n]
-```
-
-## 15.6 Comando `/brand:show` con versioning
+## 15.6 Comando `/brand:show`
 
 ```
-/brand:show                    # Muestra latest snapshot
-/brand:show v1                 # Muestra snapshot v1 específicamente
-/brand:show --list             # Lista todos los snapshots con summaries
+/brand:show                    # Latest snapshot
+/brand:show v1                 # Specific version
+/brand:show --list             # List all snapshots
 ```
 
-Output de `/brand:show --list`:
-
+`--list` output:
 ```
 Brand snapshots for "auren-compliance":
 
-v1 (2026-04-20T14:57:42Z)  — full_run, normal mode, $0.73
+v1 (2026-04-20T14:57:42Z)  — full_run, normal, Tier 0, $0.00
   Archetype: Sage · Name: Auren · Profile: b2b-smb
+  Claude Design upload: confirmed
 
-v2 (2026-04-25T10:30:15Z)  — full_run, normal mode, $0.82
+v2 (2026-04-25T10:30:15Z)  — full_run, normal, Tier 1, $0.18
   Archetype: Sage · Name: Auren · Profile: b2b-smb
-  Changes: voice shifted to formal-professional, palette refined
+  Changes: voice formal, mood imagery added, logo direction changed
+  Claude Design upload: pending
 
 (latest)
 ```
 
 ## 15.7 Reproducibility — exact reproduction
 
-Reproducir exactamente un snapshot:
+Reproducir snapshot:
 
 **Requirements**:
-1. Same tool versions accessible (si breaking changes, imposible exacto)
-2. Same input hashes (Validation + Profile unchanged — o snapshot registra hash para detect divergence)
-3. Same user overrides if any
+1. Same tool versions accessible
+2. Same input hashes (Validation + Profile unchanged)
+3. Same user overrides
+4. Same tier (cost-relevant)
 
-**Proceso**:
+**Process**:
 
 ```
 /brand:reproduce v1
 
-Reproducing snapshot v1...
-
 Checks:
-  ✓ Validation hash matches (no changes)
+  ✓ Validation hash matches
   ✓ Profile hash matches
-  ✓ Stitch MCP version: 0.3.2 (v1) → 0.3.5 (current) — MINOR change, compatible
-  ⚠ Recraft model version: v4 (v1) → v4.1 (current) — model updated, may produce different images
+  ✓ Brand module version: 1.0 → 1.0 (same)
+  ⚠ Recraft model: v4 (v1) → v4.1 (current) — minor update, may produce different images
 
 Options:
-  1. Reproduce with current tools (expect minor variance in generated images)
-  2. Abort — need exact tool versions
-  3. Produce new snapshot v3 with current tools (not a reproduction, but start from v1 inputs)
+  1. Reproduce con current tools (expect minor variance en imagenes)
+  2. Abort — need exact versions
+  3. Produce new v3 with current tools (not reproduction, start from v1 inputs)
 ```
 
-**Limitación honest**: image generation no es determinístico — mismo prompt puede producir imagen diferente. Logos y mood imagery pueden variar. Otros outputs (Strategy decisions, Verbal copy si deterministic Claude) deberían ser idénticos.
-
-**Por qué registrar input hashes**: detecta cuando inputs cambiaron y un "reproduce" sería reproducing-with-different-inputs (not true reproduction).
+**Limitation honest**: image generation no determinístico. Logos y mood pueden variar. Strategy decisions, Verbal copy (if deterministic Claude) deben ser idénticos.
 
 ## 15.8 Staleness detection
 
-Cuando un módulo downstream consume Brand:
-
+Downstream module consuming Brand:
 - Compare `brand.snapshot.created_at` vs `validation.last_updated` + `profile.last_updated`
-- Si Brand snapshot es más viejo que Validation/Profile updates: flag staleness
-- Si Brand snapshot > 180 days: flag "considera regenerar"
-
-Esto NO auto-invalida — Brand sigue siendo el reference. Pero alerta al user que el input context cambió.
+- If Brand snapshot viejo que Validation/Profile updates: flag staleness
+- If Brand > 180 days: flag "considera regenerar"
 
 ## 15.9 Storage considerations
 
-Snapshots persisten en Engram + filesystem:
+Snapshots en Engram + filesystem:
 
-- **Engram**: metadata del snapshot (~5KB) y revision refs. Negligible.
-- **Filesystem**: cada run produce ~50MB (microsite + logos + mood imagery + PDF + sources). 10 snapshots = ~500MB.
+- **Engram**: metadata (~5KB). Negligible.
+- **Filesystem per snapshot**: varies por tier.
+  - Tier 0: ~5-10MB (sin mood imagery, PDF + SVGs + markdowns)
+  - Tier 1: ~20-30MB (+ Unsplash mood refs)
+  - Tier 2: ~30-50MB (+ Recraft mood generated)
+
+10 snapshots mixed: ~200-400MB.
 
 **Policy**:
-- Keep all snapshots por default
-- User puede `/brand:cleanup --keep-last N` para deletar snapshots viejos
-- Default recommendation: keep all hasta hit 2GB del idea, después cleanup oldest except v1
+- Keep all por default
+- `/brand:cleanup --keep-last N` deletear viejos (except v1)
+- Recommendation: keep all until 2GB, después cleanup oldest
 
-**Cleanup NO toca Engram** — solo filesystem. Engram metadata preserved for historical audit.
+Cleanup NO toca Engram — solo filesystem.
 
 ## 15.10 Tool version compatibility matrix
 
-Track cuáles tool versions son compatibles con cuáles brand_module_version.
-
-Archivo: `skills/brand/references/version-compatibility.md`
+`skills/brand/references/version-compatibility.md`:
 
 ```yaml
 brand_module_version: "1.0"
 tested_with:
-  stitch_mcp: [">= 0.3.0", "< 1.0.0"]
-  image_gen_mcp: [">= 1.0.0"]
   recraft: ["v4"]
   huemint_api: ["v1"]
   domain_mcp: [">= 2.0.0"]
   pdf_skill: [">= 1.0.0"]
+  claude_design: "web v1 (Apr 2026)"
 
 breaking_changes:
   - brand_module: "1.0 → 2.0 (hypothetical)"
     effect: "archetype selection algorithm changed"
-    migration: "re-run brand to get new archetype decisions"
+    migration: "re-run brand"
+  
+  - claude_design: "Labs → GA (when released)"
+    effect: "PDF format expectations may change"
+    migration: "re-run Handoff Compiler to regenerate PDF in new format"
 ```
 
 ## 15.11 Audit log
 
-Cada action del user sobre Brand artifacts se graba:
+Cada action graba:
 
 ```
 brand/{slug}/audit-log
 
 Entries:
-  2026-04-20 14:30 — brand:new started (mode: normal)
+  2026-04-20 14:30 — brand:new started (mode: normal, tier: 0)
   2026-04-20 14:57 — brand:new completed, snapshot v1 created
-  2026-04-25 10:00 — brand:extend logo started
-  2026-04-25 10:15 — brand:extend logo completed, v1.logo.revision_count: 1 → 2
-  2026-04-25 10:30 — brand:snapshot (user-forced) — snapshot v2 created
+  2026-04-21 09:15 — user reported: Claude Design upload successful
+  2026-04-25 10:00 — brand:extend logo started (requesting Tier 1 elevation)
+  2026-04-25 10:05 — user confirmed tier elevation to Tier 1 (+$0.18 estimated)
+  2026-04-25 10:15 — brand:extend logo completed
+  2026-04-25 10:30 — brand:snapshot (user-forced) — v2 created
 ```
 
-Accesible via `/brand:audit {slug}` command.
+Accesible via `/brand:audit {slug}`.
 
 ## 15.12 Reference file a escribir en Sprint 0
 
@@ -322,17 +305,19 @@ Accesible via `/brand:audit {slug}` command.
 - Rollback procedure
 - Reproducibility guarantees y limitations
 - Storage policies
+- Tier tracking details
 
 ## 15.13 Testing
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Full run → snapshot v1 creado correctamente
-2. `/brand:extend logo` → v1.logo revision++ pero NO new snapshot
-3. `/brand:snapshot` → forces new snapshot v2
-4. Second full run → snapshot v2 creado automáticamente
-5. `/brand:diff v1 v2` → muestra diferencias accurately
+1. Full run → snapshot v1 creado
+2. `/brand:extend logo` → v1.logo revision++ but NO new snapshot
+3. `/brand:snapshot` → forces v2
+4. Second full run → snapshot v2 auto-creado
+5. `/brand:diff v1 v2` → muestra diferencias incluyendo tier change
 6. `/brand:rollback v1` → restores correctly
 7. `/brand:show --list` → lista todos
 8. Staleness detection triggered correctly
-9. Cleanup deletes old filesystem but preserves Engram metadata
+9. Cleanup filesystem preserves Engram metadata
+10. Tier 0 snapshot vs Tier 1 snapshot diff reflects cost + generation_method differences

@@ -4,9 +4,9 @@
 
 Un brand profile es una **configuración canónica** que agrupa las decisiones típicas para un tipo de idea: qué outputs son required, qué skip, qué intensity modifiers usar por default, qué archetypes funcionan vs no funcionan.
 
-Los profiles son **referencias estables**, no clasificaciones rígidas. Una idea real puede matchear multiple profiles (composition) o caer en edge cases. Pero el 80% de las ideas que pasan por Hardcore encajan razonablemente en uno de los 8.
+**Importante**: los outputs listados reflejan **lo que nuestro módulo produce** (sections del Brand Document, prompts en el Library, assets en Reference folder). La UI final (landing, decks, mockups) la genera Claude Design — nosotros le damos los prompts correctos.
 
-**Live reference**: `skills/brand/references/brand-profiles.md` (a escribir en Sprint 0 — este archivo es el plan que informa ese reference).
+Live reference: `skills/brand/references/brand-profiles.md` (a escribir en Sprint 0).
 
 ## 3.2 Los 8 profiles — overview
 
@@ -26,47 +26,33 @@ Los profiles son **referencias estables**, no clasificaciones rígidas. Una idea
 ## 3.3 Profile 1 — `b2b-enterprise`
 
 ### Descripción
-Enterprise SaaS — productos que se venden a grandes empresas via outbound sales, con deal sizes $50K+ anuales, sales cycles de 6-12 meses.
+Enterprise SaaS — productos que se venden a grandes empresas via outbound sales, deal sizes $50K+ anuales, sales cycles 6-12 meses.
 
-### Expected signals (para matching)
-- `customer: B2B` (large companies en target audience)
-- `format: SaaS` (también `API`, `service-global`)
-- `distribution: sales-driven`, `partnership-driven`, `content-driven`
-- `stage: scale` (también `growth` para empresas startup-grown)
+### Expected signals
+- `customer: B2B` (large companies)
+- `format: SaaS, API, service-global`
+- `distribution: sales-driven, partnership-driven, content-driven`
+- `stage: scale | growth`
 
-### Outputs `required`
-- Landing formal con hero + value props enterprise-focused + proof points (logos clientes, testimonials si existen)
-- Pricing page con tiers enterprise visibles ("Contact sales" default)
+### Outputs que nuestro módulo produce
+
+**Brand Document sections required**: all (cover + brand essence + voice/tone formal + palette conservative + typography authoritative + logo wordmark + visual principles + copy samples)
+
+**Prompts Library required** (para Claude Design):
+- Landing page formal con security badges + logos de clientes placeholders
+- Pricing page enterprise ("Contact sales" default)
 - Security/compliance page (SOC2, GDPR, etc.)
-- About page enterprise-oriented (team + mission + funding si aplica)
-- **Pitch deck full** (cover + 10 slide template: problem, solution, market, competition, traction, team, ask)
-- **Case study templates** (structured: customer → problem → implementation → results)
-- **Whitepaper boilerplate** (para content-driven distribution)
-- Email sequences enterprise (outbound cold, nurture, follow-up)
-- LinkedIn company bio + founder bio
-- LinkedIn sample posts (5, professional register)
-- Press release boilerplate
-- Logo full system (primary + mono + inverse + icon-only)
-- Logo wordmark-preferred (primary form)
-- Favicon set
-- OG card
-- LinkedIn cover banner
-- Brand book PDF completo + formal
+- About page enterprise-oriented
+- **Pitch deck prompt** (10-slide structure: problem, solution, market, competition, traction, team, ask)
+- **Case study template prompt**
+- Whitepaper prompt
+- Email sequences enterprise (outbound cold, nurture)
+- LinkedIn post templates (5, professional register)
+- Press release prompt
 
-### Outputs `skip`
-- TikTok bio / templates (irrelevante para target)
-- Instagram presence casual (LinkedIn domina)
-- App icon full set (no mobile app)
-- Consumer social posts templates
-- Community page
-- WhatsApp templates
-- Podcast cover (a menos que tengan podcast B2B existente — optional_recommended)
+**Reference Assets required**: logo full system + favicon + OG card + LinkedIn cover banner
 
-### Outputs `out_of_scope_declared`
-- Packaging físico
-- Print CMYK heavy
-- Motion assets
-- Sonic branding
+**Skip**: TikTok bio prompt, Instagram consumer templates, app icon, podcast cover, WhatsApp templates
 
 ### Intensity modifiers defaults
 ```
@@ -74,554 +60,453 @@ verbal_register: "formal-professional"
 copy_depth: "long-form-allowed"
 visual_formality: "high"
 logo_primary_form: "wordmark-preferred"
-typography_era: "neutral-modern" (o "editorial-classic" para industrias tradicionales)
+typography_era: "neutral-modern" (o "editorial-classic")
 social_presence_priority: "enterprise-linkedin-only"
 app_asset_criticality: "not-needed"
-print_needs: "minimal"
-sonic_needs: "none"
-motion_needs: "none"
+image_gen_tier: 0 (default — Claude native SVG wordmark suficiente)
 ```
 
-### Archetype — constraints
-- **Blocked**: Jester, Outlaw, Rebel (baja credibilidad enterprise)
+### Archetype constraints
+- **Blocked**: Jester, Outlaw, Rebel
 - **Preferred range**: Sage, Ruler, Hero, Caregiver, Creator
-- **Sweet spots**: Sage (expert guide), Ruler (authority), Hero (champion of enterprise pain)
+- **Sweet spots**: Sage, Ruler, Hero
 
-### Voice defaults
-Adjectives likely: `preciso, autorizante, medido, credible, confiado`. Avoid: `playful, irónico, casual, emocional`.
-
-### Paleta típica
-Tonos conservadores: navy + slate + off-white + un accent (amber, teal, deep red). Saturation reducida. Sin neons.
-
-### Typography típica
-Serif editorial para authority (Fraunces, Crimson, Merriweather) o sans neutral moderno para enterprise tech (Inter, IBM Plex, Söhne). Evitar display expresivo.
-
-### Ejemplos reales (para referencia)
-Datadog, Snowflake, MongoDB, Stripe (enterprise tier), Notion (enterprise), Airtable (enterprise).
+### Ejemplos reales
+Datadog, Snowflake, MongoDB, Stripe (enterprise tier).
 
 ---
 
 ## 3.4 Profile 2 — `b2b-smb`
 
 ### Descripción
-SMB SaaS — productos que se venden a small/mid businesses, self-serve o sales-assisted, pricing $10-500/mo, sales cycle de días a semanas.
+SMB SaaS — productos para small/mid businesses, self-serve o sales-assisted, pricing $10-500/mo.
 
 ### Expected signals
-- `customer: B2B` (SMB o startups)
+- `customer: B2B` (SMB/startups)
 - `format: SaaS`
-- `distribution: content-driven, SEO-driven, social-driven (LinkedIn), sales-driven (light)`
-- `stage: pre-launch | MVP | growth` (mayoría)
+- `distribution: content-driven, SEO-driven, social-driven (LinkedIn)`
+- `stage: pre-launch | MVP | growth`
 
-### Outputs `required`
-- Landing conversion-optimized (hero clear value prop, features, pricing, CTA aggressive)
-- Pricing page (self-serve tiers visibles)
+### Outputs que nuestro módulo produce
+
+**Brand Document sections required**: all sections con register professional-warm
+
+**Prompts Library required**:
+- Landing conversion-optimized
+- Pricing page (self-serve tiers)
 - About page short
-- Comparison content template (vs competidores)
+- Comparison content vs competitors
 - Email sequences (welcome, onboarding, upgrade)
-- LinkedIn company bio + founder bio
-- LinkedIn sample posts (5, professional-warm register)
+- LinkedIn post templates (5)
 - Blog post template
-- Pitch one-liner
-- Pitch 30s (para investors si aplica)
-- Logo full system
-- Favicon set
-- OG card
-- Brand book PDF
+- Pitch one-liner graphic
 
-### Outputs `optional_recommended`
-- Case study template (si tienen o planean tener clientes con permiso)
-- Twitter/X presence bio + sample posts
-- Email signature template
-- Press release boilerplate
+**Optional recommended**: Case study template, Twitter/X post templates
 
-### Outputs `skip`
-- Pitch deck formal completo (solo cover + one-liner)
-- Whitepaper (demasiado enterprise)
-- TikTok / Instagram consumer
-- App icon
-- Community page (a menos que el SaaS tenga componente community explícito)
-- Podcast cover
+**Skip**: Pitch deck formal completo, whitepaper, TikTok/Instagram consumer, app icon, community page, podcast cover
 
 ### Intensity modifiers defaults
 ```
 verbal_register: "professional-warm"
 copy_depth: "medium"
 visual_formality: "medium"
-logo_primary_form: "wordmark-preferred" (algunos combinations OK)
+logo_primary_form: "wordmark-preferred"
 typography_era: "neutral-modern"
-social_presence_priority: "professional-multichannel" (LinkedIn primary + Twitter/X secondary)
+social_presence_priority: "professional-multichannel"
 app_asset_criticality: "derivative"
-print_needs: "minimal"
-sonic_needs: "none"
-motion_needs: "subtle"
+image_gen_tier: 0
 ```
 
-### Archetype — constraints
-- **Blocked**: Outlaw, Rebel (sin profile strong que los sostenga)
+### Archetype constraints
+- **Blocked**: Outlaw, Rebel (sin profile strong)
 - **Preferred range**: Sage, Hero, Everyman, Creator, Caregiver
-- **Sweet spots**: Sage, Hero, Everyman (relatable/practical)
+- **Sweet spots**: Sage, Hero, Everyman
 
 ### Ejemplos reales
-Linear (Everyman con edge), Superhuman (Hero), Notion (pre-enterprise era — Creator), Vercel (Sage/Creator).
+Linear, Superhuman, Notion (pre-enterprise), Vercel.
 
 ---
 
 ## 3.5 Profile 3 — `b2d-devtool`
 
 ### Descripción
-Developer tool — productos que se venden a developers/engineering teams. Distribution es a través de GitHub, docs, dev Twitter, conferences. Open source friendly.
+Developer tool — productos para developers/engineering teams. Distribution via GitHub, docs, dev Twitter, conferences.
 
 ### Expected signals
-- `customer: B2D` (developers explícitamente en target)
+- `customer: B2D`
 - `format: SaaS, API, CLI`
-- `distribution: content-driven (docs/blog), community-driven, partnership-driven (integrations)`
+- `distribution: content-driven (docs/blog), community-driven, partnership-driven`
 - `stage: pre-launch | MVP | growth`
 
-### Outputs `required`
-- **Docs-style landing** (technical, code snippets visible en hero, quickstart en first scroll)
-- **Code snippet styling** (specific syntax highlighting theme aligned con brand palette)
-- **CLI/terminal branding** (si producto tiene CLI: prompt style, ASCII art optional, color scheme terminal)
-- **GitHub README template** (structured: banner, badges, install, usage, docs link, contributing)
-- **Dev Twitter presence** (bio + 5 sample posts en voice técnico casual)
-- Documentation homepage design direction
-- Blog post template (technical, long-form allowed)
-- Logo system con variante **monoscope/icon-only** prominente (para favicon, GitHub avatar)
-- OG card optimizada para dev Twitter
-- Brand book PDF
+### Outputs que nuestro módulo produce
 
-### Outputs `optional_recommended`
-- LinkedIn presence (secondary para dev tools pero valioso para B2B sales)
-- Conference talk abstract template
-- Newsletter template (si content-driven)
-- Email sequences (signup → activation focused)
+**Brand Document sections required**: all, plus dev-specific (code styling preview, CLI aesthetic)
 
-### Outputs `skip`
-- Consumer social (TikTok, Instagram)
-- App icon mobile
-- Community general (unless Discord/Slack is explicit)
-- WhatsApp
-- Pitch deck enterprise formal
-- Podcast (unless existing)
+**Prompts Library required**:
+- **Docs-style landing prompt** (code snippets en hero, quickstart visible)
+- **Code snippet styling prompt** (syntax highlighting aligned con palette)
+- **CLI/terminal branding prompt** (prompt style, ASCII art, colors)
+- **GitHub README template prompt** (banner, badges, install, usage)
+- Dev Twitter post templates (5)
+- Blog post template (technical, long-form)
+- Documentation homepage prompt
+
+**Optional recommended**: LinkedIn presence light, conference talk abstract template, newsletter template
+
+**Skip**: Consumer social (TikTok, Instagram), app icon mobile, WhatsApp, pitch deck enterprise formal
 
 ### Intensity modifiers defaults
 ```
-verbal_register: "casual-friendly" (con precision técnica — devs detectan jargon falso al instante)
-copy_depth: "medium" (technical content puede ser long, marketing copy debe ser punchy)
+verbal_register: "casual-friendly" (con precision técnica)
+copy_depth: "medium"
 visual_formality: "low-medium"
-logo_primary_form: "symbolic-first" (mascotes, marks conceptuales funcionan para dev tools — Docker whale, GitHub octocat)
-typography_era: "neutral-modern" (con preferencia por monospace secondaries — JetBrains Mono, IBM Plex Mono)
+logo_primary_form: "symbolic-first"  (mascots/marks conceptuales funcionan)
+typography_era: "neutral-modern" (con preferencia por monospace secondaries)
 social_presence_priority: "professional-multichannel" (Twitter/X + GitHub + dev blog)
 app_asset_criticality: "derivative"
-print_needs: "none"
-sonic_needs: "none"
-motion_needs: "subtle"
+image_gen_tier: 0 por default (wordmark Claude-SVG)
+  → Auto-elevate a Tier 1 si scope.logo_primary_form es symbolic-first
+    (user debe aprobar el cost adicional)
 ```
 
-### Archetype — constraints
-- **Blocked**: Caregiver (muy soft para dev culture), Ruler (muy rígido)
-- **Preferred range**: Sage, Creator, Explorer, Magician, Jester (allowed con carefulness), Rebel (permitido con profile support)
-- **Sweet spots**: Creator (build with us), Magician (transform your workflow), Explorer (frontier tech)
+### Archetype constraints
+- **Blocked**: Caregiver, Ruler (rígido para dev culture)
+- **Preferred range**: Sage, Creator, Explorer, Magician, Jester, Rebel
+- **Sweet spots**: Creator, Magician, Explorer
 
 ### Ejemplos reales
-Stripe (Sage/Creator), Supabase (Creator/Explorer), Linear (Everyman+Creator), Railway (Creator), Vercel (Magician), Cursor (Magician+Rebel), Postman (Everyman+Creator).
-
-### Notas específicas
-- Dev tools toleran humor sofisticado (Stripe jokes, GitHub octocat)
-- Anti-jargon corporate es casi obligatorio
-- Open source positioning afecta voice (welcoming, community-first)
-- Technical accuracy es non-negotiable — errores en code snippets destruyen credibility
+Stripe, Supabase, Linear, Railway, Vercel, Cursor, Postman.
 
 ---
 
 ## 3.6 Profile 4 — `b2c-consumer-app`
 
 ### Descripción
-Consumer mobile app — productos que se distribuyen via app stores (iOS/Android), monetization via freemium/subscription/in-app purchase, distribution social/viral.
+Consumer mobile app — distribución via app stores, monetization freemium/subscription/IAP.
 
 ### Expected signals
-- `customer: B2C` (mass consumer o niche consumer)
+- `customer: B2C`
 - `format: mobile-app`
-- `distribution: app-store, social-driven (TikTok, Instagram), community-driven`
+- `distribution: app-store, social-driven, community-driven`
 - `stage: pre-launch | MVP | growth`
 
-### Outputs `required`
-- **App icon completo** (CRÍTICO — primary asset, no derivativo): set iOS (multiple sizes), set Android (adaptive icon con foreground/background), mask variants
-- **App store screenshots** (template structure for 5-6 screens con overlays + copy)
-- **App landing page** (store-style: hero con phone mockup, features con screenshots, social proof, CTA download)
-- **Onboarding screens design direction** (first-run experience flow)
-- **Viral share visuals** (share card templates, referral asset designs)
-- **Instagram presence** (bio + 10 sample posts visuales en voice)
-- **TikTok presence** (bio + 5 sample post concepts — captions + visual direction, no producción de video)
-- Launch email template
-- Push notification templates (welcome, engagement, re-engagement)
-- Logo con **icon-only form prominente** (icon IS the brand — logo expande el icon)
-- Brand book PDF
+### Outputs que nuestro módulo produce
 
-### Outputs `optional_recommended`
-- Twitter/X presence (secondary para consumer, salvo ideas Twitter-native)
-- YouTube channel art (si content strategy incluye video)
-- Press kit (para PR push en launch)
+**Brand Document sections required**: all, plus app-specific (icon showcase, screenshot templates preview)
 
-### Outputs `skip`
-- LinkedIn presence heavy (company bio light OK, sample posts skip)
-- Pitch deck formal completo (a menos que raising externally — optional_recommended)
-- Case study templates (B2B concept)
-- Enterprise email sequences
-- Community page formal (apps sometimes have community — conditional)
+**Prompts Library required**:
+- **App store listing page prompt**
+- **App store screenshots templates** (5 screens con overlays + copy)
+- **Onboarding screens prompt** (first-run experience flow)
+- **Viral share visuals prompt**
+- **Instagram post templates** (3 layouts)
+- **TikTok cover prompt**
+- Launch email prompt
+- Push notification templates
+
+**Reference Assets required**: **App icon set completo** (iOS múltiples sizes + Android adaptive icon foreground/background + mask variants) — **auto-elevates tier a 1+**
+
+**Skip**: LinkedIn heavy, pitch deck formal, case study templates B2B, enterprise emails, community page formal
 
 ### Intensity modifiers defaults
 ```
 verbal_register: "playful-bold"
-copy_depth: "punchy-only" (consumer attention span)
+copy_depth: "punchy-only"
 visual_formality: "low"
-logo_primary_form: "icon-first" (icon = brand core)
-typography_era: "expressive-contemporary" (sans geométrico moderno, display fonts permitidos)
-social_presence_priority: "consumer-heavy" (Instagram + TikTok primary)
+logo_primary_form: "icon-first"  (icon = brand core)
+typography_era: "expressive-contemporary"
+social_presence_priority: "consumer-heavy"
 app_asset_criticality: "primary"
-print_needs: "none"
-sonic_needs: "branded" (app sound effect, onboarding audio)
-motion_needs: "expressive" (app transitions, logo animation, splash screen)
+sonic_needs: "branded"
+motion_needs: "expressive"
+image_gen_tier: 1 auto-elevated (app icon requires Recraft SVG)
 ```
 
-### Archetype — constraints
-- **Blocked**: Ruler (muy rígido para consumer), Caregiver solo si literalmente es app de cuidado
+### Archetype constraints
+- **Blocked**: Ruler (muy rígido)
 - **Preferred range**: Jester, Creator, Explorer, Innocent, Lover, Magician, Everyman, Hero
-- **Sweet spots**: Jester (fun consumer apps), Creator (creative tools apps), Magician (transformative apps)
-
-### Voice defaults
-`amigable, enérgica, directa, un poco irreverente`. Copy optimizado para thumb-scroll attention.
-
-### Paleta típica
-Vibrant, high-contrast, memorable. Multi-accent permitido. Saturation alta.
-
-### Typography típica
-Sans geométrico moderno (Manrope, Söhne, DM Sans). Display fonts permitidos para branding moments. Weight contrasts extremos.
+- **Sweet spots**: Jester, Creator, Magician
 
 ### Ejemplos reales
-Duolingo (Jester), Calm (Innocent+Caregiver), Headspace (Sage+Innocent), Tinder (Lover+Jester), Notion mobile (Creator+Everyman), Cash App (Everyman+Creator).
+Duolingo, Calm, Headspace, Tinder, Cash App.
 
 ### Notas
-- App icon es **el** artefacto más importante. Puede ser el 80% de la identidad visual percibida.
-- Icon debe ser legible a 16×16, memorable a 60×60, aspiracional a 180×180.
-- Consumer apps toleran personality extreme más que cualquier otro segmento.
+- App icon es **el** artefacto más importante, auto-eleva el tier
+- Icon debe ser legible a 16×16, memorable a 60×60
+- Consumer apps toleran personality extreme
 
 ---
 
 ## 3.7 Profile 5 — `b2c-consumer-web`
 
 ### Descripción
-Consumer web product — SaaS o content-media consumer-facing, web-based (no app). Subscription consumer ($5-30/mo), freemium, ad-supported o one-time purchase.
+Consumer web product — SaaS o content-media consumer-facing, web-based.
 
 ### Expected signals
-- `customer: B2C` (mass consumer)
+- `customer: B2C`
 - `format: SaaS (web), content-media`
 - `distribution: SEO-driven, social-driven, content-driven`
 - `stage: MVP | growth`
 
-### Outputs `required`
-- Landing conversion-optimized consumer (hero emotional, features simple, social proof, pricing clear)
-- Pricing page consumer-friendly (freemium si aplica, visible)
-- Email campaigns consumer (welcome, engagement, retention, winback)
-- Instagram presence (bio + 10 sample posts)
-- Newsletter branding (si content strategy)
-- Referral visuals (share cards, referral email)
-- Logo system full
-- Favicon + OG card
-- Brand book PDF
+### Outputs que nuestro módulo produce
 
-### Outputs `optional_recommended`
-- TikTok presence (si target younger)
-- YouTube channel art (si video strategy)
-- Podcast cover (si podcast planeado)
-- Twitter/X presence
+**Brand Document sections required**: all con register casual-friendly
 
-### Outputs `skip`
-- App icon (no mobile app unless PWA)
-- LinkedIn heavy (light presence OK)
-- Enterprise materials
-- Pitch deck formal completo
+**Prompts Library required**:
+- Landing conversion-optimized consumer (emotional hero)
+- Pricing page consumer-friendly (freemium si aplica)
+- Email campaigns consumer (welcome, engagement, retention)
+- Instagram post templates (5)
+- Newsletter template
+- Referral visuals
+
+**Optional recommended**: TikTok templates (si target younger), YouTube channel art, Twitter/X
+
+**Skip**: App icon (no mobile), LinkedIn heavy, enterprise materials, pitch deck formal
 
 ### Intensity modifiers defaults
 ```
 verbal_register: "casual-friendly"
-copy_depth: "medium" (emotional content puede ser longer)
+copy_depth: "medium"
 visual_formality: "low-medium"
-logo_primary_form: "combination" (logo + name both important)
+logo_primary_form: "combination"
 typography_era: "expressive-contemporary"
 social_presence_priority: "consumer-heavy"
-app_asset_criticality: "derivative" (favicon OK, no app full set)
-print_needs: "none"
-sonic_needs: "branded" (si video content)
-motion_needs: "subtle-to-expressive"
+app_asset_criticality: "derivative"
+image_gen_tier: 0
 ```
 
-### Archetype — constraints
-- **Blocked**: Ruler, Outlaw (contexto-dependent)
+### Archetype constraints
+- **Blocked**: Ruler, Outlaw (context-dependent)
 - **Preferred range**: Creator, Explorer, Innocent, Lover, Everyman, Caregiver, Magician, Jester
-- **Sweet spots**: depends heavily on vertical
 
 ### Ejemplos reales
-Substack (Creator+Sage), Medium (Creator), Pinterest (Creator+Explorer), Airbnb (Explorer+Caregiver), Figma (Creator+Magician).
+Substack, Medium, Pinterest, Airbnb, Figma.
 
 ---
 
 ## 3.8 Profile 6 — `b2local-service`
 
 ### Descripción
-Local service — negocio físico prestando servicios en una ubicación geográfica específica. Restaurant, clinic, barbershop, gym, tutoring center, cleaning service.
+Local service — negocio físico en una ubicación específica (restaurant, clinic, barbershop, gym).
 
 ### Expected signals
-- `customer: B2C` o `B2B` local
+- `customer: B2C / B2B local`
 - `format: service-local`
-- `distribution: SEO-driven (local SEO), social-driven (Instagram local), community-driven (local), PR-driven (local)`
+- `distribution: SEO-driven (local), social-driven (IG local), community-driven`
 - `cultural_scope: local`
 
-### Outputs `required`
-- **Local landing** (con address, hours, map embed, local phone)
-- **Google My Business listing copy** (description optimizada, categories, attributes)
+### Outputs que nuestro módulo produce
+
+**Brand Document sections required**: all, plus local-specific (local application preview)
+
+**Prompts Library required**:
+- **Local landing prompt** (con map, hours, address, local phone)
+- **Google My Business listing copy**
 - **WhatsApp templates** (greeting, FAQ, booking confirmation, reminder) — CRÍTICO en LATAM
-- **Printable flyers/menus** (PDF ready con direction para imprenta local)
-- **Phone greeting script** (hola + menu + call-to-action)
-- **Instagram presence** (bio local + 10 sample posts localmente relevantes)
-- **Business card design direction** (print-ready)
-- Logo full system
-- Favicon
-- Brand book PDF con focus en materiales aplicables a negocio físico
+- **Printable flyer prompt** (design direction + copy)
+- **Phone greeting script**
+- **Instagram local post templates** (3)
+- **Business card prompt**
 
-### Outputs `optional_recommended`
-- Printable menu template (si food/hospitality)
-- Signage direction (exterior, interior)
-- Uniform/merch direction (si staff-visible)
-- Door/window signage copy
+**Optional recommended**: Printable menu (si food), signage direction, uniform/merch
 
-### Outputs `skip`
-- LinkedIn presence heavy (profesional dueño OK, company casi no relevante)
-- Pitch deck (no necesita raising típicamente)
-- TikTok (a menos que video strategy — local services típicamente no dependen)
-- Case studies B2B format
-- Developer-facing anything
-- Enterprise materials
-- App icon full set (a menos que tienen mobile booking app)
+**Reference Assets required**: logo full system + favicon (limited — no heavy social)
 
-### Outputs `out_of_scope_declared`
-- Packaging 3D (food services necesitan packaging real — v1 no cubre)
-- Print CMYK heavy (entregamos RGB con flag)
+**Skip**: LinkedIn heavy, pitch deck, TikTok global, case studies B2B, developer assets, enterprise
+
+**Out of scope declared**: Packaging 3D (food services), print CMYK heavy
 
 ### Intensity modifiers defaults
 ```
-verbal_register: "professional-warm" (en idioma local, con dialect awareness)
-copy_depth: "punchy-only" (local customers no leen long-form)
-visual_formality: "medium" (formal enough to inspire confidence, warm enough to feel welcoming)
-logo_primary_form: "combination" (símbolo + nombre — name matters for word-of-mouth)
-typography_era: "neutral-modern" o "editorial-classic" (depende de vibe — tradicional vs moderno)
+verbal_register: "professional-warm"  (en idioma local)
+copy_depth: "punchy-only"
+visual_formality: "medium"
+logo_primary_form: "combination"  (símbolo + nombre)
+typography_era: "neutral-modern" o "editorial-classic"
 social_presence_priority: "local-whatsapp"
 app_asset_criticality: "not-needed"
-print_needs: "heavy" (flyers, business cards, menus, signage)
-sonic_needs: "none" (o "branded" si tienen jingle radio/TV local)
-motion_needs: "none"
+print_needs: "heavy"
+image_gen_tier: 0
 ```
 
-### Archetype — constraints
-- **Blocked**: Outlaw, Rebel (desconfianza en contextos locales típicos)
-- **Preferred range**: Everyman (relatable local), Caregiver (serve community), Innocent (trustworthy), Ruler (premium local), Sage (expertise local)
-- **Sweet spots**: Everyman (warm and local), Caregiver (community-focused)
+### Archetype constraints
+- **Blocked**: Outlaw, Rebel
+- **Preferred range**: Everyman, Caregiver, Innocent, Ruler (premium local), Sage (expertise local)
+- **Sweet spots**: Everyman, Caregiver
 
 ### Notas específicas
-- Idioma CRÍTICO — debe ser en idioma local con dialect awareness (ej: restaurant en Bogotá usa "parcero" en copy informal, restaurant en CDMX usa "güey")
-- Trust signals matter más que innovation (horarios precisos, address visible, phone real)
-- WhatsApp Business API integrations podrían ser extend target en v2
+- Idioma CRÍTICO con dialect awareness
+- Trust signals matter más que innovation
 
 ---
 
 ## 3.9 Profile 7 — `content-media`
 
 ### Descripción
-Content/creator brand — newsletter, podcast, YouTube channel, blog, social media creator, educational content. Monetization via ads, subscriptions, sponsorships, courses, merch.
+Content/creator brand — newsletter, podcast, YouTube, blog, social media creator.
 
 ### Expected signals
-- `customer: B2C` (audience/readers/listeners)
+- `customer: B2C` (audience)
 - `format: content-media`
 - `distribution: SEO-driven, social-driven, content-driven, community-driven`
-- `stage: growth | scale` (content brands usually post-MVP)
+- `stage: growth | scale`
 
-### Outputs `required`
-- **Podcast cover** (si podcast — 3000×3000 square format specs)
-- **Video thumbnails series** (templates YouTube 1280×720 with consistent branding)
-- **Newsletter template** (header, content blocks, footer con author branding)
+### Outputs que nuestro módulo produce
+
+**Brand Document sections required**: all, plus creator-specific (podcast cover preview, video thumbnail preview)
+
+**Prompts Library required**:
+- **Podcast cover prompt** (si podcast — 3000×3000 specs)
+- **Video thumbnails series template prompt** (YouTube 1280×720)
+- **Newsletter template prompt**
 - **Social post series templates** (Instagram carousel, X thread, LinkedIn post)
-- **Author bio** (short, medium, long versions — para guest appearances)
-- **Merch direction** (tees, stickers, mugs — templates + design direction, not production)
-- Logo con variante **memorable/iconic** (creators viven de recognition — logo debe ser icónico)
-- Favicon
-- OG card optimizada para social sharing de content
-- Brand book PDF
+- Author bio (short, medium, long)
+- **Merch direction prompt** (tees, stickers, mugs)
 
-### Outputs `optional_recommended`
-- Course cover templates (si sell courses)
-- Sponsorship deck template (para pitch a brands)
-- Press kit (para interviews, features)
-- Email sequences (welcome to newsletter, upsell to paid, engagement)
-- Speaking topics page (si speaker active)
+**Optional recommended**: Course cover templates, sponsorship deck, press kit, email sequences (welcome, upsell)
 
-### Outputs `skip`
-- Pitch deck enterprise formal
-- Case studies B2B
-- Developer-facing
-- Enterprise emails
-- Pricing page enterprise (si tienen paid content, consumer-style pricing)
-- LinkedIn heavy (ciertos creators LinkedIn-primary — conditional)
+**Skip**: Pitch deck enterprise formal, case studies B2B, developer-facing, enterprise emails
 
 ### Intensity modifiers defaults
 ```
-verbal_register: "expressive-raw" (creator voice = their voice, authentic)
-copy_depth: "medium" (content creators pueden long-form)
+verbal_register: "expressive-raw"
+copy_depth: "medium"
 visual_formality: "low"
-logo_primary_form: "symbolic-first" o "combination" (iconicity matters)
-typography_era: "expressive-contemporary" (personality-forward)
-social_presence_priority: "content-creator" (platform depends on creator — YouTube+IG, o Newsletter+X, o Podcast+IG)
+logo_primary_form: "symbolic-first" o "combination"
+typography_era: "expressive-contemporary"
+social_presence_priority: "content-creator"
 app_asset_criticality: "derivative"
-print_needs: "minimal" (merch — direction only)
-sonic_needs: "branded" (CRÍTICO si podcast/video — intro music, audio logo)
-motion_needs: "subtle" (lower thirds, transitions — direction only)
+sonic_needs: "branded"
+image_gen_tier: 0 default → user may elevate Tier 1 para podcast cover quality
 ```
 
-### Archetype — constraints
-- **Highly profile-dependent**: el archetype del creator = archetype del brand
-- **Preferred range**: all 12 possible — depends on creator
-- **Sweet spots**: Sage (educational), Creator (build-with-me), Jester (entertainment), Explorer (adventure content), Hero (transformation content)
+### Archetype constraints
+- **Highly profile-dependent** — archetype del creator = archetype del brand
+- **Preferred range**: all 12 posible
+- **Sweet spots**: Sage (educational), Creator (build-with-me), Jester (entertainment), Explorer, Hero
 
 ### Ejemplos reales
-Morning Brew (Jester+Sage), Huberman Lab (Sage), MrBeast (Hero+Jester), Every (Sage), Stratechery (Sage), Tim Ferriss (Explorer+Sage).
+Morning Brew, Huberman Lab, MrBeast, Every, Stratechery, Tim Ferriss.
 
 ---
 
 ## 3.10 Profile 8 — `community-movement`
 
 ### Descripción
-Community/cause/movement — organizaciones o colectivos unidos por una causa, identity, o interés. Puede ser structurado (nonprofit, DAO) o informal (online community).
+Community/cause/movement — organizaciones/colectivos unidos por causa/identity.
 
 ### Expected signals
-- `customer: B2C` (members/participants)
+- `customer: B2C` (members)
 - `format: community`
 - `distribution: community-driven, social-driven, PR-driven`
 - `cultural_scope: niche-community | regional | global`
 
-### Outputs `required`
-- **Manifesto document** (CRÍTICO — core artifact, structured chapter-based)
-- **Symbolic assets** (flag-like, emblem-style — symbols unite communities)
-- **Discord/Slack server branding** (avatar, banner, roles naming, emojis)
-- **Member onboarding materials** (welcome sequence, code of conduct, contribution guide)
-- **Recruiting copy** (why join, what you'll get, what we stand for)
-- **Merch direction** (identity merch — tees, pins, stickers; merch es señal de pertenencia)
-- Logo system con **symbolic-first** strong
-- Favicon
-- Brand book PDF + manifesto-oriented
-- Sample social posts (rallying, unifying voice)
+### Outputs que nuestro módulo produce
 
-### Outputs `optional_recommended`
-- Newsletter template (community digest)
-- Event/gathering assets (if IRL events)
-- Governance documentation template (si DAO/formal structure)
-- Donation/membership page (si monetized)
+**Brand Document sections required**: all, plus manifesto preview
 
-### Outputs `skip`
-- Pricing page traditional (a menos que paid membership — optional)
-- Sales materials B2B
-- Developer tools specific
-- Enterprise emails
-- Case studies (puede ser "stories" en su lugar)
+**Prompts Library required**:
+- **Manifesto document prompt** (CRÍTICO — structured chapter-based)
+- **Symbolic assets prompt** (flag-like emblems)
+- **Discord/Slack server branding prompt** (avatar, banner, emoji direction)
+- **Member onboarding sequence prompt**
+- **Recruiting copy templates**
+- **Merch direction prompt** (identity merch)
+
+**Optional recommended**: Newsletter, event assets, governance docs (si DAO)
+
+**Skip**: Pricing page traditional, sales materials B2B, developer tools specific, enterprise
 
 ### Intensity modifiers defaults
 ```
-verbal_register: "expressive-raw" o "playful-bold" (depends on cause tone)
-copy_depth: "long-form-allowed" (manifesto es long-form)
-visual_formality: "low-medium" (formality baja pero NOT casual if cause is serious)
+verbal_register: "expressive-raw" o "playful-bold"
+copy_depth: "long-form-allowed"  (manifesto)
+visual_formality: "low-medium"
 logo_primary_form: "symbolic-first"
-typography_era: "expressive-contemporary" o "editorial-classic" (gravitas)
+typography_era: "expressive-contemporary" o "editorial-classic"
 social_presence_priority: "community-native"
 app_asset_criticality: "not-needed"
-print_needs: "minimal" (merch direction + flyers posibles)
-sonic_needs: "none" (rarely branded audio)
-motion_needs: "subtle"
+image_gen_tier: 0 → user may elevate para symbolic logo quality
 ```
 
-### Archetype — constraints
-- **Blocked**: Ruler (contradice spirit comunal en most cases)
+### Archetype constraints
+- **Blocked**: Ruler (contradice spirit comunal)
 - **Preferred range**: Rebel, Hero, Explorer, Creator, Magician, Innocent, Caregiver
-- **Sweet spots**: Rebel (counter-cultural movements), Hero (cause-driven), Caregiver (support communities)
+- **Sweet spots**: Rebel, Hero, Caregiver
 
 ### Ejemplos reales
-Dribbble (Creator community), Black Lives Matter (Hero+Rebel), r/wallstreetbets (Rebel+Jester), Greenpeace (Hero+Caregiver), Indie Hackers (Everyman+Creator).
+Dribbble, Black Lives Matter, r/wallstreetbets, Greenpeace, Indie Hackers.
 
 ---
 
 ## 3.11 Cross-profile — output matrix summary
 
-Matriz visual de qué output aparece en qué profile como `required` (✓), `optional_recommended` (○), `skip` (—), `out_of_scope` (✗):
+Matriz de outputs por profile. Columns: qué aparece como `required` (✓), `optional_recommended` (○), `skip` (—), `out_of_scope` (✗):
 
-| Output | ent | smb | dev | c-app | c-web | local | media | comm |
+| Output nuestro módulo | ent | smb | dev | c-app | c-web | local | media | comm |
 |---|---|---|---|---|---|---|---|---|
-| Landing | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Pricing page | ✓ | ✓ | ○ | ✓ | ✓ | — | ○ | ○ |
-| Pitch deck full | ✓ | — | — | — | — | — | — | — |
-| Pitch one-liner | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ |
-| Case study template | ✓ | ○ | ○ | — | — | — | — | — |
-| TikTok bio | — | — | — | ✓ | ○ | — | ✓ | ○ |
-| Instagram bio | — | ○ | — | ✓ | ✓ | ✓ | ✓ | ○ |
-| LinkedIn bio | ✓ | ✓ | ○ | — | — | — | ○ | ○ |
+| Brand Document PDF | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Prompts: Landing | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Prompts: Pricing | ✓ | ✓ | ○ | ✓ | ✓ | — | ○ | ○ |
+| Prompts: Pitch deck full | ✓ | — | — | — | — | — | — | — |
+| Prompts: Pitch one-liner graphic | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ |
+| Prompts: Case study | ✓ | ○ | ○ | — | — | — | — | — |
+| Prompts: TikTok post | — | — | — | ✓ | ○ | — | ✓ | ○ |
+| Prompts: Instagram post | — | ○ | — | ✓ | ✓ | ✓ | ✓ | ○ |
+| Prompts: LinkedIn post | ✓ | ✓ | ○ | — | — | — | ○ | ○ |
 | WhatsApp templates | — | — | — | — | — | ✓ | — | — |
-| App icon full set | — | — | — | ✓ | — | — | — | — |
-| Code snippet styling | — | — | ✓ | — | — | — | — | — |
-| GitHub README | — | — | ✓ | — | — | — | — | — |
-| Podcast cover | — | — | — | — | ○ | — | ✓ | — |
-| Manifesto document | — | — | — | — | — | — | — | ✓ |
-| Symbolic assets | — | — | ○ | — | — | — | — | ✓ |
-| Merch direction | — | — | — | — | — | ○ | ✓ | ✓ |
+| Reference: App icon set | — | — | — | ✓ (T1+) | — | — | — | — |
+| Prompts: Code snippet styling | — | — | ✓ | — | — | — | — | — |
+| Prompts: GitHub README | — | — | ✓ | — | — | — | — | — |
+| Prompts: Podcast cover | — | — | — | — | ○ | — | ✓ | — |
+| Prompts: Manifesto | — | — | — | — | — | — | — | ✓ |
+| Reference: Symbolic assets | — | — | ○ | — | — | — | — | ✓ |
+| Prompts: Merch direction | — | — | — | — | — | ○ | ✓ | ✓ |
 | Printable flyers | — | — | — | — | — | ✓ | — | — |
-| Email transactional | ✓ | ✓ | ✓ | ✓ | ✓ | — | ○ | ○ |
-| Security/compliance page | ✓ | ○ | ✓ | — | — | — | — | — |
-| Brand book PDF | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Email transactional prompt | ✓ | ✓ | ✓ | ✓ | ✓ | — | ○ | ○ |
+| Security/compliance page prompt | ✓ | ○ | ✓ | — | — | — | — | — |
 
 ## 3.12 Composición de profiles (híbridos)
 
-Una idea puede matchear múltiples profiles con weights. Ejemplo: developer tool con fuerte componente community-driven (`b2d-devtool` 0.65 + `community-movement` 0.35).
+Una idea puede matchear múltiples profiles con weights. Ejemplo: developer tool con componente community-driven (`b2d-devtool` 0.65 + `community-movement` 0.35).
 
 **Cómo se resuelve el manifest compuesto**:
 
-1. **Outputs `required`**: union de required de ambos (ambos se generan)
-2. **Outputs `optional_recommended`**: union de optional recommended
-3. **Outputs `skip`**: intersection (solo si AMBOS lo skipean)
-4. **Outputs `out_of_scope`**: union
-5. **Intensity modifiers**: weighted average para escalas continuas (ej: `visual_formality` numeric), rules específicas para categóricos (primary profile gana si weight > 0.6; si not, user confirms)
+1. **Outputs required**: union
+2. **Outputs optional_recommended**: union
+3. **Outputs skip**: intersection (solo si AMBOS lo skipean)
+4. **Outputs out_of_scope**: union
+5. **Intensity modifiers**: weighted average para escalas continuas, primary gana categóricas si weight > 0.6
 6. **Archetype constraints**: union de blocked, intersection de preferred_range
+7. **Image gen tier**: max de ambos (conservative)
 
 ## 3.13 Fallback cuando ninguno matchea
 
-Si confidence del primary match < 0.5 (muy ambiguo):
-- Fallback a `b2b-smb` (el más genérico) con flag `"low_confidence_classification: true"`
+Si `primary_confidence < 0.5`:
+- Fallback a `b2b-smb` con flag `"low_confidence_classification: true"`
 - Ask user para descripción manual
-- Permitir user custom manifest override
-- **Registrar el caso para análisis futuro** — puede indicar need de nuevo profile
+- Permitir scope custom
 
 ## 3.14 Evolución de la taxonomía
 
-Los 8 profiles son un punto de partida. Candidatos para agregar post-v1 basado en patterns observados:
+Candidatos para agregar post-v1 si patterns emergen:
 
-- `b2g-gov-contractor` (separate de enterprise — dinámica distinta)
-- `marketplace-twosided` (tiene needs específicos dual-audience)
-- `edtech-educational` (mezcla content-media + b2b-smb)
-- `healthcare-regulated` (compliance-heavy, trust-critical)
-- `fintech-regulated` (similar pero con nuances propios)
-- `nonprofit-cause` (separate de community-movement)
+- `b2g-gov-contractor`
+- `marketplace-twosided`
+- `edtech-educational`
+- `healthcare-regulated`
+- `fintech-regulated`
+- `nonprofit-cause`
 
-Agregar cuando haya ≥3 runs que no encajan bien en los existentes.
+Agregar cuando ≥3 runs no encajen bien.
 
 ## 3.15 Reference file a escribir en Sprint 0
 
-`skills/brand/references/brand-profiles.md` contendrá:
-- Las 8 descripciones expandidas con más ejemplos reales
+`skills/brand/references/brand-profiles.md` con:
+- 8 descripciones expandidas con ejemplos reales
 - Matriz de outputs completa
 - Tablas de intensity modifier defaults
 - Archetype constraints explícitas
-- Ejemplos trabajados de composition scenarios (5-10 casos)
-- Decision tree para fallbacks
+- Ejemplos trabajados de composition scenarios
+- Auto-elevation rules para image_gen_tier
