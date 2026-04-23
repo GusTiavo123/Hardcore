@@ -97,9 +97,9 @@ Porque toda decisión downstream depende del tipo de idea. Un output manifest es
 
 Ver [02-scope-analysis.md](./02-scope-analysis.md).
 
-### ¿Por qué Scope Analysis inline (no sub-agente)?
+### ¿Por qué Scope Analysis como sub-agente?
 
-Es razonamiento liviano sin tools externos. Lanzar un sub-agente agrega overhead (context window, setup) sin beneficio. Mismo patrón que `/profile:show` — operaciones que el orchestrator ejecuta directamente.
+Consistencia con el patrón DAG del resto de deptos de Brand y Validation. Mismo envelope de output, misma persistencia en Engram, mismo department-protocol. El overhead de un sub-agente extra es negligible frente al beneficio de homogeneidad y evita abrir excepciones que después se extiendan a otros deptos.
 
 ### ¿Por qué Strategy primero?
 
@@ -128,19 +128,19 @@ Cada dept tiene un modo cognitivo y stack de tools distinto:
 
 Menos deptos colapsa boundaries. Más deptos rompe coherencia interna sin ganancia.
 
-## 1.6 Image generation por tiers (cost-conscious)
+## 1.6 Tools — stack gratuito
 
-Claude Design cubre la mayoría de image generation pagada:
+Todo el módulo corre con tools gratuitas. La única dependencia paga es la suscripción Claude Pro/Max/Team/Enterprise del user final (gate obligatorio — sin Claude Pro no se ejecuta Brand).
 
-| Tier | Image gen stack | Cost/run | Cuándo |
-|---|---|---|---|
-| **Tier 0 (default)** | Claude native SVG + Claude Design in-context | **~$0.00** | Dogfooding, early stage, vos mismo usándolo |
-| **Tier 1** | + Recraft V4 para logos simbólicos + Unsplash free API para mood refs | ~$0.10-0.20 | Primeros 50-100 users reales |
-| **Tier 2** | + Huemint paid + Recraft full | ~$0.40-0.60 | Escala con users pagos |
+Stack:
+- Engram MCP (persistencia)
+- open-websearch MCP (general search + TM screening via USPTO TESS + WIPO Global Brand Database)
+- Domain availability MCP (`imprvhub/mcp-domain-availability`)
+- Unsplash free API (mood imagery refs con attribution)
+- `ms-office-suite:pdf` skill (Brand Design Document PDF)
+- Claude native (SVG logos, palette reasoning, typography, copy)
 
-**Control runtime**: feature flag `IMAGE_GEN_MODE` en env var o CLI arg.
-
-**Estrategia**: default Tier 0. User advanced puede escalar. Ver [07-dept-logo.md](./07-dept-logo.md) y [11-tools-stack.md](./11-tools-stack.md) para detalles.
+**Costo por run en APIs externas: $0.00**. Detalle completo en [11-tools-stack.md](./11-tools-stack.md).
 
 ## 1.7 Relación con Profile y Validation
 
@@ -175,12 +175,12 @@ Un directorio `output/{idea-slug}/brand/` que contiene **4 artefactos optimizado
 ### 1. Brand Design Document PDF
 Branded document (no spec dump) que el user sube a Claude Design design system setup (Fase 1). Claude Design lo lee y extrae el design system completo.
 
-Detallado en [24-brand-design-document-structure.md](./24-brand-design-document-structure.md).
+Detallado en [23-brand-design-document-structure.md](./23-brand-design-document-structure.md).
 
 ### 2. Prompts Library Markdown
 Prompts pre-escritos, customizados al brand + scope, que el user pega en Claude Design para cada deliverable específico (landing, deck, social, etc.). Cada prompt sigue la estructura best-practice de Claude Design: goal + layout + content + audience.
 
-Detallado en [25-prompts-library-templates.md](./25-prompts-library-templates.md).
+Detallado en [24-prompts-library-templates.md](./24-prompts-library-templates.md).
 
 ### 3. Brand Tokens code folder
 Codebase-style folder que Claude Design puede linkear para extraer design tokens automáticamente. Incluye CSS custom properties, JSON (DTCG format), Tailwind config, examples.
@@ -210,16 +210,18 @@ Estructura detallada en [18-output-package-structure.md](./18-output-package-str
 **Claude Design aporta**: pasos 4-10 (UI generation).
 **Claude Code aporta**: paso 11 (deployment).
 
-## 1.11 Timeline estimado
+## 1.11 Timeline
 
-- **Sprint 0 (planning completo)**: 1-2 sesiones focalizadas para escribir los SKILL.md + references del módulo (~55 archivos)
-- **Sprint 1 (implementación)**: 2-3 semanas
-  - Implementación del orchestrator + scope analysis
-  - Implementación de cada dept (Strategy, Verbal, Visual, Logo, Handoff Compiler)
-  - Integración con MCPs (Recraft opcional via feature flag, Huemint opcional, Domain MCP, PDF skill)
-  - Testing (8 brand profiles × dogfooding)
-  - Dogfooding contra Hardcore mismo (output sube a Claude Design para testing del flow completo)
-- **Sprint 2**: iteración + migration a Claude Design MCP cuando Anthropic lo ship.
+Sin deadlines fijos — se optimiza calidad, no velocidad.
+
+Fases:
+- **Sprint 0**: escribir specs del módulo (~30 archivos: SKILL.md + references por dept + testing protocol). Ver [21-file-structure.md](./21-file-structure.md)
+- **Sprint 1**: implementación + dogfooding
+  - Setup de MCPs del user (Domain MCP, Unsplash API key, Claude Pro active)
+  - Dogfooding contra Hardcore mismo: brandear Hardcore, subir el PDF a Claude Design y validar end-to-end
+  - 3 brand profiles iniciales en testing: `b2b-smb`, `b2c-consumer-app`, `b2local-service`
+  - Los otros 5 profiles del suite se corren a medida que aparezcan casos reales
+- **Post-dogfooding**: iteración basada en failure modes observados + migration a Claude Design MCP/API cuando Anthropic lo ship
 
 ## 1.12 Lecturas relacionadas
 
@@ -231,3 +233,4 @@ Estructura detallada en [18-output-package-structure.md](./18-output-package-str
 - Cost + timing por tier: [17-cost-and-timing.md](./17-cost-and-timing.md)
 - Structure del Brand Design Document: [23-brand-design-document-structure.md](./23-brand-design-document-structure.md)
 - Prompts Library templates: [24-prompts-library-templates.md](./24-prompts-library-templates.md)
+- Contrato de consumo (Validation + Profile → Brand): `skills/_shared/brand-contract.md`

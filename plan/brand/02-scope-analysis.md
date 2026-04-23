@@ -5,34 +5,36 @@
 Clasificar el tipo de idea y producir un **manifest de scope** que define:
 - Qué outputs aplican (`required`, `optional_recommended`, `skip`, `out_of_scope_declared`)
 - Qué modificadores de intensidad aplicar (`verbal_register`, `visual_formality`, etc.)
-- Qué archetypes están bloqueados o preferidos
-- Qué tier de image gen usar por default
+- Qué archetypes están bloqueados o preferidos por el contexto de mercado + profile
 
-Este manifest es el **contrato** que los 5 deptos downstream consumen para adaptar su ejecución al tipo de idea.
+Este manifest es el **contrato** que los 4 deptos downstream (Strategy, Verbal, Visual, Logo) consumen para adaptar su ejecución al tipo de idea. El Handoff Compiler también consume el manifest para decidir qué secciones del Brand Document generar y qué prompts incluir en la Prompts Library.
 
-## 2.2 Ejecución — inline en orchestrator (no sub-agente)
+## 2.2 Ejecución — sub-agent (mismo patrón que los 4 deptos)
 
-Scope Analysis se ejecuta directamente por el orchestrator de Brand (patrón equivalente a `/profile:show` en el módulo Profile). No es un sub-agente separado porque:
+Scope Analysis se ejecuta como **sub-agent** lanzado por el orchestrator, siguiendo el mismo patrón de la DAG de Validation y del resto de los deptos de Brand. Razones:
 
-- Es razonamiento liviano sin tools externos
-- Lanzar sub-agente agrega overhead (context window, tool setup) sin beneficio
-- El output es consumido inmediatamente por todos los deptos
+- **Consistencia con el department-protocol compartido** (`skills/_shared/department-protocol.md`). No introducir excepciones que abran la puerta a otros deptos "liviano inline" más adelante.
+- **Mismo envelope de output** — todos los deptos retornan el output-contract estándar, incluido Scope Analysis.
+- **Mismo patrón de persistencia en Engram** (`brand/{slug}/scope`).
+- El overhead de un sub-agent extra es negligible comparado con el beneficio de homogeneidad.
 
-Si en el futuro la complejidad crece, se convierte a sub-agente. En v1, inline.
+El sub-agent de Scope Analysis no requiere WebSearch ni tools externos — solo Engram retrieval + reasoning.
 
 ## 2.3 Inputs
 
-### Obligatorios (retrieved via Engram)
-- `validation/{slug}/report` (verdict, scores, flags)
-- `validation/{slug}/problem` (target audience real, pain points, user research)
-- `validation/{slug}/market` (SOM, segmentos, geografías)
-- `validation/{slug}/competitive` (incumbents, visual landscape del mercado)
-- `validation/{slug}/bizmodel` (modelo de revenue, pricing — informa distribution)
+### Obligatorios (retrieved via Engram por el sub-agent)
+- `validation/{slug}/synthesis` (verdict, scores, flags)
+- `validation/{slug}/problem` (target audience, pain points, industry, demand_stack)
+- `validation/{slug}/market` (SOM, segments, geographies, market_stage)
+- `validation/{slug}/competitive` (direct_competitors, market_gaps, pricing_benchmark)
+- `validation/{slug}/bizmodel` (recommended_model, pricing_suggestion)
 - Idea text original
 
 ### Opcionales
-- `profile/{user-slug}/core` + `extended`
-- User overrides explícitos (ej: `"tono formal"`, `"tier premium"`)
+- `founder_brand_context` (pasado desde el orchestrator si profile existe)
+- User overrides explícitos (ej: `"tono formal"`, `"scope: b2b-smb"`)
+
+El sub-agent recibe los inputs como parte del prompt de lanzamiento (ver sub-agent-template en orchestrator references). No accede directamente al user.
 
 ## 2.4 Proceso detallado
 
@@ -103,35 +105,20 @@ Array multi-valor:
 
 Dados los 5 ejes, match contra los 8 brand profiles (ver [03-brand-profiles.md](./03-brand-profiles.md)) usando similarity scoring:
 
-```python
-def match_brand_profile(classification, canonical_profiles):
-    scores = {}
-    for profile in canonical_profiles:
-        score = 0
-        if classification.customer in profile.expected_customer:
-            score += 3
-        if classification.format in profile.expected_format:
-            score += 3
-        if any(d in profile.expected_distribution for d in classification.distribution):
-            score += 2
-        if classification.stage in profile.expected_stage:
-            score += 1
-        if classification.cultural_scope in profile.expected_cultural_scope:
-            score += 1
-        scores[profile.id] = score
-    
-    primary = max(scores.items(), key=lambda x: x[1])
-    primary_confidence = primary[1] / 10
-    
-    return {
-        "primary": primary[0],
-        "primary_confidence": primary_confidence,
-        "secondary": next_best if significant else None,
-        "composition_weights": normalize(...)
-    }
+```
+scoring function:
+  base_score = 0
+  if classification.customer in profile.expected_customer: base_score += 3
+  if classification.format in profile.expected_format: base_score += 3
+  if any(d in profile.expected_distribution for d in classification.distribution): base_score += 2
+  if classification.stage in profile.expected_stage: base_score += 1
+  if classification.cultural_scope in profile.expected_cultural_scope: base_score += 1
+  
+primary = profile con highest score
+primary_confidence = primary.score / 10
 ```
 
-**Threshold**: `primary_confidence < 0.7` triggers user confirmation.
+**Threshold**: si `primary_confidence < 0.7`, el sub-agent retorna el output con flag `requires_user_confirmation: true` y el orchestrator prompt al user antes de proseguir con el pipeline.
 
 ### Paso C — Generar output manifest
 
@@ -140,11 +127,13 @@ Para cada output posible del módulo (ver matriz en [03-brand-profiles.md](./03-
 - `required`: siempre se genera
 - `optional_recommended`: se genera si scope lo soporta
 - `skip`: se omite silenciosamente
-- `out_of_scope_declared`: v1 no cubre
+- `out_of_scope_declared`: v1 no cubre (ej: motion, sonic branding)
 
-**Nota**: el manifest refleja los outputs que **nosotros producimos** (naming, brand document sections, logo variants, prompts específicos por deliverable). La generación de UI (landing, decks, mockups) la ejecuta Claude Design downstream — no se lista en nuestro manifest como output nuestro, se lista como **prompt** en el Prompts Library.
+El manifest refleja los outputs que **Brand produce** (naming, brand document sections, logo variants, prompts específicos por deliverable). La generación de UI aplicada (landing, decks, mockups) la ejecuta Claude Design downstream — no se lista en nuestro manifest como output propio; aparece como **prompt template** en la Prompts Library.
 
 ### Paso D — Intensity modifiers
+
+Modificadores finos que los deptos consumen para calibrar tono, formato, y volumen de output:
 
 ```json
 {
@@ -157,16 +146,15 @@ Para cada output posible del módulo (ver matriz en [03-brand-profiles.md](./03-
   "app_asset_criticality": "not-needed | derivative | primary",
   "print_needs": "none | minimal | heavy",
   "sonic_needs": "none | branded | heavy",
-  "motion_needs": "none | subtle | expressive",
-  "image_gen_tier": "0 | 1 | 2"
+  "motion_needs": "none | subtle | expressive"
 }
 ```
 
-**Modifier `image_gen_tier`**: default `0` (Tier 0, zero cost). Puede ser elevado por user override `/brand:new --tier=1` o por scope requirement (ej: si `b2c-consumer-app` requiere symbolic app icon, auto-elevates a Tier 1).
+Los modifiers son derivados determinísticamente del brand_profile + classification + founder_brand_context (si existe). No hay ramificaciones en base a tier ni cost — el módulo usa un solo stack de tools (ver [11-tools-stack.md](./11-tools-stack.md)).
 
 ### Paso E — Archetype constraints
 
-Según brand profile + user profile:
+Según brand profile + founder profile:
 
 | Brand profile | Archetypes bloqueados típicos |
 |---|---|
@@ -177,29 +165,33 @@ Según brand profile + user profile:
 | `community-movement` | Ruler |
 | `b2local-service` | Outlaw, Rebel |
 
-Plus profile-based blocks:
-- `profile.risk_tolerance: low` → Outlaw, Hero bloqueados
-- `profile.primary_goal: calm` → Jester, Hero, Outlaw bloqueados
+Plus profile-based blocks (si `founder_brand_context` existe):
+- `profile.risk_tolerance: conservative` → Outlaw, Hero bloqueados
+- `profile.working_style.orientation: technical` puro → Lover, Caregiver con fricción en B2C emocional
+
+La lista final de archetypes compatibles (no bloqueados) pasa a Strategy para seleccionar uno con justificación.
 
 ### Paso F — Confidence assessment
 
-Si `confidence < 0.7`, pause y ask user:
+Si `primary_confidence >= 0.7`, output marca `requires_user_confirmation: false` y el pipeline continúa sin interrupción.
 
+Si `primary_confidence < 0.7`, el output del sub-agent incluye:
+
+```json
+{
+  "requires_user_confirmation": true,
+  "confirmation_options": [
+    {"id": 1, "label": "b2b-smb (confidence 0.62) — correct"},
+    {"id": 2, "label": "b2b-enterprise — large companies"},
+    {"id": 3, "label": "b2d-devtool — developer audience"},
+    {"id": 4, "label": "b2c-consumer-app"},
+    {"id": 5, "label": "other — describe"}
+  ],
+  "confirmation_context": "Tu idea clasificó como b2b-smb con señales: compliance officers, subscription $200-500/mo, distribution content+outbound. ¿Correcto?"
+}
 ```
-Clasifiqué tu idea como B2B SMB SaaS (confidence 0.62).
 
-Señales principales:
-- Target audience: compliance officers de fintechs
-- Pricing model: subscription $200-500/mo
-- Distribution: content + outbound
-
-¿Te suena correcto?
-  1. ✓ Correcto (b2b-smb)
-  2. Es B2B enterprise (large companies, $50K+)
-  3. Es B2D (developer tool)
-  4. Es B2C consumer
-  5. Otra (describila)
-```
+El orchestrator presenta las opciones al user y re-invoca el sub-agent de Scope Analysis con `user_override: {brand_profile: "...", ...}` si el user corrige.
 
 ## 2.5 Output schema completo
 
@@ -208,35 +200,44 @@ Señales principales:
   "schema_version": "1.0",
   "department": "scope_analysis",
   "timestamp": "ISO-8601",
+
   "inputs_summary": {
-    "validation_slug": "...",
-    "profile_user_slug": "..." | null,
-    "has_profile": true | false,
+    "validation_slug": "string",
+    "profile_user_slug": "string | null",
+    "has_profile": true,
     "validation_verdict": "GO | PIVOT | NO-GO",
     "user_overrides": {}
   },
+
   "classification": {
     "customer": "B2B",
     "customer_secondary": null,
     "format": "SaaS",
-    "distribution": ["content-driven", "outbound-sales"],
+    "distribution": ["content-driven", "sales-driven"],
     "stage": "pre-launch",
     "cultural_scope": "regional-LATAM"
   },
+
   "brand_profile": {
     "primary": "b2b-smb",
     "primary_confidence": 0.84,
     "secondary": null,
     "composition_weights": {"b2b-smb": 1.0}
   },
+
+  "requires_user_confirmation": false,
+  "confirmation_options": null,
+  "confirmation_context": null,
+
   "output_manifest": {
     "brand_document_sections": {
       "required": [
         "cover", "brand_essence", "voice_tone", "palette",
         "typography", "logo", "visual_principles", "copy_samples"
       ],
-      "optional_recommended": ["mood_atmosphere"],
-      "conditional_on_tier": ["mood_imagery_generated"]
+      "optional_recommended": ["mood_atmosphere", "case_study_framing"],
+      "skip": ["manifesto_page", "app_icon_grid"],
+      "out_of_scope_declared": ["motion_guidelines", "sonic_guidelines"]
     },
     "prompts_library": {
       "required": [
@@ -244,22 +245,18 @@ Señales principales:
         "about_page", "linkedin_post_templates[3]", "email_welcome",
         "pitch_one_liner_graphic"
       ],
-      "optional_recommended": [
-        "case_study_template", "press_release_template"
-      ],
-      "skip": [
-        "tiktok_post", "instagram_story", "app_store_listing",
-        "podcast_cover", "manifesto_page"
-      ]
+      "optional_recommended": ["case_study_template", "press_release_template"],
+      "skip": ["tiktok_post", "instagram_story", "app_store_listing", "podcast_cover", "manifesto_page"]
     },
     "brand_tokens": {
       "required": ["tokens.css", "tokens.json", "tailwind.config", "fonts.css", "examples/button", "examples/card", "examples/hero"]
     },
     "reference_assets": {
       "required": ["logo_primary", "logo_mono", "logo_inverse", "logo_icon_only", "favicon_set"],
-      "conditional_on_tier": ["mood_imagery[6]", "sample_application"]
+      "optional_recommended": ["mood_imagery_refs", "sample_application"]
     }
   },
+
   "intensity_modifiers": {
     "verbal_register": "professional-warm",
     "copy_depth": "medium",
@@ -270,69 +267,68 @@ Señales principales:
     "app_asset_criticality": "derivative",
     "print_needs": "minimal",
     "sonic_needs": "none",
-    "motion_needs": "none",
-    "image_gen_tier": 0
+    "motion_needs": "none"
   },
+
   "archetype_constraints": {
     "blocked": ["Jester", "Outlaw"],
     "preferred_range": ["Sage", "Ruler", "Hero", "Everyman"],
-    "reasoning": "..."
+    "reasoning": "string — why these are blocked vs preferred for this classification + profile"
   },
+
   "reasoning_trace": {
-    "classification_signals": {...},
-    "profile_matching_scores": {...},
-    "modifier_decisions": {...}
+    "classification_signals": {},
+    "profile_matching_scores": {},
+    "modifier_decisions": {}
   }
 }
 ```
 
 ## 2.6 Persistencia
 
-`brand/{idea-slug}/scope` en Engram.
+`brand/{idea-slug}/scope` en Engram. Save via el sub-agent al final de su ejecución, siguiendo `skills/_shared/engram-convention.md` y `skills/_shared/department-protocol.md`.
 
 ## 2.7 User interaction
 
-- Si `confidence < 0.7`: ask-for-confirmation prompt
-- Si user override: applied before scope generation
-- Si confidence ≥ 0.7: proceed sin interrupción
+El sub-agent de Scope Analysis no interactúa directamente con el user. Cualquier interacción (confirmación de classification ambigua, user override) la media el orchestrator:
+
+- Si `requires_user_confirmation: true`: orchestrator renderiza las `confirmation_options` y re-invoca el sub-agent con el override aplicado
+- Si user aplicó override pre-run (ej. `/brand:override brand_profile=b2b-enterprise`): orchestrator pasa el override en los inputs iniciales
 
 ## 2.8 Edge cases
 
 ### Idea ambigua, múltiples matches cercanos
-- Si primary y secondary tienen scores casi iguales, force user confirmation
+Si primary y secondary tienen scores dentro de 1 punto, forzar user confirmation (flag `requires_user_confirmation: true`).
 
 ### Idea que no matchea ningún profile bien
-- `confidence < 0.5` → fallback a `b2b-smb` con flag `"low_confidence_classification: true"` + ask manual description
+`primary_confidence < 0.5` → fallback a `b2b-smb` con flag `low_confidence_classification: true` + prompt de user confirmation obligatorio. El user puede elegir otro profile o describir manualmente.
 
 ### Idea híbrida
-- `primary + secondary` con composition_weights
-- Output manifest toma union de required
-- Intensity modifiers: weighted average / primary dominante
+`primary + secondary` con `composition_weights`. El output manifest toma union de required sections/prompts. Intensity modifiers se derivan con primary dominante; secondary aporta modificadores donde no conflictan.
 
 ### Profile ausente
-- Proceed con idea + validation
-- Archetype constraints relajadas (sin profile-based blocks)
-- Flag `"decided_without_profile: true"`
+Proceed con idea + validation solamente. Archetype constraints relajadas (sin profile-based blocks). Flag `decided_without_profile: true` en el output.
 
-## 2.9 Reference file a escribir en Sprint 0
+### Profile con completeness < 0.4
+Mismo tratamiento que profile ausente pero con flag `decided_with_partial_profile: true`. Las partes del profile que sí están disponibles se aplican a los modifiers; las ausentes se ignoran.
 
-`skills/brand/references/scope-analysis-rubric.md` contiene:
-- Tabla expandida de señales per eje
-- Algoritmo de matching con pseudocódigo
-- Decision tree completo para intensity modifiers
-- Ejemplos trabajados para las 8 canonical profiles
-- Ejemplos trabajados para 5-10 casos híbridos
-- Cómo auto-elevar tier según requirements del scope
+## 2.9 Archivos a escribir en Sprint 0
 
-## 2.10 Testing de Scope Analysis
+Para este depto:
+- `skills/brand/scope-analysis/SKILL.md` — sub-agent instructions. **Incluye inline**: rubric de signals per eje, matching algorithm con pseudocódigo, decision tree para intensity modifiers, ejemplos trabajados para los 8 canonical profiles y 5-10 casos híbridos
+- `skills/brand/scope-analysis/references/data-schema.md` — output schema + assembly checklist
+
+Las refs standalone (archetype-guide, brand-profiles, coherence-rules) viven a nivel orchestrator y son consumidas por Scope Analysis via cross-reference.
+
+## 2.10 Testing
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos mínimos:
 
-1. Idea B2B SaaS clara → clasifica `b2b-smb` con confidence ≥ 0.8
-2. Idea consumer mobile app clara → clasifica `b2c-consumer-app` con confidence ≥ 0.8
-3. Idea híbrida B2D + community → primary/secondary ambos
-4. Idea ambigua → triggers user confirmation
-5. Idea local service → clasifica `b2local-service` correctamente
-6. Idea sin profile → proceeds with flag
+1. Idea B2B SaaS clara → `b2b-smb` con confidence ≥ 0.8
+2. Idea consumer mobile app clara → `b2c-consumer-app` con confidence ≥ 0.8
+3. Idea híbrida B2D + community → primary + secondary ambos con composition_weights
+4. Idea ambigua (score cercano) → `requires_user_confirmation: true`
+5. Idea local service → `b2local-service` correctamente, manifest compacto
+6. Idea sin profile → proceeds con `decided_without_profile: true`
 7. User override previo → manifest respeta hints
-8. Scope auto-eleva a Tier 1 cuando `b2c-consumer-app` requiere app icon symbolic
+8. User override post-confirmation → re-invocación del sub-agent produce output consistente

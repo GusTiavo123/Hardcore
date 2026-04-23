@@ -12,16 +12,16 @@ El paquete es autoexplicativo, completo, usable sin instrucciones externas.
 {repo-root}/output/{idea-slug}/brand/
 ```
 
-Dentro del repo (consistente con patterns existentes).
+Dentro del repo del user (consistente con patterns existentes de Validation y Profile).
 
 ## 18.3 Invariantes (siempre presentes)
 
-Independiente de scope/tier, SIEMPRE:
+Independiente de scope, SIEMPRE:
 
 ```
 output/{idea-slug}/brand/
 ├── README.md                               ← Always — instructions para Claude Design
-├── AUDIT.md                                ← Always — evidence + versioning + cost tracking
+├── AUDIT.md                                ← Always — evidence + versioning
 ├── brand-design-document.pdf               ← Always — DELIVERABLE 1 (Claude Design upload)
 ├── prompts-for-claude-design.md            ← Always — DELIVERABLE 2 (Claude Design prompts)
 ├── brand-tokens/                           ← Always — DELIVERABLE 3 (codebase integration)
@@ -37,27 +37,29 @@ output/{idea-slug}/brand/
 └── reference-assets/                       ← Always — DELIVERABLE 4 (visual refs)
     ├── logo/
     │   ├── primary.svg
-    │   ├── primary.png (800px rasterized)
+    │   ├── primary.png (800px rasterized si rasterization tool disponible)
     │   ├── mono.svg
     │   ├── inverse.svg
-    │   ├── icon-only.svg
+    │   ├── icon-only.svg (si aplica al form chosen)
     │   └── derivations/
-    │       ├── favicon-16.png
-    │       ├── favicon-32.png
-    │       ├── favicon-48.png
-    │       ├── favicon.ico
-    │       ├── apple-touch-180.png
-    │       ├── og-card-1200x630.png
-    │       └── profile-pic-400.png
+    │       ├── favicon-16.svg (+png)
+    │       ├── favicon-32.svg (+png)
+    │       ├── favicon-48.svg (+png)
+    │       ├── favicon.ico (si rasterization tool disponible)
+    │       ├── apple-touch-180.svg (+png)
+    │       ├── og-card-1200x630.svg (+png)
+    │       └── profile-pic-400.svg (+png)
     └── README.md
 ```
 
-## 18.4 Elementos dinámicos — según scope + tier
+Nota: PNG/ICO generations requieren rasterization tool (headless chromium o rsvg-convert). Si no está disponible, entregamos SVG-only con instrucciones manuales en el README (ver [07-dept-logo.md](./07-dept-logo.md)).
+
+## 18.4 Elementos dinámicos — según scope
 
 ### Brand Design Document PDF — sections dinámicas
 
 Siempre tiene:
-- Cover
+- Cover con logo + brand name
 - Brand essence (archetype + positioning + values)
 - Voice & tone
 - Palette
@@ -66,18 +68,19 @@ Siempre tiene:
 - Visual principles
 - Copy library samples
 - Scope declaration + limitations
+- Appendix (evidence trace, versioning)
 
-Tier 1+ añade:
-- Mood & atmosphere section con imagery grid (Unsplash Tier 1, Recraft Tier 2)
+Si scope incluye mood imagery (profiles que lo benefician — ver sección 18.8 abajo), se agrega:
+- Mood & atmosphere section con Unsplash refs (URL + attribution strings) y prosa que describe el mood
 
-Scope-dependent sections:
+Scope-dependent sections (siempre condicionales):
 - **b2d-devtool**: Developer aesthetic preview page (code snippet styling, CLI colors)
 - **b2local-service**: Print applications preview (flyer mockup, business card)
 - **content-media**: Content application preview (podcast cover mock, thumbnail series)
 - **community-movement**: Symbolic assets preview (emblem variations, merch direction)
 - **b2c-consumer-app**: App icon showcase + screenshot templates preview
 
-Detallado en [24-brand-design-document-structure.md](./24-brand-design-document-structure.md).
+Page range varía por profile (ver [23-brand-design-document-structure.md](./23-brand-design-document-structure.md) para spec por profile).
 
 ### Prompts Library Markdown — dinámica per scope
 
@@ -98,14 +101,13 @@ Prompt: ...
 
 ### {Deliverable 2}
 Prompt: ...
-...
 ```
 
 Cada prompt customizado al brand (name, palette HEX, typography, voice) + formato Claude Design best-practice (goal + layout + content + audience).
 
-Prompts que se incluyen según scope — ver matriz en [03-brand-profiles.md](./03-brand-profiles.md#311-cross-profile---output-matrix-summary).
+Los prompts que se incluyen dependen del `scope.output_manifest.prompts_library.required + optional_recommended` — ver matriz en [03-brand-profiles.md](./03-brand-profiles.md).
 
-Templates detallados en [25-prompts-library-templates.md](./25-prompts-library-templates.md).
+Templates detallados en [24-prompts-library-templates.md](./24-prompts-library-templates.md).
 
 ### Brand Tokens — contenido constante, valores dinámicos
 
@@ -120,47 +122,66 @@ reference-assets/
 └── README.md
 ```
 
-**Tier 1+ añade**:
+**Si el scope incluye mood imagery** (profiles que lo benefician):
 ```
 reference-assets/
-├── mood/
-│   ├── mood-01-energy.{png|jpg}
-│   ├── mood-02-texture.png
-│   ├── ... (6-8 total)
-│   └── README.md (con attribution si Unsplash)
+└── mood/
+    ├── mood-01-{theme}.md    # Archivo con URL Unsplash + attribution + descripción del mood que inspira
+    ├── mood-02-{theme}.md
+    ├── ... (3-6 total según scope)
+    └── README.md
 ```
+
+Los archivos `mood-XX-*.md` contienen metadata (no imágenes descargadas localmente). Esto evita binarios pesados y respeta ToS de Unsplash (attribution requerido, preferible linkear que downloadar). El user o Claude Design pueden fetchar las imágenes desde los URLs según necesidad.
 
 **Scope-dependent añade** (cuando applicable):
 
-#### If `b2c-consumer-app` (Tier 1+ auto-elevated)
+#### Si `b2c-consumer-app` con `app_asset_criticality: primary`
 ```
 reference-assets/
-├── app-icons/
-│   ├── ios/ (multiple sizes 20, 29, 40, 58, 60, 80, 87, 120, 180, 1024)
-│   └── android/ (foreground.svg, background.svg, adaptive-icon.png, masks)
+└── app-icons/
+    ├── ios/
+    │   ├── icon-20.svg (+png si rasterization disponible)
+    │   ├── icon-29.svg (+png)
+    │   ├── icon-40.svg (+png)
+    │   ├── icon-60.svg (+png)
+    │   ├── icon-80.svg (+png)
+    │   ├── icon-120.svg (+png)
+    │   ├── icon-180.svg (+png)
+    │   └── icon-1024.svg (+png)
+    └── android/
+        ├── foreground.svg
+        ├── background.svg
+        ├── adaptive-icon.svg (+png)
+        └── launcher-masks/
+            ├── circle.svg
+            ├── rounded.svg
+            └── squircle.svg
 ```
 
-#### If `b2local-service`
+#### Si `b2local-service`
 ```
 reference-assets/
-├── print-templates/
-│   ├── flyer-template.pdf
-│   ├── business-card.pdf
-│   └── menu-template.pdf (si food)
+└── print-templates/
+    ├── flyer-template.svg (+pdf)
+    ├── business-card.svg (+pdf)
+    └── menu-template.svg (+pdf) # si es food service
 ```
 
-#### If `community-movement` or `content-media`
+Nota: para generar PDFs de templates de print, Handoff Compiler usa `ms-office-suite:pdf` skill. Si falla, entrega los SVGs con instrucciones manuales.
+
+#### Si `community-movement` o `content-media`
 ```
 reference-assets/
-├── merch-direction/
-│   ├── tshirt-layout.pdf
-│   ├── sticker-designs.svg
-│   └── README.md
+└── merch-direction/
+    ├── tshirt-layout.svg
+    ├── sticker-designs.svg
+    └── README.md
 ```
 
-## 18.5 Estructura completa (maximum)
+## 18.5 Estructura completa (maximum example)
 
-Para context, mostrando TODA la estructura posible (solo para b2c-consumer-app Tier 2 con max features):
+Ejemplo con todas las features activas (b2c-consumer-app con mood refs y full app icon set):
 
 ```
 output/{slug}/brand/
@@ -186,180 +207,142 @@ output/{slug}/brand/
     │   ├── inverse.svg
     │   ├── icon-only.svg
     │   └── derivations/
-    │       ├── favicon-16.png
-    │       ├── favicon-32.png
-    │       ├── favicon-48.png
+    │       ├── favicon-16.svg (+png)
+    │       ├── favicon-32.svg (+png)
+    │       ├── favicon-48.svg (+png)
     │       ├── favicon.ico
-    │       ├── apple-touch-180.png
-    │       ├── og-card-1200x630.png
-    │       └── profile-pic-400.png
-    ├── mood/                          # Tier 1+
-    │   ├── mood-01-energy.png
-    │   ├── mood-02-texture.png
-    │   ├── mood-03-composition.png
-    │   ├── mood-04-light.png
-    │   ├── mood-05-motion.png
-    │   ├── mood-06-focus.png
+    │       ├── apple-touch-180.svg (+png)
+    │       ├── og-card-1200x630.svg (+png)
+    │       └── profile-pic-400.svg (+png)
+    ├── mood/
+    │   ├── mood-01-energy.md
+    │   ├── mood-02-texture.md
+    │   ├── mood-03-composition.md
+    │   ├── mood-04-light.md
+    │   ├── mood-05-motion.md
+    │   ├── mood-06-focus.md
     │   └── README.md
-    ├── app-icons/                     # b2c-consumer-app only
+    ├── app-icons/
     │   ├── ios/
-    │   │   ├── icon-20.png
-    │   │   ├── icon-29.png
-    │   │   ├── icon-40.png
-    │   │   ├── icon-60.png
-    │   │   ├── icon-80.png
-    │   │   ├── icon-120.png
-    │   │   ├── icon-180.png
-    │   │   └── icon-1024.png
+    │   │   ├── icon-20.svg
+    │   │   ├── icon-29.svg
+    │   │   ├── icon-40.svg
+    │   │   ├── icon-60.svg
+    │   │   ├── icon-80.svg
+    │   │   ├── icon-120.svg
+    │   │   ├── icon-180.svg
+    │   │   └── icon-1024.svg
     │   └── android/
     │       ├── foreground.svg
     │       ├── background.svg
-    │       ├── adaptive-icon.png
+    │       ├── adaptive-icon.svg
     │       └── launcher-masks/
+    │           ├── circle.svg
+    │           ├── rounded.svg
+    │           └── squircle.svg
     └── README.md
 ```
 
 ## 18.6 README.md del package — estructura
 
-Ver template detallado en [08-dept-handoff-compiler.md](./08-dept-handoff-compiler.md#66-paso-6-generar-readme-del-package).
+Ver template detallado en [08-dept-handoff-compiler.md](./08-dept-handoff-compiler.md) (Paso 6).
 
-Resumen sections:
-- Identity summary (name, archetype, profile, tier used)
+Resumen de secciones:
+- Identity summary (name, archetype, profile)
 - Scope identified + confidence
-- **Step-by-step Claude Design workflow** (critical para user)
+- Claude Pro subscription requirement (critical)
+- **Step-by-step Claude Design workflow**
 - Lo que SÍ incluye (por category + deliverable)
 - Lo que NO incluye (skipped + out-of-scope con reasons)
 - How to use each deliverable
-- Disclaimers
-- Versioning info
+- Disclaimers (TM screening preliminar, Claude Design dependency)
+- Versioning info + comandos disponibles
 
 ## 18.7 AUDIT.md — estructura
 
-Ver detalles en [15-versioning-reproducibility.md](./15-versioning-reproducibility.md#audit-log).
+Ver detalles en [15-versioning-reproducibility.md](./15-versioning-reproducibility.md).
 
-Summary sections:
-- Run metadata (ID, version, mode, tier, duration)
-- Tool versions
-- Input hashes
+Secciones:
+- Run metadata (ID, version, mode, duration)
+- Tool versions usadas
+- Input hashes (validation snapshot, profile snapshot)
 - Decisions made per dept
-- Coherence trace (8 gates)
-- Failures encountered
-- Cost tracking
-- User interactions
-- Claude Design integration status
+- Coherence trace (9 gates) con user decisions si aplica
+- Failures encountered (soft failures con flags)
+- User interactions (qué se preguntó, qué eligió el user)
+- Claude Design integration status (post-delivery si el user reporta)
 
-## 18.8 Entregables por scope × tier — cuadro resumen
+## 18.8 Entregables por scope — matriz
 
-| Scope | Tier 0 base | Tier 1 adds | Tier 2 adds |
-|---|---|---|---|
-| `b2b-enterprise` | 4 deliverables + logo wordmark SVG | Mood refs (Unsplash) | Mood generated + Recraft wordmark |
-| `b2b-smb` | 4 deliverables + logo wordmark | Mood refs | Mood generated |
-| `b2d-devtool` | 4 deliverables + wordmark; symbolic NOT recommended | Recraft symbolic + mood | All Recraft |
-| `b2c-consumer-app` | **Not recommended** (elevates to T1) | **Default** — App icons + Recraft symbolic | App icons + full Recraft + mood generated |
-| `b2c-consumer-web` | 4 deliverables + combination logo | Mood refs | Mood generated |
-| `b2local-service` | 4 deliverables + combination + printable templates | Mood refs | Mood generated + premium printables |
-| `content-media` | 4 deliverables + symbolic (limited Tier 0 quality) | Recraft symbolic + mood + podcast cover quality | Full premium |
-| `community-movement` | 4 deliverables + symbolic (limited Tier 0) | Recraft symbolic + merch direction | Full premium |
+Todos los profiles reciben los 4 deliverables base. Las diferencias son qué prompts se incluyen en la Library, qué secciones tiene el Brand Document, y qué assets adicionales hay en Reference Assets:
+
+| Scope | Brand Doc extras | Mood refs incluidos | Logo form bias | Asset folders extras |
+|---|---|---|---|---|
+| `b2b-enterprise` | Security section, pitch deck preview | Opcional (baja prioridad) | wordmark | — |
+| `b2b-smb` | Pricing page preview | Opcional | wordmark | — |
+| `b2d-devtool` | Developer aesthetic preview, code snippet styling | Opcional | combination o geometric | — |
+| `b2c-consumer-app` | App icon showcase, onboarding screens preview | Recomendado | geometric (icon-first) | `app-icons/` si `app_asset_criticality: primary` |
+| `b2c-consumer-web` | Social grid preview, referral preview | Recomendado | combination o geometric | — |
+| `b2local-service` | Print applications preview | Opcional | combination | `print-templates/` |
+| `content-media` | Podcast cover + thumbnail preview | Recomendado | geometric o wordmark | `merch-direction/` (opcional) |
+| `community-movement` | Symbolic assets preview, manifesto page | Recomendado | symbolic-geometric | `merch-direction/` |
+
+"Mood refs" siempre via Unsplash free API con attribution. Skippable si Unsplash API está down (soft failure).
 
 ## 18.9 Cross-references en el package
 
-Algunos assets aparecen con references cruzadas:
-- Logo SVG primary: `reference-assets/logo/primary.svg` (canonical) referenced from `brand-design-document.pdf` (embedded) + `brand-tokens/examples/*.html` (linked) + `README.md` (mentioned)
-- Palette HEX: `brand-tokens/tokens.json` (source of truth) + `tokens.css` (CSS version) + `tailwind.config.js` (Tailwind version) + referenced in Brand Document PDF palette section + each prompt in Prompts Library
+Algunos assets aparecen con referencias cruzadas:
+- **Logo SVG primary**: `reference-assets/logo/primary.svg` (canonical) + embedded en `brand-design-document.pdf` + referenced en `brand-tokens/examples/*.html` + mencionado en `README.md`
+- **Palette HEX**: `brand-tokens/tokens.json` (source of truth DTCG format) + `tokens.css` (CSS version) + `tailwind.config.js` (Tailwind) + referenced en Brand Document palette section + inyectado en cada prompt de la Prompts Library
 
-Todos los duplicates son copies/references, no symlinks, para portabilidad (user zip + send, no broken links).
+Todos los duplicates son copies/references, no symlinks, para portabilidad (user zip + send sin broken links).
 
 ## 18.10 Deployability
 
-Package es **immediately usable**:
+Package es **immediately usable**. Tres paths posibles para el user:
 
-### Via Claude Design workflow
+### Path primario: Claude Design workflow (recomendado)
 ```
-1. Abrir claude.ai/design
-2. Design system setup → Upload brand-design-document.pdf
-3. Validate + publish
-4. Copy prompts from prompts-for-claude-design.md
-5. Run in Claude Design projects
-6. Export from Claude Design → Claude Code → deploy
+1. Abrir claude.ai/design (requires Claude Pro / Max / Team / Enterprise)
+2. "Set up your design system" → Upload brand-design-document.pdf
+3. Validate con test project
+4. Publish el design system
+5. Copy prompts from prompts-for-claude-design.md en projects
+6. Export desde Claude Design → Claude Code → deploy
 ```
 
-### Via codebase integration (advanced)
+### Path avanzado: codebase integration
 ```
-1. Copy brand-tokens/ folder to your repo
-2. Import tokens.css in main CSS
-3. Link codebase to Claude Design
-4. Claude Design auto-extracts design system
+1. Copy brand-tokens/ folder a tu repo
+2. Import tokens.css en tu main CSS
+3. Link codebase a Claude Design (si tenés Pro+)
+4. Claude Design auto-extrae design system desde el código
 5. Use prompts from Library
 ```
 
-### Via manual use (no Claude Design)
+### Path alternativo: manual (fuera de Claude Design)
 ```
-1. Use brand-design-document.pdf as brief for human designer
-2. Use Reference Assets (logo SVGs) directly in design tools
-3. Use Brand Tokens in your own code
-4. Copy prompts from Library as guidance (adapt to other AI tools)
-```
-
-## 18.11 README template específico (excerpt)
-
-Ver [08-dept-handoff-compiler.md](./08-dept-handoff-compiler.md#66) para template completo.
-
-Elementos clave:
-
-```markdown
-# {Brand Name} — Brand Package
-
-Generated by Hardcore Brand module · v1.0 · {date}
-For use with: **Claude Design** (primary downstream)
-
-## Quick start
-
-1. **Use with Claude Design** (recommended):
-   - Go to claude.ai/design
-   - Upload `brand-design-document.pdf` to design system setup
-   - Use prompts from `prompts-for-claude-design.md` in projects
-   
-2. **Use tokens in codebase**:
-   ```bash
-   cp -r brand-tokens/ your-repo/
-   ```
-   
-3. **Use assets directly**:
-   - Logo SVGs: `reference-assets/logo/*.svg`
-   - Reference images: `reference-assets/mood/` (if tier ≥ 1)
-
-## Directory guide
-
-[...]
-
-## Scope
-
-Classified as: **{profile}** (confidence {%})
-Tier used: {N} (cost: ${amount})
-
-Package optimized for:
-- [characteristics based on scope]
-
-## What's included vs not
-
-[...]
-
-## Disclaimers
-
-[...]
+1. Usar brand-design-document.pdf como brief para human designer
+2. Usar Reference Assets (logo SVGs) directamente en Figma, Illustrator, etc.
+3. Usar Brand Tokens en tu propio código
+4. Copy prompts from Library como guidance (adaptar a otras AI tools)
 ```
 
-## 18.12 Testing del package structure
+El package está optimizado para el path primario (Claude Design) — si el user no tiene Pro+, el pre-flight del orchestrator bloquea el run (ver 08 y 13). Pero si de algún modo el package termina en manos de alguien sin Claude Design, es usable manualmente.
+
+## 18.11 Testing del package structure
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Package structure correcta por brand profile + tier
+1. Package structure correcta por brand profile
 2. README lista accurately lo incluido y excluido
-3. All invariants present
-4. Brand Design Document PDF opens + uploadable to Claude Design
-5. Prompts Library markdown valid + prompts customized
-6. Brand Tokens parseable (JSON schema, CSS syntax, Tailwind config valid)
-7. SVGs editable en vector editors
-8. Tier 0 package smaller than Tier 1 (no mood folder)
-9. b2c-consumer-app package has app-icons folder (Tier 1+)
-10. b2local-service package has print-templates folder
+3. Todos los invariants presentes
+4. Brand Design Document PDF opens + uploadable a Claude Design
+5. Prompts Library markdown valid + prompts customizados al brand
+6. Brand Tokens parseable (JSON schema DTCG, CSS syntax, Tailwind config valid, HTML parseable)
+7. SVGs editables en vector editors
+8. `b2c-consumer-app` con `app_asset_criticality: primary` → package tiene `app-icons/` folder
+9. `b2local-service` package tiene `print-templates/` folder
+10. Profiles con mood refs → `mood/` folder con al menos 3 entries cuando Unsplash está up
+11. Unsplash down → package estructura intacta, no `mood/` folder, flag registrado
+12. Rasterization tool down → solo SVGs, instrucciones manuales en el README

@@ -1,304 +1,216 @@
-# 17 — Costo y Timing (Tier-based)
+# 17 — Costo y Timing
 
 ## 17.1 Propósito
 
 Budget detallado por run + timing estimado.
 
-**Nota**: timing numbers son baselines estimados — Sprint 1 calibra con real runs. Cost numbers están basados en API pricing oficial.
+**Nota**: timing numbers son baselines estimados. Sprint 1 calibra con real runs. Cost es fijo: $0 en APIs externas.
 
-## 17.2 Cost per run — por tier
+## 17.2 Cost por run
 
-### Tier 0 (DEFAULT) — Zero cost
+| Componente | Costo | Volumen típico |
+|---|---|---|
+| Engram MCP | Free | N reads/writes |
+| open-websearch MCP | Free | 15-25 queries (TM + sentiment) |
+| `imprvhub/mcp-domain-availability` | Free | 1 bulk call (10-12 domains) |
+| Unsplash free API | Free (commercial-safe con attribution) | 3-6 fetches |
+| `ms-office-suite:pdf` skill | Free | 1 PDF |
+| Claude native (SVG gen + palette + copy + reasoning) | Incluido en subscription | ~80-120K tokens |
+| **Total por run en APIs externas** | — | **$0.00** |
 
-| Componente | Costo | Volumen típico | Subtotal |
-|---|---|---|---|
-| Engram MCP | Free | N reads/writes | $0.00 |
-| open-websearch MCP | Free | 10-15 queries (TM) | $0.00 |
-| `imprvhub/mcp-domain-availability` | Free | 1 bulk call | $0.00 |
-| `ms-office-suite:pdf` skill | Free | 1 PDF | $0.00 |
-| Claude native (SVG gen + palette + reasoning) | Incluido subscription | ~80-120K tokens | Absorbido |
-| **Total Tier 0** | — | — | **$0.00** |
+**Dependencia paga asociada**: suscripción Claude Pro/Max/Team/Enterprise del user final (gate obligatorio, no facturable por Hardcore).
 
-### Tier 1 — Minimal paid usage
+El módulo no genera variabilidad de costo por idea, profile ni scope — todos los runs consumen $0 en APIs externas.
 
-| Componente | Costo unitario | Volumen | Subtotal |
-|---|---|---|---|
-| Todo Tier 0 | | | $0.00 |
-| Recraft V4 (symbolic logos only) | $0.04/img | 3-5 imgs | $0.12-0.20 |
-| Unsplash API (mood refs) | Free tier | 6-8 fetches | $0.00 |
-| Huemint API (palette ML) | Free non-commercial | 1 call | $0.00 |
-| **Total Tier 1** | — | — | **$0.12-0.20** |
+## 17.3 Cost tracking en audit
 
-### Tier 2 — Premium quality
-
-| Componente | Costo | Volumen | Subtotal |
-|---|---|---|---|
-| Todo Tier 1 base | | | $0.00-0.20 |
-| Recraft V4 (all logos) | $0.04/img | 10-14 imgs | $0.40-0.56 |
-| Recraft V4 (mood generated) | $0.04/img | 6-8 imgs | $0.24-0.32 |
-| Huemint paid license | ~$10-50/mo (pending negotiation) | N/A | amortized over many runs |
-| **Total Tier 2 per run** | — | — | **~$0.64-0.88** |
-
-## 17.3 Cost por brand profile × tier
-
-Matriz de cost esperado por combinación:
-
-| Brand profile | Tier 0 | Tier 1 (auto-elevated if required) | Tier 2 |
-|---|---|---|---|
-| `b2b-enterprise` | $0.00 | ~$0.16 (si Recraft wordmark refinado) | ~$0.64 |
-| `b2b-smb` | $0.00 | — (Tier 0 suficiente típicamente) | ~$0.60 |
-| `b2d-devtool` | $0.00 (wordmark) — **aceptable mayoría casos** | $0.16 (si scope symbolic-first) | ~$0.64 |
-| `b2c-consumer-app` | **Possible pero quality limitada** (app icon a 16×16 challenging con Claude SVG) | $0.28 (auto-elevated: 4 symbolic concepts + iOS/Android icon set regens + OG card) | ~$0.80 |
-| `b2c-consumer-web` | $0.00 | $0.16 (opcional mood imagery) | ~$0.68 |
-| `b2local-service` | $0.00 — **minimal scope, Tier 0 ideal** | — (rara vez necesario) | ~$0.56 (raramente justified) |
-| `content-media` | $0.00 para newsletter-focused · **$0.20-0.28 para podcast/video-focused** (auto-eleva para podcast cover quality) | $0.20-0.28 | ~$0.72 |
-| `community-movement` | $0.00 para text-heavy (manifesto) · **$0.16-0.20 si symbolic assets importan mucho** | $0.16-0.20 | ~$0.68 |
-
-**Nota sobre `b2c-consumer-app` Tier 0**: es possible pero limitado. Apps con wordmark logo minimalista (Notion, Linear mobile style) funcionan Tier 0. Apps con identity primarily icon-driven (Duolingo owl, Tinder flame) necesitan Tier 1+.
-
-**Rango general**: **$0.00 - $0.80 per run** dependiendo de tier + profile.
-
-## 17.4 Insight clave
-
-Tier 0 es completamente free y suficiente para dogfooding + early stage. Tier 1 para quality mejorada en casos específicos. Tier 2 solo para premium.
-
-## 17.5 Cost variables
-
-Cost up:
-- User regenerations
-- Retries por failures
-- Coherence gate failures requiring regens
-- Tier elevations durante run
-
-Cost down:
-- Fast mode (fewer regen requests)
-- Scope compacto
-- Cached reuse en partial re-runs
-
-## 17.6 Cost tracking
-
-Cada run graba en `audit.cost_tracking`:
+Cada run graba en `audit.cost_tracking` para observabilidad:
 
 ```json
 {
-  "tier_used": 0,
-  "image_gen_usd": 0.00,
-  "image_gen_count": 0,
-  "image_gen_breakdown": {
-    "claude_native_svgs": 4,
-    "recraft_logos": 0,
-    "recraft_mood": 0,
-    "unsplash_fetches": 0,
-    "huemint_calls": 0
-  },
+  "external_api_cost_usd": 0.00,
+  "claude_reasoning_tokens_estimated": 85000,
+  "engram_operations": 24,
+  "web_search_queries": 18,
   "domain_checks": 12,
-  "tm_searches": 12,
+  "tm_screening_queries": 6,
+  "unsplash_fetches": 4,
   "pdf_generations": 1,
-  "total_cost_usd": 0.00,
-  "claude_reasoning_tokens_estimated": 85000
+  "claude_svgs_generated": 4
 }
 ```
 
-## 17.7 Cost caps
+## 17.4 Timing por paso — baseline
 
-- **Per-run max**: $5 (10× typical Tier 2)
-- **Per-day max per user**: $20 (freemium protection)
-- **Per-month max per user**: configurable por tier
+Normal mode (con checkpoints mid-run):
 
-Exceder cap → alert + pause, user confirms antes de continuar.
+| Paso | Tiempo |
+|---|---|
+| Setup + Engram retrieval + pre-flight checks | 30-60s |
+| Scope Analysis (sub-agent) | 1-2 min |
+| ① Strategy | 2-3 min |
+| ② Verbal Identity (paralelo con ③) | 5-7 min |
+| ③ Visual System (paralelo con ②) | 2-3 min |
+| ④ Logo & Key Visuals | 3-4 min |
+| ⑤ Handoff Compiler | 3-5 min |
+| **Total** | **15-20 min** |
 
-## 17.8 Timing por paso
+El paralelismo Verbal ∥ Visual mantiene el total en ~15-20 min. Sin paralelismo serían ~22-28 min.
 
-Estimaciones baseline basadas en API latency típica + Claude reasoning. Sprint 1 calibra con real runs.
+## 17.5 Timing por brand profile
 
-### Normal mode — baseline Tier 0
+Cada profile tiene diferente volumen de output; timing ajustado:
 
-| Paso | Tier 0 | Tier 1 | Tier 2 |
-|---|---|---|---|
-| Setup + Engram retrieval | 30-60s | 30-60s | 30-60s |
-| Scope Analysis (inline) | 1-2 min | 1-2 min | 1-2 min |
-| ① Strategy | 2-3 min | 2-3 min | 2-3 min |
-| ② Verbal (paralelo con ③) | 5-7 min | 5-7 min | 5-7 min |
-| ③ Visual System (paralelo) | 2-3 min | 3-5 min | 4-6 min |
-| ④ Logo | 3-4 min | 4-6 min | 5-8 min |
-| ⑤ Handoff Compiler | 3-5 min | 3-5 min | 3-5 min |
-| **Total** | **15-20 min** | **18-25 min** | **22-30 min** |
-
-### Normal mode — per brand profile
-
-Diferentes profiles tienen diferente volumen de output que afecta timing:
-
-| Brand profile | Tier 0 estimated | Why distinto de baseline |
+| Brand profile | Normal mode | Observaciones |
 |---|---|---|
-| `b2b-enterprise` | **20-25 min** | Pitch deck cover + case study template + security/compliance copy agregan ~5 min a Verbal. Brand Document tiene página extra enterprise-specific |
-| `b2b-smb` | **15-20 min** (baseline) | Matches el baseline. El profile que usamos para estimaciones iniciales |
-| `b2d-devtool` | **15-20 min** | Similar a b2b-smb. Bit extra en Verbal (GitHub README, CLI aesthetic). Balanced out con menos social prompts |
-| `b2c-consumer-app` | **20-28 min** (Tier 1+ típico) | App icon set genera 8-10 extra images (Tier 1+). App store templates + onboarding screens agregan Handoff Compiler time. Más user interaction en selections |
+| `b2b-enterprise` | **20-25 min** | Pitch deck cover + case study template + security/compliance copy agregan ~5 min a Verbal. Brand Document con página extra enterprise-specific |
+| `b2b-smb` | **15-20 min** | Matches baseline |
+| `b2d-devtool` | **15-20 min** | Similar a b2b-smb. Extra en GitHub README + CLI aesthetic, compensado con menos social prompts |
+| `b2c-consumer-app` | **18-22 min** | App icon set + app store templates + onboarding copy agregan a Handoff Compiler. Más user interaction en selections |
 | `b2c-consumer-web` | **15-20 min** | Matches baseline |
-| `b2local-service` | **10-15 min** ⚡ | **Más rápido**: scope reducido (no pitch deck, no TikTok, no enterprise), prompts library más corta, Brand Document minimal. WhatsApp templates son punchy |
-| `content-media` | **18-24 min** | Podcast cover prompt + video thumbnails series + newsletter template + merch direction agregan Handoff Compiler time |
-| `community-movement` | **22-30 min** | **Más lento**: manifesto opening es long-form (Verbal toma ~10 min vs 5-7), symbolic assets prompts + Discord branding prompts agregan tiempo. Handoff Compiler page del manifesto es substantial |
+| `b2local-service` | **10-15 min** | Scope reducido: sin pitch deck, sin TikTok, sin enterprise. Prompts library más corta. Brand Document minimal. WhatsApp templates son punchy |
+| `content-media` | **18-24 min** | Podcast cover + video thumbnails series + newsletter template + merch direction agregan a Handoff Compiler |
+| `community-movement` | **22-30 min** | Manifesto opening es long-form (Verbal toma ~10 min vs 5-7), symbolic assets prompts + Discord branding agregan tiempo. Handoff Compiler con página del manifesto substancial |
 
 **Insights**:
-- `b2local-service` es más rápido de lo que baseline sugería (scope compacto)
-- `community-movement` es más lento (manifesto + symbolic focus)
-- `b2c-consumer-app` agrega tiempo por app icon generation (Tier 1+)
-- `b2b-enterprise` agrega tiempo por pitch deck + case study assets
+- `b2local-service` es el más rápido (scope compacto)
+- `community-movement` el más lento (manifesto + symbolic focus)
+- `b2b-enterprise` agrega tiempo por pitch deck + compliance copy
 
-### Fast mode — per profile
+## 17.6 Timing en fast mode
 
-| Brand profile | Tier 0 fast |
+Fast mode (`/brand:fast`) skippea mid-run checkpoints pero mantiene final review. Reduce ~20% del total:
+
+| Brand profile | Fast mode |
 |---|---|
-| `b2b-enterprise` | 15-18 min |
-| `b2b-smb` | 12-15 min |
-| `b2d-devtool` | 12-15 min |
-| `b2c-consumer-app` | 15-22 min (Tier 1 typical) |
-| `b2c-consumer-web` | 12-15 min |
-| `b2local-service` | 8-12 min ⚡ |
+| `b2b-enterprise` | 15-20 min |
+| `b2b-smb` | 12-16 min |
+| `b2d-devtool` | 12-16 min |
+| `b2c-consumer-app` | 14-18 min |
+| `b2c-consumer-web` | 12-16 min |
+| `b2local-service` | 8-12 min |
 | `content-media` | 14-18 min |
 | `community-movement` | 18-24 min |
 
-### Calibration plan Sprint 1
+## 17.7 User interaction wait times (normal mode)
+
+Tiempo en el que el user responde checkpoints (no computable automáticamente; depende del user):
+
+- Scope confirmation: 30s - 2 min
+- Strategy review: 30s - 1 min
+- Naming selection: 1 - 3 min
+- Logo selection: 1 - 3 min
+- Final pre-delivery review: 1 - 2 min
+
+Total user time: **3-10 min** adicionales al compute time.
+
+## 17.8 Factores que modifican timing
+
+**Aumentan tiempo**:
+- Network latency (open-websearch, domain MCP, Unsplash, TM screening)
+- User indecision en checkpoints
+- Gate failures que disparan re-runs parciales (ver fail-fast protocol en 09)
+- Tool failures + retries
+- Scope `community-movement` (manifesto long-form)
+
+**Reducen tiempo**:
+- Fast mode (skip mid-checkpoints)
+- Cached outputs en partial re-runs (`/brand:extend`)
+- Scope `b2local-service` (scope compacto)
+- Paralelismo Verbal ∥ Visual
+
+## 17.9 Context timing (comparativa)
+
+| Opción | Tiempo |
+|---|---|
+| Designer tradicional | days - weeks |
+| Branding agency | weeks - months |
+| DIY con templates + tools gratis | hours - days |
+| **Hardcore Brand** | **15-30 min** |
+
+## 17.10 Timing alerts durante run
+
+El orchestrator surface events en tiempo real:
+
+- Mayor dept completions ("Strategy completo en 2:34")
+- Si un paso excede expectativa +50%: *"⚠ Este paso está tomando más de lo esperado (esperado ~3 min, actual ~5 min). Esperar o cancelar?"*
+- Si total excede 60 min: alert + option to cancel o `/brand:resume` más tarde
+
+## 17.11 Calibration Sprint 1
 
 Track actual timing en `testing/brand-runs/*/test-results.yaml`:
-- Field: `timing_actual_seconds_per_dept`
-- Compare to estimated
-- After 3+ runs per profile, update este doc con calibrated numbers
-
-### User interaction wait times (Normal)
-
-- Scope confirmation: 30s-2min
-- Strategy review: 30s-1min
-- Naming selection: 1-3min
-- Logo selection: 1-3min
-- Tier elevation prompt (si aplica): 30s-1min
-
-Total user time: 3-10 min.
-
-## 17.9 Factors affecting timing
-
-Up (slower):
-- Network latency (Recraft, Huemint, domain, web search)
-- User indecision
-- Coherence gate regens
-- Tool failures + retries
-- Tier elevations mid-run
-
-Down (faster):
-- Fast mode
-- Cached outputs en partial re-runs
-- Tier 0 (no external API latency)
-
-## 17.10 Acceptable timing tradeoffs
-
-- Designer traditional: days-weeks
-- Branding agency: weeks-months
-- DIY: hours-days
-- **Hardcore Brand**: 15-30 min
-
-Wow factor preserved incluso en Tier 0 (15-20 min).
-
-## 17.11 Timing alerts
-
-Durante ejecución:
-- Major dept completions
-- Si step excede expectativa: "⚠ Este paso está tomando más..."
-- Si total > 60 min: alert + option to cancel + resume
-
-## 17.12 Economics — pricing strategy implications
-
-### Cost per user (freemium)
-
-Freemium: 1 brand gratis. Absorbe $0-$0.80 según tier del user.
-
-**Tier 0 freemium** (recommended): user corre en Tier 0 default, cost $0. Upgrade prompt si necesita symbolic logos.
-
-1000 users freemium Tier 0 default → $0 marketing cost. Tier 1 opt-ins: ~10% tal vez → $20 total month.
-
-### Cost per paid user
-
-Paid tier (hypothetical $29/mo):
-- User corre Brand 2-3×/mes
-- Tier 0 most users: $0 variable cost
-- Tier 1 opt-in heavy users: $0.20 × 3 = $0.60/mo
-- Gross margin: ~98%
-
-Brand es highly profitable per user una vez pagan.
-
-### Cost scenarios
-
-| Usuarios/mes | Tier 0 usage | Tier 1 opt-ins | Est cost | Est revenue ($29/mo paid) | Margin |
-|---|---|---|---|---|---|
-| 100 free + 10 paid | 95% Tier 0 | 5% Tier 1 | $5 | $290 | **98%** |
-| 500 free + 100 paid | 90% Tier 0 | 10% Tier 1 | $30 | $2,900 | **99%** |
-| 1000 free + 500 paid | 85% Tier 0 | 15% Tier 1 | $100 | $14,500 | **99.3%** |
-
-Margins altos porque la mayoría de users corre en Tier 0 (zero variable cost).
-
-### Huemint commercial license consideration
-
-Cuando Hardcore lance comercial, Huemint requires commercial license ($10-50/mo estimated). Amortized over monthly runs es trivial ($0.001-0.005 per run).
-
-Alternative: fallback to Claude-generated palette para commercial users en Tier 0 (zero-cost compliance).
-
-## 17.13 Cost optimization opportunities
-
-Opportunities:
-1. **Cache visual assets si archetype unchanged**: partial re-runs reuse → savings en extend mode
-2. **Batch Recraft calls** (si supported): reduce API overhead
-3. **Lower-cost palette** (Colormind) como fallback si Huemint caro después
-
-**No optimizing en v1**: simplicity + wow > cost optimization. Revisit with data.
-
-## 17.14 Latency optimization
-
-Top latency contributors:
-1. **Recraft V4** (Tier 1+): ~5-15s per image × N imgs
-2. **Claude native SVG** (Tier 0): ~10-20s per logo (faster than Recraft since no API round-trip)
-3. **Huemint** (Tier 1+): <5s
-4. **Domain MCP**: ~5-10s bulk
-5. **TM screening**: ~10-20s per query × 10 candidates = 100-200s (biggest contributor)
-
-Opportunity: parallelize TM queries.
-
-## 17.15 Reference file a escribir en Sprint 0
-
-`skills/brand/references/budget-tracking.md` con:
-- Cost tracking schema per tier
-- Timing estimates per tier
-- Acceptable ranges + alerts
-- Optimization strategies (future)
-- Tier degradation cost implications
-
-## 17.16 Testing cost + timing
-
-Track per test run en `testing/brand-runs/*/test-results.yaml`:
 
 ```yaml
-tier_used: 0
-cost_actual_usd: 0.00
-cost_estimated_usd: 0.00
-cost_variance: 0%
-
 timing_actual_seconds: 1042
 timing_estimated_seconds: 1080
-timing_variance: -3.5%
+timing_variance_pct: -3.5
 
 breakdown_per_step:
-  setup: 42s
-  scope: 68s
-  strategy: 158s
-  verbal: 355s
-  visual: 158s (Tier 0 — no Huemint/Recraft)
-  logo: 195s (Tier 0 — Claude SVG generation)
-  handoff: 285s
-  user_interaction: 85s
+  setup: 42
+  scope_analysis: 68
+  strategy: 158
+  verbal: 355
+  visual: 158
+  logo: 195
+  handoff: 285
+  user_interaction: 85
 
-cost_breakdown:
-  claude_native_svgs: 4 (cost: $0.00)
-  recraft: 0 (Tier 0)
-  huemint: 0 (Tier 0)
-  unsplash: 0 (Tier 0)
+cost_actual_usd: 0.00
+external_api_calls:
+  engram: 24
+  open_websearch: 18
+  domain_mcp: 1
+  unsplash: 4
+  pdf_skill: 1
 ```
 
-Si variance > 25% consistente, reassess estimates.
+Si variance > 25% consistentemente en un paso específico, reassess estimate en este doc.
+
+## 17.12 Economics — implicaciones pricing
+
+### Cost per user
+
+Cada run consume **$0 en APIs externas**. Variable cost por user = $0 independientemente del volumen.
+
+La única cost de Hardcore es el compute del host del módulo (servidor/infra donde corre Claude Code + Engram), pero eso es fixed cost, no per-run.
+
+### Freemium economics
+
+| Escenario | Users/mes | Variable cost Brand | Revenue ($29/mo paid tier) | Margin |
+|---|---|---|---|---|
+| Launch | 100 free + 10 paid | $0 | $290 | ~100% (menos infra fixed) |
+| Growth | 500 free + 100 paid | $0 | $2,900 | ~100% |
+| Scale | 1000 free + 500 paid | $0 | $14,500 | ~100% |
+
+El módulo Brand es gratis para Hardcore opera. El user aporta su suscripción Claude Pro (no split con Hardcore).
+
+### Comentario sobre pricing en el plan
+
+Estas cifras son referenciales y no comprometen la estrategia GTM. El módulo puede ser freemium sin que fuga de gross margin por APIs. El verdadero cost floor son los costos fijos del servidor y la mantención del producto.
+
+## 17.13 Latency contributors (para optimización futura)
+
+Top contribuyentes en orden:
+
+1. **open-websearch queries** (TM screening + sentiment derivation): ~10-20s por query × 10-15 queries = ~150-300s en total. Paralelización reduce a ~30-60s.
+2. **Claude native SVG** (Logo dept): ~10-20s por logo × 3-5 logos = ~30-100s.
+3. **Claude reasoning** (Strategy + Verbal naming): ~60-120s cada uno.
+4. **Domain MCP bulk**: ~5-10s (bajo impacto).
+5. **Unsplash**: <5s.
+6. **PDF generation**: ~10-30s.
+
+Optimización principal v1: paralelizar TM queries dentro de Verbal dept. Optimizaciones adicionales post-v1 si se justifican por data.
+
+## 17.14 Reference file a escribir en Sprint 0
+
+Los cost y timing se trackean en el envelope `audit` de cada dept y el final report. No requiere un archivo `budget-tracking.md` separado — el tracking queda en:
+
+- Output envelope (per dept, `audit.cost_tracking` y `audit.timing`)
+- Final report (`brand/{slug}/final-report` en Engram agrega totales)
+- Test results (`testing/brand-runs/*/test-results.yaml`)
+
+## 17.15 Reglas de los caps
+
+No hay caps. El módulo corre end-to-end sin throttle porque el costo variable es $0 y el timing tiene límite natural por el scope.
+
+Si un run se pasa de 60 min (caso extremo por failures múltiples), el orchestrator ofrece `/brand:resume` en vez de abortar.

@@ -63,7 +63,6 @@ logo_primary_form: "wordmark-preferred"
 typography_era: "neutral-modern" (o "editorial-classic")
 social_presence_priority: "enterprise-linkedin-only"
 app_asset_criticality: "not-needed"
-image_gen_tier: 0 (default — Claude native SVG wordmark suficiente)
 ```
 
 ### Archetype constraints
@@ -72,7 +71,7 @@ image_gen_tier: 0 (default — Claude native SVG wordmark suficiente)
 - **Sweet spots**: Sage, Ruler, Hero
 
 ### Ejemplos reales
-Datadog, Snowflake, MongoDB, Stripe (enterprise tier).
+Datadog, Snowflake, MongoDB, Stripe (enterprise).
 
 ---
 
@@ -114,7 +113,6 @@ logo_primary_form: "wordmark-preferred"
 typography_era: "neutral-modern"
 social_presence_priority: "professional-multichannel"
 app_asset_criticality: "derivative"
-image_gen_tier: 0
 ```
 
 ### Archetype constraints
@@ -164,9 +162,6 @@ logo_primary_form: "symbolic-first"  (mascots/marks conceptuales funcionan)
 typography_era: "neutral-modern" (con preferencia por monospace secondaries)
 social_presence_priority: "professional-multichannel" (Twitter/X + GitHub + dev blog)
 app_asset_criticality: "derivative"
-image_gen_tier: 0 por default (wordmark Claude-SVG)
-  → Auto-elevate a Tier 1 si scope.logo_primary_form es symbolic-first
-    (user debe aprobar el cost adicional)
 ```
 
 ### Archetype constraints
@@ -204,7 +199,7 @@ Consumer mobile app — distribución via app stores, monetization freemium/subs
 - Launch email prompt
 - Push notification templates
 
-**Reference Assets required**: **App icon set completo** (iOS múltiples sizes + Android adaptive icon foreground/background + mask variants) — **auto-elevates tier a 1+**
+**Reference Assets required**: **App icon set completo** (iOS múltiples sizes + Android adaptive icon foreground/background + mask variants)
 
 **Skip**: LinkedIn heavy, pitch deck formal, case study templates B2B, enterprise emails, community page formal
 
@@ -219,7 +214,6 @@ social_presence_priority: "consumer-heavy"
 app_asset_criticality: "primary"
 sonic_needs: "branded"
 motion_needs: "expressive"
-image_gen_tier: 1 auto-elevated (app icon requires Recraft SVG)
 ```
 
 ### Archetype constraints
@@ -231,8 +225,8 @@ image_gen_tier: 1 auto-elevated (app icon requires Recraft SVG)
 Duolingo, Calm, Headspace, Tinder, Cash App.
 
 ### Notas
-- App icon es **el** artefacto más importante, auto-eleva el tier
-- Icon debe ser legible a 16×16, memorable a 60×60
+- App icon es **el** artefacto más importante del profile
+- Icon debe ser legible a 16×16, memorable a 60×60 (Gate 6 enforza legibility)
 - Consumer apps toleran personality extreme
 
 ---
@@ -273,7 +267,6 @@ logo_primary_form: "combination"
 typography_era: "expressive-contemporary"
 social_presence_priority: "consumer-heavy"
 app_asset_criticality: "derivative"
-image_gen_tier: 0
 ```
 
 ### Archetype constraints
@@ -327,7 +320,6 @@ typography_era: "neutral-modern" o "editorial-classic"
 social_presence_priority: "local-whatsapp"
 app_asset_criticality: "not-needed"
 print_needs: "heavy"
-image_gen_tier: 0
 ```
 
 ### Archetype constraints
@@ -378,7 +370,6 @@ typography_era: "expressive-contemporary"
 social_presence_priority: "content-creator"
 app_asset_criticality: "derivative"
 sonic_needs: "branded"
-image_gen_tier: 0 default → user may elevate Tier 1 para podcast cover quality
 ```
 
 ### Archetype constraints
@@ -427,7 +418,6 @@ logo_primary_form: "symbolic-first"
 typography_era: "expressive-contemporary" o "editorial-classic"
 social_presence_priority: "community-native"
 app_asset_criticality: "not-needed"
-image_gen_tier: 0 → user may elevate para symbolic logo quality
 ```
 
 ### Archetype constraints
@@ -456,7 +446,7 @@ Matriz de outputs por profile. Columns: qué aparece como `required` (✓), `opt
 | Prompts: Instagram post | — | ○ | — | ✓ | ✓ | ✓ | ✓ | ○ |
 | Prompts: LinkedIn post | ✓ | ✓ | ○ | — | — | — | ○ | ○ |
 | WhatsApp templates | — | — | — | — | — | ✓ | — | — |
-| Reference: App icon set | — | — | — | ✓ (T1+) | — | — | — | — |
+| Reference: App icon set | — | — | — | ✓ | — | — | — | — |
 | Prompts: Code snippet styling | — | — | ✓ | — | — | — | — | — |
 | Prompts: GitHub README | — | — | ✓ | — | — | — | — | — |
 | Prompts: Podcast cover | — | — | — | — | ○ | — | ✓ | — |
@@ -479,7 +469,6 @@ Una idea puede matchear múltiples profiles con weights. Ejemplo: developer tool
 4. **Outputs out_of_scope**: union
 5. **Intensity modifiers**: weighted average para escalas continuas, primary gana categóricas si weight > 0.6
 6. **Archetype constraints**: union de blocked, intersection de preferred_range
-7. **Image gen tier**: max de ambos (conservative)
 
 ## 3.13 Fallback cuando ninguno matchea
 
@@ -509,4 +498,3 @@ Agregar cuando ≥3 runs no encajen bien.
 - Tablas de intensity modifier defaults
 - Archetype constraints explícitas
 - Ejemplos trabajados de composition scenarios
-- Auto-elevation rules para image_gen_tier

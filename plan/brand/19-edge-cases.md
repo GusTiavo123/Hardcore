@@ -25,21 +25,24 @@ Casos no-happy-path que el módulo maneja correctamente. Cada edge case con dete
 - Default: bloqueado con mensaje
 - Override: `--force` flag, warning permanente grabado
 
-### Brand sin Claude subscription
+### Brand sin Claude Pro subscription
 
-**Situación**: user completa Brand run pero no tiene Claude Pro+ para usar Claude Design.
+**Situación**: user invoca Brand sin Claude Pro/Max/Team/Enterprise.
 
-**Detección**: orchestrator no puede verificar programáticamente (Claude subscription es external). Lo detectamos si user reporta en reveal.
+**Detección**: pre-flight check del orchestrator (ver 08-dept-handoff-compiler.md §8 y 13-failure-modes.md §13.3).
 
-**Comportamiento**:
-- Brand run procede normalmente (genera 4 deliverables)
-- README del package explica alternative paths:
-  - Upgrade Claude Pro para usar Claude Design
-  - Usar Brand Design Document PDF como brief para Figma AI / Midjourney / human designer
-  - Usar Brand Tokens en cualquier codebase
-  - Reference Assets son usables en cualquier tool
+**Comportamiento**: hard halt antes de lanzar ningún dept. Mensaje claro:
 
-Ver [16-v1-limitations.md](./16-v1-limitations.md#dependencia-de-claude-design-para-execution).
+```
+⚠ Brand requires Claude Design access.
+
+Claude Design está disponible en Claude Pro, Max, Team o Enterprise.
+Upgrade en claude.ai/upgrade y corré /brand:new de nuevo.
+
+El run no se ejecutó — no hay state parcial.
+```
+
+Ver [16-v1-limitations.md](./16-v1-limitations.md#dependencia-de-claude-design-gate-de-entrada).
 
 ### Brand sobre idea con múltiples Validations
 
@@ -50,8 +53,7 @@ Ver [16-v1-limitations.md](./16-v1-limitations.md#dependencia-de-claude-design-p
 
 - `primary + secondary` con composition_weights
 - Union de required outputs
-- Intensity modifiers weighted
-- Tier: max de ambos (conservative)
+- Intensity modifiers weighted (ver 03-brand-profiles.md §3.12)
 
 ### Brand sobre idea que no matchea ningún profile
 
@@ -85,51 +87,26 @@ Ver [16-v1-limitations.md](./16-v1-limitations.md#dependencia-de-claude-design-p
 - Detect via input hashes
 - Inform user + continue/cancel choice
 
-## 19.4 Tier-related edge cases
+## 19.4 Logo form edge cases
 
-### Scope requires symbolic-first pero user en Tier 0
+### Scope demanda ilustración orgánica compleja
 
-**Detección**: pre-check en Logo dept.
+**Situación**: scope configuración sugiere mark con ilustración expresiva (ej. mascota) que Claude native SVG no alcanza con consistencia.
 
-**Respuesta**: tier elevation prompt (Punto 5 de interaction):
+**Detección**: el user feedback en el logo selection indica "más orgánico" o rechaza múltiples rounds geometric.
 
-```
-Tu scope requiere symbolic logos.
-Tier 0 produce wordmarks bien pero symbolic limitados.
+**Respuesta**:
+- Flag `organic_mark_requested_geometric_delivered: true`
+- Sugerir manual-upload del mark orgánico hecho por un illustrator con nuestro Brand Document como brief
+- O iterar geometric en Claude Design downstream para variaciones orgánicas sobre la base
 
-Opciones:
-  1. Elevar a Tier 1 (~$0.20)
-  2. Cambiar a wordmark-preferred
-  3. Proceder Tier 0 acknowledging quality loss
-```
+### User rechaza 3+ rondas de logo
 
-### User previously set --tier=0 explicitly pero scope requires elevation
+**Respuesta**: después de 3 rondas, offer "manual upload" mode. User provee SVG propio, dept valida y propaga a Handoff.
 
-**Comportamiento**: respetar user preference. Warning visible pero no bloquea.
+### Quality validation fails persistently en todos los concepts
 
-```
-⚠ Vos elegiste Tier 0 pero scope sugeriría Tier 1+.
-Continuando Tier 0. Symbolic logos tendrán quality limitada.
-
-Si cambias de opinión: /brand:extend logo --tier=1
-```
-
-### Tier elevation mid-run
-
-**Situación**: durante run, algún gate o quality validation triggers tier elevation.
-
-**Comportamiento**: 
-- Pause, ask user confirmation para additional cost
-- If yes: proceed at higher tier from that point
-- Grabar tier change en audit
-
-### User exceeds Tier 2 free budgets
-
-**Situación**: Tier 2 genera muchos retries, cost aproxima cap.
-
-**Comportamiento**:
-- Alert at 70% of per-run cap
-- Pause at 100% cap, user confirms continuation
+**Respuesta**: present con flag `quality_degraded: true`, user elige acepta, regen, o manual-upload.
 
 ## 19.5 Output edge cases
 
@@ -178,11 +155,11 @@ Si cambias de opinión: /brand:extend logo --tier=1
 - Retry con format emphasis
 - Fallback if persistent
 
-### Huemint returns invalid color (Tier 1+)
+### Palette generation produce colors inválidos (fuera de gamut RGB o contrast insuficiente en todas las combinations)
 
-- Clamp to valid RGB range
-- Retry with different temperature
-- Fallback Claude palette (Tier 0 behavior)
+- Auto-adjust para llevar dentro de gamut
+- Re-run palette generation con seeds más distantes si contrast sigue failing
+- Surface al user con 3 alternate palettes si automated fixes no resuelven
 
 ## 19.8 Data consistency edge cases
 
@@ -248,9 +225,9 @@ Si cambias de opinión: /brand:extend logo --tier=1
 - Mantain manual path como fallback
 - Update docs + version bump
 
-## 19.11 Reference file a escribir en Sprint 0
+## 19.11 Dónde vive esto en Sprint 0
 
-`skills/brand/references/edge-cases.md` con tabla completa de cada edge case + detección + response.
+Edge cases handling se escribe **dentro de `skills/brand/SKILL.md`** (orchestrator) como sección dedicada con tabla completa de cada edge case + detección + response. Edge cases específicos por dept van dentro del SKILL.md del dept correspondiente.
 
 ## 19.12 Testing
 
@@ -269,7 +246,7 @@ Ver [14-testing-strategy.md](./14-testing-strategy.md). Edge cases críticos:
 - [ ] Engram inconsistency → detected
 - [ ] Concurrent runs same slug → blocked
 - [ ] Concurrent different slugs → both proceed
-- [ ] Tier 0 symbolic request → elevation prompt
-- [ ] User keeps Tier 0 despite elevation → proceed with flag
-- [ ] User sin Claude subscription → README guidance
-- [ ] Claude Design handoff issues → troubleshooting guidance
+- [ ] User rechaza 3+ rounds de logo → manual upload mode offered
+- [ ] Scope demanda mark orgánico complejo → flag + manual-upload suggestion
+- [ ] User sin Claude Pro → pre-flight halt con mensaje claro
+- [ ] Claude Design handoff issues → troubleshooting guidance en README

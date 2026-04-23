@@ -2,157 +2,104 @@
 
 ## 7.1 Propósito
 
-Generar **logo + assets visuales derivados** con tier-based generation:
-- **Tier 0** (default): Claude native SVG generation (zero cost) para wordmarks + simple combinations
-- **Tier 1+**: Recraft V4 para symbolic logos cuando scope lo requiere
+Generar **logo + assets visuales derivados** usando Claude native SVG generation. Zero costo externo. Output son archivos SVG (vector, text-based) que pueden ser editados, versionados y transformados programáticamente.
 
-**Importante**: el logo que generamos es el **standalone asset**. Cuando Claude Design aplica la marca en mockups (landing, decks, etc.), puede usar nuestro SVG referenced desde el Brand Document o Reference Assets folder — no necesita regenerarlo.
+**Importante**: el logo que generamos es el **standalone asset**. Cuando Claude Design aplica la marca en mockups (landing, decks, etc.), puede consumir nuestro SVG desde el Brand Document o desde la Reference Assets folder — no necesita regenerarlo.
 
 ## 7.2 Inputs
 
-- `brand/{slug}/scope` (manifest — determina primary_form + tier + derived assets)
-- `brand/{slug}/strategy` (archetype, voice — vocabulary para prompts)
+- `brand/{slug}/scope` (manifest — determina primary_form + derived assets needed)
+- `brand/{slug}/strategy` (archetype, voice — vocabulario para guiar el form language)
 - `brand/{slug}/visual` (paleta para aplicar, typography para wordmarks)
 - `brand/{slug}/verbal` (nombre elegido, tagline para OG card)
 
-## 7.3 Tier system explícito
+## 7.3 Form language según `logo_primary_form`
 
-### Tier 0 — Claude native SVG generation ($0)
+| Primary form | Directions generated | Form language |
+|---|---|---|
+| `wordmark-preferred` | 3 wordmark + 1 combination | Tipográfico puro con ajustes custom (letter-spacing, weight, custom-cut de 1 glyph) |
+| `combination` | 1 symbolic-geometric + 2 combination + 1 wordmark | Wordmark + símbolo geométrico (círculo, cuadrado modular, intersección de formas) |
+| `symbolic-first` | 3 symbolic-geometric + 1 combination | Símbolo geométrico protagonista; wordmark secundario |
+| `icon-first` (consumer app) | 4 symbolic-geometric optimizados para 16×16/app stores + 1 combination | Geometric marks que sobreviven scale-down; grid 1024px con safe area |
 
-**Cubre bien**:
-- Wordmarks (tratamiento tipográfico del nombre)
-- Combination logos simples (símbolo geométrico + wordmark)
-- Variants derivados (mono, inverse, icon-only del wordmark)
-
-**Calidad esperada**:
-- Wordmarks: excelente — Claude escribe SVG text con Google Fonts reference
-- Simple symbolic marks: bueno — shapes básicas con paleta
-- Complex symbolic marks: limitado — abstract concepts son más difíciles sin modelo specialized
-
-**Proceso**:
-1. Claude genera SVG markup directamente en chat
-2. Output: SVG code como string
-3. Save a filesystem
-4. Parse + validate SVG
-5. Render preview para user
-
-### Tier 1 — Claude native + Recraft para symbolic
-
-**Cuando activar**:
-- `scope.intensity_modifiers.logo_primary_form == "symbolic-first"` o `"icon-first"`
-- `app_asset_criticality == "primary"` (requires high-quality icon)
-- User override `--tier=1` o `--with-symbolic-logo`
-
-**Setup**:
-- Wordmarks: Claude native (mismo que Tier 0)
-- Symbolic marks: Recraft V4 via `merlinrabens/image-gen-mcp-server`
-- Combinations: mixed (Claude para text part, Recraft para symbol part)
-
-**Cost adicional**: $0.04 × 3-5 generations = $0.12-0.20
-
-### Tier 2 — Recraft V4 everywhere
-
-**Cuando activar**: user override `--tier=2` para max quality.
-
-**Setup**: todos los logos via Recraft V4, incluso wordmarks.
-
-**Cost**: $0.04 × 4-5 concepts + $0.04 × 3-4 variants + $0.04 × 4-8 derivations = $0.44-0.68
+**Constraint de v1**: todos los símbolos son **geometric** (shapes matemáticas, intersecciones, líneas, gradientes simples). Ilustraciones orgánicas complejas, mascotas dibujadas, y scenes ilustradas quedan fuera de scope v1 — Claude native SVG no alcanza la calidad consistente para eso. Si el scope demanda un mark orgánico fuerte, el output flagea `organic_mark_requested_geometric_delivered: true` con nota al user de que ese refinamiento específico es mejor subirlo a Claude Design y pedirle una variante orgánica sobre nuestro mark geometric como base.
 
 ## 7.4 Proceso — 7 pasos
 
-### Paso 1 — Determinar directions según `logo_primary_form`
+### Paso 1 — Determinar directions
 
-| Primary form | Directions generated | Tier 0 posible? |
-|---|---|---|
-| `wordmark-preferred` | 3 wordmark + 1 combination | ✓ (Claude native handles this well) |
-| `combination` | 1 symbolic + 2 combination + 1 wordmark | Partial — combinations OK, symbolic limited |
-| `symbolic-first` | 3 symbolic + 1 combination | **Requires Tier 1+** |
-| `icon-first` (consumer app) | 4 symbolic (legible 16×16) + 1 combination | **Requires Tier 1+** (app icons need quality) |
+Basado en `scope.logo_primary_form` + `scope.intensity_modifiers.app_asset_criticality`, Logo dept decide cuántos concepts generar y con qué form language (ver tabla 7.3).
 
-**Auto-elevation rule**: si scope specifies `symbolic-first` o `icon-first` y tier actual es 0, orchestrator ask al user:
+Para consumer-app con `app_asset_criticality: primary`, el dept prioriza geometric marks con alta legibilidad a 16×16 (tests de shrink durante generation).
 
-```
-Tu scope requiere symbolic logos (archetype + category matchean symbolic-first).
-Tier 0 (Claude native) produce wordmarks bien pero symbolic marks son limitados.
+### Paso 2 — SVG generation strategy
 
-Opciones:
-  1. Elevar a Tier 1 (~$0.20 de Recraft para 3 symbolic concepts)
-  2. Cambiar a wordmark-preferred (symbolic deja de ser primary)
-  3. Proceder con Tier 0 acknowledging symbolic quality loss
-```
+Claude genera SVG markup directamente. Estructura base para wordmarks:
 
-### Paso 2 — Prompt engineering
-
-**Para Claude native (Tier 0 — wordmarks)**:
-
-Claude genera SVG markup con structure:
 ```xml
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
-  <text x="20" y="70" font-family="Fraunces, serif" font-size="60" font-weight="600" fill="#0B1F3A">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+  <text x="20" y="70" font-family="Fraunces, serif" font-size="60" font-weight="600" fill="#0B1F3A"
+        letter-spacing="-0.02em">
     {Brand Name}
   </text>
   <!-- Optional: geometric accent element -->
 </svg>
 ```
 
-Custom adjustments per archetype:
-- Sage: letter-spacing slight, weight 600-700, classical serif
-- Jester: playful sizing, color accent
-- Etc.
+Estructura base para symbolic geometric marks:
 
-**Para Recraft V4 (Tier 1+ symbolic)**:
-
-Prompt estructurado:
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <circle cx="100" cy="100" r="80" fill="#0B1F3A"/>
+  <path d="M60 100 L100 60 L140 100 L100 140 Z" fill="#F4EFE6"/>
+</svg>
 ```
-System: You are generating a brand identity logo.
 
-Brand context:
-  Name: Auren
-  Archetype: Sage (scholarly, authoritative, minimal)
-  Voice: claro, autorizante, directo, empático-técnico
-  Category: compliance platform for LATAM fintechs
+Ajustes per archetype (selección, no exhaustivo):
 
-Palette (apply exactly):
-  Primary: #0B1F3A (navy)
-  Background: #F4EFE6 (off-white)
-  Accent: #D4A74A (amber)
+| Archetype | Wordmark adjustments | Symbolic adjustments |
+|---|---|---|
+| Sage | Serif clásico, weight 600-700, letter-spacing slight (-0.02em), proporción estable | Geometría circular + cuadrada; simetría; líneas delgadas-medias |
+| Jester | Sans redondeado, weight 700+, playful sizing mix | Shapes curvas, overlap con color vivo, composición asimétrica |
+| Ruler | Serif moderno (Didone) o sans geométrico, weight 500-600, letter-spacing generoso | Geometría angular simétrica, proporciones doradas, heráldica minimal |
+| Outlaw | Sans condensed, weight 800+, tracking tight, 1 glyph distorsionado | Slash/cut marks, asimetría agresiva, contraste fuerte |
+| Caregiver | Serif humanista o sans redondeado, weight 400-500, warmth | Orgánicos geométricos (heart, leaf via polygons), círculo protagonista |
+| Hero | Sans geometric weight 700-800, tracking tight, all-caps op | Triangle-based, escalada, momentum diagonal |
+| Explorer | Sans refined weight 500-600, leve tracking amplio | Líneas de mapa, compass-like geometry, horizontes |
+| Creator | Sans display con 1 custom cut, weight mixto | Composición modular, grid visible, stroke + fill contrast |
+| Innocent | Sans rounded weight 400-500, generous letter-spacing | Formas simples (círculo, estrella), palette clara |
+| Lover | Serif romántico weight 400, italic op, hairlines delgados | Orgánicos sensual (shapes sinuosas via bezier), paleta saturada |
+| Magician | Sans geometric con 1 transformation, weight 600 | Simetría mágica, geometría sacra, gradientes sutiles |
+| Everyman | Sans neutral weight 500, no frills | Shapes simples universales, rectángulo/círculo base |
 
-Task: Generate 2 variants of a SYMBOLIC logo mark.
-  - No text. Pure abstract mark.
-  - Must work at small sizes (32×32 readable)
-  - Sage vocabulary: scholarly, authoritative, minimal
-  - Shape: geometric-soft (rounded 8-12px, circular elements OK)
-  - Output: SVG vector (native, editable)
-
-Negative: no text/letters, no AI-glow, no cliché compliance symbols, no overdecoration, no gradients non-editable
-
-Format: SVG native output.
-```
+El detalle completo queda en `skills/brand/logo/references/svg-templates.md` (Sprint 0).
 
 ### Paso 3 — Generación
 
-Ejecutar según tier:
-- Tier 0: Claude writes SVG markup, parse + save
-- Tier 1+: Claude for wordmarks + Recraft API calls for symbolic
-- Output: 4-5 SVG logos total
+Claude escribe SVG markup para cada concept. Output típico: 4-5 SVG strings.
+
+Save a filesystem en `output/{slug}/brand/logo/concepts/`:
+- `concept-b1.svg`, `concept-b2.svg`, etc.
 
 ### Paso 4 — Quality validation pre-user
 
-Checks automáticos:
-- **Not empty**: SVG tiene content (minimum path/element count)
-- **Not all-same-color**: no es rectángulo sólido
-- **No text corruption**: si wordmark, texto legible (Claude vision check)
-- **Palette compliance**: colores usados están en paleta (con tolerancia)
-- **Reasonable complexity**: no demasiado complejo para logo
+Checks automáticos antes de mostrar al user:
 
-If fail: regenerate (Claude rewrites SVG, or Recraft re-call with adjusted prompt). Max 2 retries.
+- **Valid XML**: parse con XML parser; si falla, regenerate
+- **Not empty**: minimum 2 elements (para wordmarks: al menos 1 text + optional accent; para symbolic: al menos 2 paths o shapes)
+- **Not all-same-color**: verifica que uses al menos 2 colores de la paleta (salvo mono/inverse variants)
+- **Palette compliance**: colores usados están en la paleta de Visual dept (tolerance ±5 en RGB)
+- **Reasonable complexity**: element count entre 2 y 40 (evita logos vacíos o overworked)
+- **16px legibility** (si `app_asset_criticality: primary`): render el SVG a 16×16 internamente, check si las features principales sobreviven (via visual inspection prompt a Claude)
+
+Si un concept falla, regenerate con feedback explícito. Max 2 retries por concept. Si 2 retries fallan, skip ese concept y continuar con los que sí pasaron (mínimo 3 concepts deben pasar para no bloquear).
 
 ### Paso 5 — User selection
 
-Presentar 4-5 SVG logos al user como grid visual:
+Presentar concepts como grid al user:
 
 ```
-[17:45] ④ 4 logo concepts (wordmark-preferred, Tier 0)
+[17:45] ④ 4 logo concepts (wordmark-preferred)
 
   [B1] [B2] [B3] [C1]
   Wordmark serif    Wordmark hybrid    Sans refined    Combination
@@ -168,96 +115,91 @@ Presentar 4-5 SVG logos al user como grid visual:
 
 User options:
 - Pick one
-- Pick direction + regenerate variants
-- "None" + feedback for full regen
-- "Manual" — user provides own logo, dept skips generation, downstream uses user's SVG
+- Pick a direction + regenerate 2-3 variants en esa direction
+- "None" + feedback for full regen (max 2 full regens antes de offer manual mode)
+- "Manual" — user provides own logo SVG, dept skips generation, downstream uses el SVG del user
 
 ### Paso 6 — Variants del logo elegido
 
-De la SVG primary:
-- **Primary**: full color
-- **Mono**: black on white (programmatic — strip colors from SVG)
-- **Inverse**: white on dark (programmatic — invert)
-- **Icon-only**: solo símbolo (extract from combination, or skip if wordmark)
+Variants se generan programáticamente via SVG XML manipulation (no requiere regeneration):
 
-Generation path:
-- Tier 0: SVG transformations programmatic (manipulate XML)
-- Tier 1+: Recraft can regenerate variants with consistency
+| Variant | Cómo se genera |
+|---|---|
+| **Primary** (full color) | El SVG del concept seleccionado |
+| **Mono** (negro sobre blanco) | Reemplazar todos los `fill` por `#000000`, `stroke` por `#000000` |
+| **Inverse** (blanco sobre dark bg) | Reemplazar todos los `fill` por `#FFFFFF`, agregar background rect oscuro |
+| **Icon-only** | Si combination: extraer solo el símbolo (drop text elements). Si wordmark puro: skip (no icon-only disponible) |
+
+Claude ejecuta estas transformaciones emitiendo el SVG modificado directamente (cheap, reproducible).
 
 ### Paso 7 — Derived assets
 
 Condicional según `scope.output_manifest`:
 
-#### Always (programmatic from SVG)
-- **Favicon set**: 16×16, 32×32, 48×48 PNGs
-- **Apple touch icon**: 180×180 PNG
-- **Favicon.ico**: multi-size combined
+**Siempre** (programmatic desde SVG primary):
+- **Favicon set**: 16×16, 32×32, 48×48 (Claude emite SVGs simplified a cada size; conversión a PNG via headless render en Sprint 1 tooling, o entrega como SVG embedded si PNG tool no disponible)
+- **Apple touch icon**: 180×180
+- **Favicon.ico**: multi-size combined (Sprint 1 via librería)
 
-#### If `app_asset_criticality: primary` (consumer app)
-Tier 1+ required:
-- **App icon iOS**: set completo (20/29/40/58/60/80/87/120/180/1024)
-- **App icon Android**: foreground + background layers, adaptive icon format
-- **Mask variants**: circular, rounded, squircle
+**Si `app_asset_criticality: primary`** (consumer app):
+- **App icon iOS**: set completo (20/29/40/58/60/80/87/120/180/1024 en SVG, raster en Sprint 1)
+- **App icon Android**: foreground + background layers (adaptive icon format)
+- **Mask variants**: circular, rounded, squircle (Claude emite variants aplicando clip-path SVG)
 
-#### If landing in prompts library
-- **OG card**: 1200×630 PNG (composition: logo + tagline + palette bg)
-  - Tier 0: SVG composition → rasterize
-  - Tier 1+: Recraft generation possible
+**Si landing en prompts library**:
+- **OG card** (1200×630): Claude emite SVG composition (logo + tagline + palette bg). Rasterización en Sprint 1.
 
-#### If social presence in scope
-- **Profile pictures**: 400×400 (crop cuadrado del logo)
-- **Cover banners**: X 1500×500, LinkedIn 1584×396 (composition)
+**Si social presence en scope**:
+- **Profile pictures** (400×400): crop cuadrado del logo/icon
+- **Cover banners**: X 1500×500, LinkedIn 1584×396 (composition con logo + paleta)
 
-#### If `community-movement` or `content-media`
-- **Merch direction** (templates, not production):
-  - T-shirt design layout (hero print + placement)
+**Si `community-movement` o `content-media`**:
+- **Merch direction** (templates, no production-ready):
+  - T-shirt design layout (hero print + placement en SVG mockup)
   - Sticker designs (circular, square)
-  - Mug design (wraparound direction)
-  - Tier 0: SVG-based templates
-  - Tier 2: Recraft generates merch-specific concepts
+  - Mug design direction (wraparound spec en SVG + description)
+
+Todos los derived assets se emiten inicialmente como SVG. La conversión a PNG/ICO requiere tooling adicional que se instala/configura en Sprint 1 (headless chromium o rsvg-convert). Si ese tooling falla, Brand entrega los SVGs + un README con instrucciones manuales de conversión.
 
 ## 7.5 Tools
 
-### Tier 0
-- Claude native SVG generation
-- SVG manipulation utilities (parse XML, transform paths, convert to raster)
-- Built-in image composition utilities (layer SVGs + text)
-
-### Tier 1
-- Above + Recraft V4 via `merlinrabens/image-gen-mcp-server`
-
-### Tier 2
-- Above + Recraft for all generations
+- Claude native (SVG generation, palette reasoning, archetype interpretation)
+- SVG XML manipulation (para variants mono/inverse/icon-only)
+- Headless rasterization tool (Sprint 1 — rsvg-convert o similar) para derived assets PNG
 
 ## 7.6 Output package estructurado
 
 ```
-logo/
+output/{slug}/brand/logo/
+├── concepts/
+│   ├── concept-b1.svg
+│   ├── concept-b2.svg
+│   ├── concept-b3.svg
+│   └── concept-c1.svg
 ├── source/
 │   ├── primary.svg           # Full color
 │   ├── primary-mono.svg      # Black on white
 │   ├── primary-inverse.svg   # White on dark
 │   └── icon-only.svg         # Símbolo aislado (si aplica)
 ├── derivations/
-│   ├── favicon-16.png
-│   ├── favicon-32.png
-│   ├── favicon-48.png
-│   ├── favicon.ico
-│   ├── apple-touch-180.png
-│   ├── og-card-1200x630.png
-│   ├── profile-pic-400.png
-│   ├── profile-pic-400-bg.png
-│   ├── cover-x-1500x500.png
-│   └── cover-linkedin-1584x396.png
-├── app-icons/                # Tier 1+ si scope lo requiere
+│   ├── favicon-16.svg (+png si tool disponible)
+│   ├── favicon-32.svg (+png)
+│   ├── favicon-48.svg (+png)
+│   ├── favicon.ico (si tool disponible)
+│   ├── apple-touch-180.svg (+png)
+│   ├── og-card-1200x630.svg (+png)
+│   ├── profile-pic-400.svg (+png)
+│   ├── profile-pic-400-bg.svg (+png)
+│   ├── cover-x-1500x500.svg (+png)
+│   └── cover-linkedin-1584x396.svg (+png)
+├── app-icons/                # Si scope lo requiere
 │   ├── ios/
 │   │   └── (multiple sizes)
 │   └── android/
 │       └── (adaptive icon files)
-├── merch/                    # Tier 1+ si scope
-├── rationale.md
-├── usage-guidelines.md       # Do/don'ts, clearspace, min size
-└── tier-used.txt             # Records which tier was used
+├── merch/                    # Si scope lo requiere
+├── rationale.md              # Why this concept, archetype expression, how variants work
+└── usage-guidelines.md       # Do/don'ts, clearspace, min size, palette rules
 ```
 
 ## 7.7 Output schema (metadata en Engram)
@@ -267,57 +209,66 @@ logo/
   "schema_version": "1.0",
   "status": "ok",
   "department": "logo",
-  "tier_used": 0 | 1 | 2,
-  "scope_ref": "...",
-  "strategy_ref": "...",
-  "visual_ref": "...",
-  "verbal_ref": "...",
-  
+  "scope_ref": "brand/{slug}/scope",
+  "strategy_ref": "brand/{slug}/strategy",
+  "visual_ref": "brand/{slug}/visual",
+  "verbal_ref": "brand/{slug}/verbal",
+
   "directions_generated": {
-    "primary_form": "wordmark-preferred",
-    "generation_method": "claude-native | recraft-v4 | mixed",
+    "primary_form": "wordmark-preferred | combination | symbolic-first | icon-first",
+    "generation_method": "claude-native-svg",
     "concepts": [
-      {"id": "B1", "direction": "...", "path": "...svg", "rationale": "...", "source": "claude-native"},
-      ...
+      {
+        "id": "B1",
+        "direction": "string",
+        "path": "logo/concepts/concept-b1.svg",
+        "rationale": "string",
+        "form_language": "wordmark | combination | symbolic-geometric"
+      }
     ],
     "chosen": "B2",
-    "user_selection_method": "user-picked | auto-picked"
+    "user_selection_method": "user-picked | auto-picked | user-manual-uploaded",
+    "manual_upload_note": "string | null"
   },
-  
+
   "variants": {
     "primary": "logo/source/primary.svg",
     "mono": "logo/source/primary-mono.svg",
     "inverse": "logo/source/primary-inverse.svg",
-    "icon_only": "..." | null
+    "icon_only": "logo/source/icon-only.svg | null"
   },
-  
+
   "derivations": {
-    "favicon": [...],
+    "favicon": ["..."],
     "apple_touch": "...",
     "og_card": "...",
-    "profile_pics": [...],
-    "covers": {...}
+    "profile_pics": ["..."],
+    "covers": {"x": "...", "linkedin": "..."}
   },
-  
-  "app_icons": null | {...},
+
+  "app_icons": null | {"ios": [...], "android": {...}},
   "merch_direction": null | {...},
-  
+
   "usage_guidelines": {
-    "clearspace_rule": "...",
-    "minimum_size": {...},
-    "donts": [...]
+    "clearspace_rule": "1x the x-height del wordmark | 0.5x el diámetro del icon",
+    "minimum_size": {
+      "wordmark_px": 120,
+      "icon_px": 24,
+      "favicon_px": 16
+    },
+    "donts": ["no rotar", "no aplicar filtros", "no recolorear fuera de paleta", "no distorsionar ratios"]
   },
-  
+
   "quality_validation": {
     "all_concepts_passed_quality": true,
     "retries_required": 0,
-    "flags": []
+    "flags": [],
+    "organic_mark_requested_geometric_delivered": false
   },
-  
-  "cost_tracking": {
-    "tier_used": 0,
-    "recraft_generations": 0,
-    "total_cost_usd": 0.00
+
+  "evidence_trace": {
+    "svg_generation_attempts": 4,
+    "regenerations_due_to_validation_fail": 0
   }
 }
 ```
@@ -332,7 +283,7 @@ logo/
 ### Post-generation initial
 
 ```
-[17:45] ④ 4 logo concepts (Tier {N}, wordmark-preferred)
+[17:45] ④ 4 logo concepts (wordmark-preferred)
 
 [B1 SVG rendered]  [B2 SVG rendered]  [B3 SVG rendered]  [C1 SVG rendered]
 Serif classical    Hybrid            Sans refined       Combination
@@ -341,7 +292,7 @@ Rationales:
   B1: Authority clásica, Fraunces-inspired con 'A' custom
   B2: Unexpected — 'A' serif, resto sans. Sage pedagogy
   B3: Refined sans, maximum legibility
-  C1: Símbolo + wordmark
+  C1: Símbolo geometric + wordmark
 
 ¿Cuál? (o pedí variants, o feedback para regen)
 ```
@@ -356,80 +307,72 @@ MONO:       [SVG]
 INVERSE:    [SVG]
 ICON-ONLY:  [SVG]
 
-Applied in contexts:
-[Favicon en browser tab mockup]
-[Mock business card]
+Applied in mockups:
+[Favicon en browser tab]
+[Business card mock]
 [OG card preview]
 [LinkedIn banner mock]
 
-12 derivations generated.
-Tier used: 0 (Claude native SVG)
-Total cost: $0.00
+12 derivations generadas.
 ```
 
 ## 7.10 Relación con otros deptos
 
 **Handoff Compiler consume**:
-- Logo primary + variants → Brand Document PDF (logo section embedded) + Reference Assets folder
+- Logo primary + variants → sección Logo del Brand Document PDF + Reference Assets folder (SVGs sueltos)
 - Derivations → Reference Assets folder
-- Rationale → Brand Document rationale section
+- Rationale → sección Logo rationale del Brand Document
+- Usage guidelines → sección Logo usage del Brand Document
 
 ## 7.11 Failure modes específicos
 
-### Claude-generated SVG inválido (Tier 0)
+### SVG inválido (Claude output malformado)
 - Parse XML → fails
-- Retry con explicit prompt "output must be valid SVG XML"
-- Max 2 retries
-- Fallback: request Recraft (auto-elevate to Tier 1 temporarily con user confirm)
+- Retry con explicit prompt: *"output must be valid SVG XML with correct attribute syntax"*
+- Max 2 retries por concept
+- Si persistent: skip ese concept, continuar con los que pasaron (mínimo 3 válidos para no bloquear)
 
-### Recraft API down (Tier 1+)
-- Retry 3×
-- Fallback: Claude native (degrade to Tier 0 behavior)
-- Flag: "symbolic logos degraded — Claude-generated limited quality"
+### Quality validation falla en 2+ concepts consecutivos
+- Flag `quality_degraded: true`
+- Present al user con warning explícito: *"2 concepts no pasaron validation automática. Revisá cuidadosamente antes de elegir."*
+- User decide si acepta, re-genera, o manual-upload
 
-### Quality validation falla persistently
-- Present con flag "some concepts below quality threshold"
-- User can accept or request regen
+### 16px legibility fail (consumer-app)
+- Concept no sobrevive scale-down
+- Regenerate con prompt adicional: *"mark must remain recognizable at 16×16; simplify shapes, increase stroke width relative to size"*
+- Max 3 retries en este caso
+- Si persistent: flag + warn user, ofrecer manual-upload del app icon específico
 
-### User rechaza 3+ rounds
+### User rechaza 3+ rounds de regeneration
 - Offer "manual upload" mode
+- User provee su propio SVG, dept lo valida (parse, palette check), y downstream consume ese
+- Brand Document registra `user_manual_upload: true` en logo section
 
-### SVG malformed
-- Validation fail
-- Retry con emphasis format
-- Fallback raster PNG (degraded)
+### Rasterization tool down (sprint 1 concern)
+- SVG outputs OK, pero PNGs no se generan
+- Brand Document embeb SVGs directamente (soportado por navegadores y Claude Design)
+- README incluye instrucciones de conversión manual (e.g., imagemagick, online converters)
+- Flag: `rasterization_deferred_to_user: true`
 
-### App icon 16×16 not legible (Tier 1+)
-- Design doesn't survive scale-down
-- Regenerate con prompt "must remain identifiable at 16px"
-- Max 3 retries
-- Warn user explicitly if persistent
+## 7.12 Archivos a escribir en Sprint 0
 
-## 7.12 SKILL.md a escribir en Sprint 0
-
-`skills/brand/logo/SKILL.md` con los 7 pasos + tier-based logic + auto-elevation rules.
-
-## 7.13 Reference files a escribir en Sprint 0
-
+Para este depto:
+- `skills/brand/logo/SKILL.md` — los 7 pasos. **Incluye inline**: form language tables per archetype, direction strategies per brand_profile, quality validation checks (XML parse, element count, palette compliance, 16px legibility), variants derivation rules (mono/inverse/icon-only como transformations programáticas), derived assets logic (favicons, OG cards, app icons, covers, merch direction)
 - `skills/brand/logo/references/data-schema.md`
-- `skills/brand/logo/references/claude-svg-templates.md` — SVG structure templates for Claude native (Tier 0)
-- `skills/brand/logo/references/recraft-prompt-templates.md` — Recraft prompts per archetype × direction (Tier 1+)
-- `skills/brand/logo/references/direction-strategies-by-profile.md`
-- `skills/brand/logo/references/quality-validation.md`
-- `skills/brand/logo/references/auto-elevation-rules.md` — cuándo auto-elevate tier
+- `skills/brand/logo/references/svg-templates.md` — templates de SVG por archetype × form language (big reference, standalone)
 
 ## 7.14 Testing
 
-Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
+Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos específicos:
 
-1. Tier 0 + wordmark-preferred → 4 SVG wordmarks Claude-generated, parseables, valid
-2. Tier 0 + symbolic-first → user prompted to elevate tier
-3. Tier 1 + symbolic-first → Recraft symbolic + Claude wordmark mixed
-4. Tier 2 + any → Recraft todo
-5. SVG output válido (parseable, no corrupto) para Tier 0
-6. Variants (mono, inverse) preservan structure
-7. Derivations (favicon, OG card) rendean correctamente
-8. `app_asset_criticality: primary` → set completo iOS + Android (Tier 1+)
-9. User regen con feedback → feedback applied
-10. Quality validation detecta SVG corrupto y regenerate
-11. Recraft down (Tier 1+) → degrade graceful a Tier 0
+1. `wordmark-preferred` scope → 4 SVG wordmarks válidos, parseables, palette-compliant
+2. `combination` scope → mezcla de wordmark + geometric marks
+3. `symbolic-first` scope → 3 geometric marks + 1 combination, sin text
+4. `icon-first` scope (consumer-app) → 4 geometric marks que pasan 16px legibility test
+5. Variants programmatic (mono, inverse, icon-only) preservan structure del primary
+6. Derivations (favicon, OG card) rendean correctamente desde SVG source
+7. `app_asset_criticality: primary` → set completo iOS + Android en SVG
+8. User regen con feedback → feedback applied en próxima round
+9. Quality validation detecta SVG corrupto/vacío y regenera
+10. User manual-upload → SVG validado y propagado a Handoff sin regenerar
+11. Rasterization tool down → graceful degradation, SVG-only + instrucciones manuales

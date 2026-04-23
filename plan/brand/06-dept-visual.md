@@ -2,22 +2,23 @@
 
 ## 6.1 Propósito
 
-Diseñar las **reglas visuales** de la marca — paleta, tipografía, mood direction (tier-dependent), visual principles. **NO genera el logo** (siguiente dept).
+Diseñar las **reglas visuales** de la marca — paleta, tipografía, mood direction, visual principles. **NO genera el logo** (siguiente dept).
 
 Notas específicas:
-1. Mood imagery es **tier-dependent** (Tier 0 sin generación, Tier 1+ con Recraft o Unsplash)
-2. Palette puede usar Huemint (Tier 1+) o Claude-generated (Tier 0 default)
-3. Output alimenta el Brand Document PDF
+1. Paleta vía Claude native reasoning (color theory + archetype seeds + WCAG validation)
+2. Mood imagery vía Unsplash free API (refs, no generación propia) cuando el scope lo incluye
+3. Typography pairing desde catálogo Google Fonts
+4. Output alimenta el Brand Document PDF + brand-tokens + prompts library
 
 ## 6.2 Inputs
 
 ### Obligatorios
-- `brand/{slug}/scope` (manifest — determina formality, typography era, tier)
-- `brand/{slug}/strategy` (archetype, voice — seed para palette + typography)
+- `brand/{slug}/scope` (manifest — determina `visual_formality`, `typography_era`, y si el scope incluye mood imagery)
+- `brand/{slug}/strategy` (archetype, voice — seed para palette + typography + mood)
 
 ### Opcionales
-- Profile (constraints culturales)
-- Validation Competitive (visual landscape — white space visual, patterns dominantes)
+- `founder_brand_context` (constraints culturales + aesthetic preferences)
+- `validation/{slug}/competitive.direct_competitors` (visual landscape — white space visual, patterns dominantes para evitar)
 
 ## 6.3 Proceso — 6 pasos
 
@@ -41,32 +42,39 @@ Base mapping por archetype (tabla completa en `skills/brand/visual/references/ar
 | Creator | Vibrant unexpected | Teal + coral + mustard |
 
 **Modulación por `visual_formality`**:
-- `high` → saturación reducida, max 1 accent, no neons
-- `medium` → balance, 1-2 accents
+- `high` → saturación reducida (sat media < 60), max 1 accent con sat > 70, no neons
+- `medium` → balance, 1-2 accents, saturation media ≤ 80
 - `low` → permisivo, hasta 3 accents, saturation alta OK
 
-### Paso 2 — Palette generation (tier-dependent)
+### Paso 2 — Palette generation
 
-**Tier 0 (default) — Claude-generated palette**:
-- Claude razona sobre color theory + archetype seeds + visual_formality
-- Produce palette de 5 colors con HEX + usage + contrast
-- Calidad razonable (GPT-style color reasoning) — suficiente para dogfooding
+**Proceso** (Claude native, $0):
 
-**Tier 1+ — Huemint API**:
-- Endpoint: `POST https://api.huemint.com/color`
-- Mode: "transformer" o "diffusion"
-- "brand-intersection" config
-- Seed: 2-3 colors derived from archetype
-- Output: 5 palettes, select la que mejor matcheaa narrativa
+1. Claude razona sobre color theory + archetype seeds + visual_formality
+2. Genera 3 paletas candidatas (primary + alternate 1 + alternate 2) con 5 colors cada una
+3. Cada palette incluye HSL values, HEX, nombre y usage
+4. Self-check de WCAG AA (ver Paso 3)
+5. Selecciona primary palette + emite 2 alternates en el output
 
-**Decision runtime**: si `scope.intensity_modifiers.image_gen_tier == 0`, skip Huemint. Si `>= 1`, use Huemint.
+Output por color:
+```json
+{
+  "hex": "#0B1F3A",
+  "hsl": {"h": 216, "s": 68, "l": 14},
+  "name": "Navy",
+  "usage": "backgrounds, auth, headers"
+}
+```
+
+Si el user pasó `primary_color` override, se usa como seed obligatorio y las otras colors se derivan por armonía (complementary, triadic, split-complementary, analogous) según el archetype.
 
 ### Paso 3 — WCAG contrast validation
 
 Para cada par text-background:
-- Calcular contrast ratio
-- Verificar Level AA (4.5:1 body, 3:1 large)
-- Ajustar si falla
+- Calcular contrast ratio (WCAG formula sobre luminance)
+- Verificar Level AA (4.5:1 body text, 3:1 large text)
+- Si un par falla, auto-ajustar darkening/lightening del text color (no del background — preserva la identidad)
+- Si no fixable con ajustes, regenerate palette entera con seeds más distantes
 
 Herramienta: utility function WCAG inline (pseudocode en `skills/brand/visual/references/wcag-utility.md`).
 
@@ -77,72 +85,65 @@ Claude reasoning basado en archetype + `typography_era`:
 | Archetype | Heading tendency | Body tendency | Mood |
 |---|---|---|---|
 | Sage | Classical serif (Fraunces, Crimson) | Neutral sans (Inter, IBM Plex) | Authority + clarity |
-| Ruler | Serif elegante (Playfair, Marcellus) | Sans refined (Söhne) | Premium, editorial |
-| Hero | Display bold (Syne, Boldonse) | Sans geometric (Manrope) | Dynamic |
-| Creator | Display expresivo (Recoleta, Clash) | Sans friendly (Work Sans) | Crafted |
-| Jester | Display playful (Mona Sans, Rubik) | Sans friendly | Fun, unexpected |
-| Everyman | Sans humanist (Inter) | Sans humanist | Relatable |
+| Ruler | Serif elegante (Playfair, Marcellus) | Sans refined (Inter, Manrope) | Premium, editorial |
+| Hero | Display bold (Syne, Archivo Black) | Sans geometric (Manrope) | Dynamic |
+| Creator | Display expresivo (Recoleta, Clash Display) | Sans friendly (Work Sans) | Crafted |
+| Jester | Display playful (Mona Sans, Rubik) | Sans friendly (Poppins) | Fun, unexpected |
+| Everyman | Sans humanist (Inter) | Sans humanist (Inter) | Relatable |
 | Caregiver | Serif soft (Lora, Source Serif) | Sans warm (Quicksand) | Warm |
 | Innocent | Sans rounded (Quicksand, Nunito) | Sans rounded | Soft, simple |
 | Explorer | Serif rugged (Bitter, Merriweather) | Sans utilitarian (IBM Plex) | Rugged |
-| Outlaw | Display contundente (Anton, Bebas) | Sans condensed | Disruption |
-| Magician | Serif ornate (Cormorant) | Sans clean | Mystical |
-| Lover | Serif romantic (Cormorant) | Sans soft | Sensual |
+| Outlaw | Display contundente (Anton, Bebas Neue) | Sans condensed (Barlow Condensed) | Disruption |
+| Magician | Serif ornate (Cormorant) | Sans clean (Inter) | Mystical |
+| Lover | Serif romantic (Cormorant) | Sans soft (Work Sans) | Sensual |
 
-**Todas Google Fonts** (free, commercial OK, widely supported).
+**Todas Google Fonts** (free, commercial OK, widely supported, embeddable en PDF).
 
 **Modulación por `typography_era`**:
-- `editorial-classic` → Serif + sans clean (Fraunces + Inter)
-- `neutral-modern` → Sans + sans (Inter + Söhne)
-- `expressive-contemporary` → Display + sans friendly
+- `editorial-classic` → Serif + sans clean (e.g., Fraunces + Inter)
+- `neutral-modern` → Sans + sans (e.g., Inter + Manrope)
+- `expressive-contemporary` → Display + sans friendly (e.g., Clash Display + Work Sans)
 - `experimental` → Variable fonts, unconventional pairings
 
-### Paso 5 — Mood imagery (tier-dependent)
+Output incluye Google Fonts import URL completo para inclusión directa en tokens/fonts.css.
 
-**Solo si `scope.output_manifest.reference_assets.conditional_on_tier` incluye `mood_imagery`**.
+### Paso 5 — Mood imagery refs (condicional)
 
-**Tier 0 (default) — Skip mood imagery generada**:
-- No se genera mood imagery propia
-- Brand Document usa descripción textual del mood + visual principles
-- Si el user quiere mood references para Claude Design projects, usa el campo "mood references" del Brand Document directamente como prompt guide
+Se ejecuta solo si `scope.output_manifest.reference_assets.optional_recommended` incluye `mood_imagery_refs` (profiles que lo benefician — ver [18-output-package-structure.md](./18-output-package-structure.md) §18.8).
 
-**Tier 1 — Unsplash curated references**:
-- Unsplash API (free, 50 req/h demo)
-- Search queries basados en archetype + mood axes
-- Pull 6-8 imágenes curated
-- Output en Reference Assets folder como `mood-*.jpg`
-- Attribution file auto-generated
+**Via Unsplash free API**:
 
-**Tier 2 — Recraft V4 generated**:
-- Prompts estructurados por eje de mood (energy, texture, composition, light)
-- 6-8 imágenes generadas, coherent entre sí
-- Stylized (no photoreal) — direction de marca única
-- Output en Reference Assets folder como `mood-*.png`
+1. Construir queries basados en archetype + `mood_keywords` derivados de brand values + voice attributes + `target_audience.psychographics`
+   - Ejemplo para Sage/authority/compliance: *"minimal architectural monochrome"*, *"quiet precision geometry"*, *"ordered light shadow"*
+2. Ejecutar 3-6 queries contra Unsplash API (`GET /search/photos` con query)
+3. Select top 3-6 resultados (1 por query idealmente, o los mejores 6 total)
+4. Output: array de refs con URL, photographer, photo_id, attribution string, mood axis (energy, texture, composition, light, focus, motion)
+5. Estos refs van a Reference Assets folder como markdown files con metadata (URL + attribution + mood description) — NO binarios descargados
+
+**Si Unsplash API está down**:
+- Retry 3× con backoff
+- Si persiste: skip mood refs. Brand Document describe el mood en prosa dentro de la página de Visual Principles. Flag `mood_imagery_skipped: true` en envelope.
+
+Templates de queries por archetype se documentan inline dentro de `skills/brand/visual/SKILL.md` (Sprint 0) — son una tabla compacta, no ameritan ref standalone.
 
 ### Paso 6 — Visual principles
 
 Documentar en lenguaje natural:
-- Whitespace philosophy
-- Shape language (geometric/organic/mixed)
-- Imagery style
-- Density preference
-- Motion principles (rough guidelines, ejecutadas por Claude Design downstream)
+- **Whitespace philosophy** (generous vs dense, symmetric vs asymmetric)
+- **Shape language** (geometric / organic / mixed, rounded corners spec, stroke weights)
+- **Imagery style direction** (guidance para que Claude Design genere imagery coherente downstream — descripción, no assets aquí)
+- **Density preference** (información per screen: low / medium / high)
+- **Motion principles** (direction-level guidelines, ejecutados por Claude Design downstream — speed, easing defaults)
+
+Estos principios viajan al Brand Document + se embeben como context en cada prompt de la Prompts Library.
 
 ## 6.4 Tools
 
-### Tier 0 (default, $0)
-- Claude native (palette + typography + principles reasoning)
+- Claude native (palette reasoning, typography pairing, visual principles)
 - WCAG contrast utility (built-in algorithm)
+- Unsplash free API (cuando scope incluye mood refs)
 
-### Tier 1 ($0.00-0.05/run)
-- Huemint API (palette ML)
-- Unsplash API (free tier, mood refs curated)
-- Claude native (typography, principles)
-
-### Tier 2 (~$0.24-0.32/run)
-- Huemint API (paid tier ideally)
-- Recraft V4 via `merlinrabens/image-gen-mcp-server` (mood imagery generated)
-- Claude native (typography, principles)
+Costo externo: $0.
 
 ## 6.5 Output schema
 
@@ -151,68 +152,98 @@ Documentar en lenguaje natural:
   "schema_version": "1.0",
   "status": "ok",
   "department": "visual_system",
-  "scope_ref": "...",
-  "strategy_ref": "...",
-  "tier_used": 0 | 1 | 2,
-  
+  "scope_ref": "brand/{slug}/scope",
+  "strategy_ref": "brand/{slug}/strategy",
+
   "palette": {
-    "generation_method": "claude-reasoning | huemint-transformer | huemint-diffusion",
+    "generation_method": "claude-reasoning",
     "primary_palette": {
       "colors": {
-        "primary": {"hex": "#0B1F3A", "name": "Navy", "usage": "backgrounds, auth"},
-        "background": {"hex": "#F4EFE6", "name": "Off-white", "usage": "page bg"},
-        "accent": {"hex": "#D4A74A", "name": "Amber", "usage": "CTAs, highlights"},
-        "text_primary": {"hex": "#2A3B52", "name": "Deep slate", "usage": "body text"},
-        "text_secondary": {"hex": "#8B97A8", "name": "Steel", "usage": "meta"}
+        "primary": {"hex": "#0B1F3A", "hsl": {"h": 216, "s": 68, "l": 14}, "name": "Navy", "usage": "backgrounds, auth"},
+        "background": {"hex": "#F4EFE6", "hsl": {"h": 38, "s": 28, "l": 93}, "name": "Off-white", "usage": "page bg"},
+        "accent": {"hex": "#D4A74A", "hsl": {"h": 41, "s": 60, "l": 56}, "name": "Amber", "usage": "CTAs, highlights"},
+        "text_primary": {"hex": "#2A3B52", "hsl": {"h": 215, "s": 32, "l": 24}, "name": "Deep slate", "usage": "body text"},
+        "text_secondary": {"hex": "#8B97A8", "hsl": {"h": 212, "s": 14, "l": 60}, "name": "Steel", "usage": "meta"}
       }
     },
-    "alternate_palettes": [...],
-    "contrast_matrix": {...},
-    "palette_narrative": "..."
+    "alternate_palettes": [
+      {"colors": {...}, "name": "alt-1", "rationale": "string"},
+      {"colors": {...}, "name": "alt-2", "rationale": "string"}
+    ],
+    "contrast_matrix": {
+      "text_primary_on_background": 9.2,
+      "text_secondary_on_background": 3.4,
+      "primary_on_background": 12.8
+    },
+    "palette_narrative": "string — why these colors for this archetype + formality"
   },
-  
+
   "typography": {
     "heading": {
       "family": "Fraunces",
       "weights_available": [400, 500, 600, 700],
       "weight_default": 600,
       "google_fonts_import": "https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&display=swap",
-      "rationale": "..."
+      "rationale": "string"
     },
-    "body": {...},
-    "mono": {...},
+    "body": {
+      "family": "Inter",
+      "weights_available": [400, 500, 600],
+      "weight_default": 400,
+      "google_fonts_import": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
+      "rationale": "string"
+    },
+    "mono": {
+      "family": "JetBrains Mono",
+      "weights_available": [400, 500],
+      "weight_default": 400,
+      "google_fonts_import": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap",
+      "rationale": "string"
+    },
     "scale": {
       "h1": "48px", "h2": "32px", "h3": "24px",
       "body_large": "18px", "body": "16px", "body_small": "14px", "meta": "12px",
       "line_height_body": "1.6", "line_height_heading": "1.2"
     }
   },
-  
-  "mood_imagery": null | [
-    {"path": "brand/visual/mood/01-...png", "axis": "energy-static", "source": "recraft | unsplash", "attribution": "..."},
-    ...
+
+  "mood_imagery_refs": null | [
+    {
+      "mood_axis": "energy-quiet-deliberate",
+      "unsplash_url": "https://unsplash.com/photos/{id}",
+      "photo_id": "string",
+      "photographer": "string",
+      "attribution": "Photo by {photographer} on Unsplash",
+      "description": "string — por qué este ref para este mood"
+    }
   ],
-  
+
   "visual_principles": {
-    "whitespace": {...},
-    "shape_language": {...},
-    "imagery_style": {...},
-    "density": {...},
-    "motion_principles": {...}
+    "whitespace": "string — philosophy",
+    "shape_language": "geometric | organic | mixed + detalles",
+    "imagery_style_direction": "string",
+    "density": "low | medium | high",
+    "motion_principles": "string — speed + easing defaults"
   },
-  
-  "evidence_trace": {...}
+
+  "evidence_trace": {
+    "profile_fields_used": ["string"],
+    "validation_depts_used": ["competitive"],
+    "scope_modifiers_applied": ["string"],
+    "mood_refs_queries_used": ["string"],
+    "wcag_adjustments_applied": ["string"]
+  }
 }
 ```
 
 ## 6.6 Persistencia
 
-`brand/{slug}/visual`.
+`brand/{slug}/visual` en Engram.
 
 ## 6.7 Reveal al user
 
 ```
-[12:31] ③ Visual System locked (Tier {N})
+[12:31] ③ Visual System locked
 
 PALETTE (WCAG AA ✓)
 ■ #0B1F3A Navy        — primary, auth
@@ -229,9 +260,7 @@ Mono:    JetBrains Mono (500)
 [Samples rendered]
 
 MOOD
-Tier 0: [No generated — described in principles]
-Tier 1: [6 Unsplash curated in grid]
-Tier 2: [6 Recraft generated in grid]
+[3 mood refs from Unsplash si scope los incluye, con thumbnails + attribution. Si scope no los incluye o Unsplash down: "Described in Visual Principles"]
 
 PRINCIPLES
 whitespace: generous-asymmetric
@@ -244,60 +273,50 @@ imagery: abstract-stylized
 **Logo consume**:
 - Paleta (aplicar en logos + variants)
 - Typography (para wordmarks)
-- Visual principles (logo direction)
+- Visual principles (logo direction, shape language)
 
 **Handoff Compiler consume**:
-- Palette → Brand Document palette section + tokens.css/json/tailwind
+- Palette → Brand Document palette section + brand-tokens (tokens.css / tokens.json / tailwind.config.js)
 - Typography → Brand Document typography section + fonts.css
-- Mood imagery (si tier ≥ 1) → Reference Assets folder
-- Visual principles → Brand Document principles section + prompts del Library
+- Mood imagery refs (si están) → Reference Assets folder (markdown files con URLs + attribution) + Brand Document mood section
+- Visual principles → Brand Document principles section + embedidos en prompts del Library
 
 ## 6.9 Failure modes específicos
 
-### Huemint API down (Tier 1+)
-- Retry 3× → fallback a Claude-generated palette (degraded a Tier 0 behavior)
-- Flag: "palette generated without ML optimization"
-
 ### WCAG falla en todas las combinations
-- Adjust manually darkening/lightening
-- If unfixable, elegir alternate palette
-- Raramente, re-prompt con seeds ajustados
+Auto-adjust darkening/lightening del text color. Si unfixable después de 2 iteraciones, regenerate palette entera con seeds más distantes. Si sigue fallando, surface al user con las 3 alternate palettes y que elija.
 
-### Recraft API down (Tier 2)
-- Retry 3× → fallback a Unsplash (degraded a Tier 1 behavior)
-- Flag en output
+### Unsplash API down
+Retry 3× con backoff. Si persiste: skip mood refs, Brand Document describe el mood en prosa en Visual Principles. Flag `mood_imagery_skipped: true` en envelope.
 
-### Unsplash API down (Tier 1)
-- Retry → skip mood imagery (degraded a Tier 0)
-- Flag: "mood imagery not included — check Brand Document description"
+### Unsplash queries devuelven 0 resultados
+Refine queries con synonyms automático (Claude genera alternativas). Si sigue en 0 resultados: skip mood refs con flag.
 
-### Typography pairing no tiene Google Fonts adecuadas
-- Fallback a pairing más genérico (Inter + Fraunces default)
-- Flag
+### Typography pairing no tiene Google Fonts adecuadas para el archetype
+Fallback a pairing default universal (Inter + Fraunces + JetBrains Mono). Flag `typography_fallback_to_default: true` con nota en rationale.
 
-## 6.10 SKILL.md a escribir en Sprint 0
+### `primary_color` override no compatible con archetype (ej. neon amarillo con Sage)
+Visual dept genera la palette alrededor del override, pero Gate 3 (Palette ↔ Archetype) va a halt el pipeline en Handoff Compiler. El user decide si override el archetype o revisita el color.
 
-`skills/brand/visual/SKILL.md` con los 6 pasos + tier-dependent logic.
+## 6.10 Archivos a escribir en Sprint 0
 
-## 6.11 Reference files a escribir en Sprint 0
-
+Para este depto:
+- `skills/brand/visual/SKILL.md` — los 6 pasos. **Incluye inline**: typography pairing tables per archetype × era, unsplash query templates per archetype × mood axis, visual principles generation rules
 - `skills/brand/visual/references/data-schema.md`
-- `skills/brand/visual/references/archetype-palette-seeds.md`
-- `skills/brand/visual/references/archetype-typography-map.md`
+- `skills/brand/visual/references/archetype-palette-seeds.md` — seeds per archetype con HSL ranges detallados (big reference, standalone)
 - `skills/brand/visual/references/wcag-utility.md` — algoritmo de contrast + pseudocode
-- `skills/brand/visual/references/mood-prompt-templates.md` — templates per archetype (Tier 2)
-- `skills/brand/visual/references/unsplash-query-templates.md` — templates per archetype (Tier 1)
 
 ## 6.12 Testing
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Archetype Sage + formality medium → palette conservadora
-2. Archetype Jester + formality low → palette vibrant
-3. WCAG check detecta contrast failures y ajusta
+1. Archetype Sage + formality medium → palette conservadora (sat media 40-60)
+2. Archetype Jester + formality low → palette vibrant (sat 70+, 3 accents)
+3. WCAG check detecta contrast failures y auto-ajusta
 4. Typography era matchea pairing
-5. Tier 0 run → no mood imagery, todo ok
-6. Tier 1 run → Unsplash mood refs entregados
-7. Tier 2 run → Recraft mood gens entregados
-8. Huemint down → fallback to Claude palette works
-9. Unsplash down (Tier 1) → degrade graceful
+5. Scope incluye mood refs + Unsplash up → 3-6 refs entregados con attribution
+6. Scope incluye mood refs + Unsplash down → skip, flag, prosa en principles
+7. Scope NO incluye mood refs → no se ejecuta el paso, output coherente
+8. `primary_color` override compatible → palette se genera alrededor del seed
+9. `primary_color` override incompatible con archetype → Gate 3 halt downstream
+10. Typography fallback cuando archetype no tiene pairing claro → default universal

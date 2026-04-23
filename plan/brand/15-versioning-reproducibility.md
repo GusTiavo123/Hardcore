@@ -4,7 +4,7 @@
 
 Cómo Brand versiona runs, permite reproducción, y compara versiones.
 
-Snapshot incluye `tier_used`, tracking de Claude Design compatibility, y cost tracking tier-aware.
+Snapshot incluye input hashes, tool versions, timestamps, coherence trace, y file manifests. Reproducibility está limitada por la naturaleza no-determinística de la SVG generation (ver 15.7).
 
 ## 15.2 Conceptos
 
@@ -14,19 +14,19 @@ Snapshot incluye `tier_used`, tracking de Claude Design compatibility, y cost tr
 - Creado al completar Handoff Compiler
 - Inmutable
 - Identificado por `vN`
-- Auto-increment en full run
+- Auto-increment en cada full run completo
 
 ### Partial re-run (extend)
 
 `/brand:extend {depto}` **NO** crea snapshot nuevo:
 - Updatea topic key del dept
-- Incrementa revision_count del dept
+- Incrementa `revision_count` del dept en el current snapshot
 - Files en filesystem sobrescriben
-- Se graba en `snapshot.extensions[]` del current
+- Se graba en `snapshot.extensions[]` del snapshot actual
 
 ### User-forced snapshot
 
-`/brand:snapshot` fuerza nuevo snapshot con current state (útil después de varios extends).
+`/brand:snapshot` fuerza nuevo snapshot con el current state (útil después de varios extends consecutivos).
 
 ## 15.3 Snapshot schema
 
@@ -40,29 +40,30 @@ Topic key: `brand/{slug}/snapshot/v{N}`
   "created_at": "ISO-8601",
   "completed_at": "ISO-8601",
   "duration_seconds": 1122,
-  
+
   "idea_slug": "auren-compliance",
-  "user_slug": "user-slug",
-  
-  "mode_used": "normal | fast | extend | override",
-  "tier_used": 0 | 1 | 2,
-  "user_overrides": [...],
-  
+  "user_slug": "user-slug | null",
+
+  "mode_used": "normal | fast | extend | override | resume",
+  "user_overrides": [],
+
   "input_hashes": {
     "validation_hash": "sha256:...",
-    "profile_hash": "sha256:...",
+    "profile_hash": "sha256:... | null",
     "idea_text_hash": "sha256:..."
   },
-  
+
   "tool_versions": {
     "brand_module_version": "1.0",
-    "recraft_model": "v4 or null if Tier 0",
-    "huemint_api": "v1 or null if Tier 0",
-    "domain_mcp": "2.1.0",
-    "pdf_skill": "1.2",
-    "claude_model": "claude-opus-4-7"
+    "engram_mcp": "X.Y.Z",
+    "open_websearch_mcp": "X.Y.Z",
+    "domain_availability_mcp": "X.Y.Z",
+    "unsplash_api_tier": "free-demo | free-production | unavailable",
+    "pdf_skill": "X.Y",
+    "claude_model": "claude-opus-4-7",
+    "claude_design_version": "web v1 (2026-04)"
   },
-  
+
   "output_refs": {
     "scope": "brand/{slug}/scope#revision_N",
     "strategy": "brand/{slug}/strategy#revision_N",
@@ -71,7 +72,7 @@ Topic key: `brand/{slug}/snapshot/v{N}`
     "logo": "brand/{slug}/logo#revision_N",
     "handoff": "brand/{slug}/handoff#revision_N"
   },
-  
+
   "filesystem_path": "output/auren-compliance/brand/",
   "filesystem_manifest": [
     {"path": "brand-design-document.pdf", "sha256": "..."},
@@ -79,32 +80,33 @@ Topic key: `brand/{slug}/snapshot/v{N}`
     {"path": "brand-tokens/tokens.json", "sha256": "..."},
     {"path": "reference-assets/logo/primary.svg", "sha256": "..."}
   ],
-  
+
   "cost_tracking": {
-    "tier_used": 0,
-    "image_gen_usd": 0.00,
-    "image_gen_count": 0,
-    "claude_design_handoff_made": true,
-    "total_cost_usd": 0.00,
-    "total_runtime_seconds": 1122
+    "external_api_cost_usd": 0.00,
+    "engram_operations": 0,
+    "web_search_queries": 0,
+    "domain_checks": 0,
+    "unsplash_fetches": 0,
+    "pdf_generations": 1,
+    "claude_svgs_generated": 0
   },
-  
+
   "coherence_trace": {
-    "gates_executed": [...8 gates],
-    "escalations": [],
-    "final_state": "all_gates_passed"
+    "gates_executed": [],
+    "final_state": "all_gates_passed | halted_by_user | accepted_with_flags"
   },
-  
+
   "audit": {
     "failures_encountered": [],
-    "retries_per_tool": {...},
-    "extensions": []
+    "retries_per_tool": {},
+    "extensions": [],
+    "flags_raised": []
   },
-  
+
   "claude_design_integration": {
-    "handoff_method": "manual | auto (future when MCP exists)",
-    "brand_document_pdf_path": "...",
-    "user_upload_confirmed": null | true | false
+    "handoff_method": "manual",
+    "brand_document_pdf_path": "output/{slug}/brand/brand-design-document.pdf",
+    "user_upload_confirmed": null
   }
 }
 ```
@@ -121,19 +123,16 @@ Compara dos snapshots.
 Comparing v1 (2026-04-20) ↔ v2 (2026-04-25)
 
 Inputs changed:
-  ⚠ validation_hash: differente (re-run Validation entre snapshots)
+  ⚠ validation_hash: different (re-run Validation entre snapshots)
   ✓ profile_hash: same
   ✓ idea_text_hash: same
-
-Tier:
-  v1: Tier 0 ($0.00)
-  v2: Tier 1 ($0.18) — auto-elevated for symbolic logo
 
 Strategy:
   archetype: Sage → Sage (same)
   voice_attributes:
     - added: "formal"
     - removed: "levemente irónico"
+  sentiment_landscape: trust_heavy → trust_heavy (same)
 
 Verbal:
   name: Auren → Auren (same)
@@ -143,43 +142,39 @@ Verbal:
 Visual:
   palette: (navy/off-white/amber) → (navy/cream/gold) — accent shifted
   typography: same
-  mood_imagery: 
-    v1: none (Tier 0)
-    v2: 6 Unsplash curated (Tier 1)
+  mood_imagery_refs: 3 → 6 (+3)
 
 Logo:
   chosen: B2 → C1 (different direction — wordmark → combination)
-  generation_method: claude-native → mixed (Recraft + Claude)
 
 Handoff:
-  brand-design-document.pdf: regenerated
-  prompts-library.md: regenerated  
+  brand-design-document.pdf: regenerated (8 pages → 12 pages)
+  prompts-library.md: regenerated
   brand-tokens/: regenerated
-  reference-assets/: logos regenerated + mood added
+  reference-assets/: logos regenerated + mood refs added
 
-Cost delta: $0.00 → $0.18 (tier elevation)
+Coherence:
+  gates passed: 9/9 → 9/9 (both clean)
 
 Claude Design compatibility:
   v1 upload: confirmed ✓
   v2 upload: pending
 
-Overall: v2 shifted more institutional register, logo direction changed,
-mood imagery added.
+Overall: v2 shifted more institutional register, logo direction changed, more mood refs.
 ```
 
 ## 15.5 Comando `/brand:rollback v1`
 
 Revertir a snapshot v1:
-- Restore Engram topic keys
-- Backup current filesystem to `output/{slug}/brand-v2-backup/`
-- Restore filesystem from v1 state
-
-User confirms antes de sobreescribir.
+- Restore Engram topic keys al state de v1
+- Backup current filesystem a `output/{slug}/brand-vN-backup/`
+- Restore filesystem desde v1 manifest
+- User confirms antes de sobreescribir (confirmación explícita requerida porque es destructive)
 
 ## 15.6 Comando `/brand:show`
 
 ```
-/brand:show                    # Latest snapshot
+/brand:show                    # Latest snapshot — executive summary
 /brand:show v1                 # Specific version
 /brand:show --list             # List all snapshots
 ```
@@ -188,136 +183,163 @@ User confirms antes de sobreescribir.
 ```
 Brand snapshots for "auren-compliance":
 
-v1 (2026-04-20T14:57:42Z)  — full_run, normal, Tier 0, $0.00
+v1 (2026-04-20T14:57:42Z)  — full_run, normal
   Archetype: Sage · Name: Auren · Profile: b2b-smb
   Claude Design upload: confirmed
 
-v2 (2026-04-25T10:30:15Z)  — full_run, normal, Tier 1, $0.18
+v2 (2026-04-25T10:30:15Z)  — full_run, normal
   Archetype: Sage · Name: Auren · Profile: b2b-smb
-  Changes: voice formal, mood imagery added, logo direction changed
+  Changes: voice más formal, mood refs añadidos, logo direction cambiado
   Claude Design upload: pending
 
 (latest)
 ```
 
-## 15.7 Reproducibility — exact reproduction
+## 15.7 Reproducibility — honest limitations
 
-Reproducir snapshot:
+Reproducir exactamente un snapshot tiene límites inherentes:
 
-**Requirements**:
-1. Same tool versions accessible
-2. Same input hashes (Validation + Profile unchanged)
-3. Same user overrides
-4. Same tier (cost-relevant)
+**Qué es determinístico (alta reproducibilidad)**:
+- Archetype selection (dado mismo input)
+- Voice attributes (dado mismo archetype + register)
+- Brand values (dado mismos inputs)
+- Positioning statement (alta consistencia)
+- Palette generation (Claude razonamiento — alta consistencia pero no idéntica)
+- Typography pairing
 
-**Process**:
+**Qué NO es determinístico**:
+- SVG logo generation (Claude genera SVG markup con variación creativa)
+- Copy text específico (tagline, hero headlines — wording varía)
+- Unsplash refs (si Unsplash devuelve resultados distintos o el query cambia levemente)
+- Brand Document layout fino (PDF rendering puede variar entre versiones del skill)
+
+**Proceso para reproduction**:
 
 ```
 /brand:reproduce v1
 
 Checks:
-  ✓ Validation hash matches
+  ✓ Validation hash matches (validation no cambió desde v1)
   ✓ Profile hash matches
   ✓ Brand module version: 1.0 → 1.0 (same)
-  ⚠ Recraft model: v4 (v1) → v4.1 (current) — minor update, may produce different images
+  ⚠ pdf_skill version: X.Y (v1) → X.Z (current) — minor update, layout puede variar
 
 Options:
-  1. Reproduce con current tools (expect minor variance en imagenes)
-  2. Abort — need exact versions
-  3. Produce new v3 with current tools (not reproduction, start from v1 inputs)
+  1. Reproduce con current tools (expect variance en SVGs + copy wording)
+  2. Abort — needs exact versions (no siempre posible)
+  3. Produce new v3 with current tools (no reproduction — start from v1 inputs)
 ```
 
-**Limitation honest**: image generation no determinístico. Logos y mood pueden variar. Strategy decisions, Verbal copy (if deterministic Claude) deben ser idénticos.
+**Qué sí podemos garantizar al reproduce**:
+- Archetype elegido es el mismo
+- Voice attributes son los mismos (o muy cercanos)
+- Brand values son los mismos
+- Scope classification es la misma
+
+**Qué no podemos garantizar**:
+- SVG output idéntico (bytes iguales)
+- Copy wording idéntico
+- PDF layout idéntico
 
 ## 15.8 Staleness detection
 
 Downstream module consuming Brand:
-- Compare `brand.snapshot.created_at` vs `validation.last_updated` + `profile.last_updated`
-- If Brand snapshot viejo que Validation/Profile updates: flag staleness
-- If Brand > 180 days: flag "considera regenerar"
+- Compara `brand.snapshot.created_at` vs `validation.last_updated` + `profile.last_updated`
+- Si Brand snapshot es más viejo que Validation/Profile updates: flag staleness ("brand may be outdated — upstream changed")
+- Si Brand > 180 días: flag "considera regenerar"
 
 ## 15.9 Storage considerations
 
 Snapshots en Engram + filesystem:
 
-- **Engram**: metadata (~5KB). Negligible.
-- **Filesystem per snapshot**: varies por tier.
-  - Tier 0: ~5-10MB (sin mood imagery, PDF + SVGs + markdowns)
-  - Tier 1: ~20-30MB (+ Unsplash mood refs)
-  - Tier 2: ~30-50MB (+ Recraft mood generated)
+- **Engram**: metadata (~5-10 KB por snapshot). Negligible.
+- **Filesystem per snapshot**: típicamente 2-15 MB
+  - PDF (~2-8 MB según profile)
+  - SVGs (<1 MB total — vector text)
+  - Markdown files (<1 MB total)
+  - Tokens folder (<1 MB)
 
-10 snapshots mixed: ~200-400MB.
+10 snapshots típicos: ~20-150 MB total filesystem.
 
 **Policy**:
 - Keep all por default
-- `/brand:cleanup --keep-last N` deletear viejos (except v1)
-- Recommendation: keep all until 2GB, después cleanup oldest
+- `/brand:cleanup --keep-last N` borra los snapshots más viejos (excepto v1 — siempre preservado como baseline histórico)
+- Recommendation: keep all hasta que el espacio sea un issue
 
-Cleanup NO toca Engram — solo filesystem.
+Cleanup NO toca Engram — solo filesystem. Los metadata de snapshots viejos quedan en Engram para `/brand:diff` histórico aunque los files ya no estén.
 
 ## 15.10 Tool version compatibility matrix
 
-`skills/brand/references/version-compatibility.md`:
+Sección dentro de `skills/brand/SKILL.md` (orchestrator):
 
 ```yaml
 brand_module_version: "1.0"
 tested_with:
-  recraft: ["v4"]
-  huemint_api: ["v1"]
+  engram_mcp: [">= X.Y.Z"]
+  open_websearch_mcp: [">= X.Y.Z"]
   domain_mcp: [">= 2.0.0"]
-  pdf_skill: [">= 1.0.0"]
-  claude_design: "web v1 (Apr 2026)"
+  unsplash_free_api: "current (2026-04)"
+  pdf_skill: [">= X.Y"]
+  claude_design: "web v1 (2026-04 Labs)"
 
 breaking_changes:
   - brand_module: "1.0 → 2.0 (hypothetical)"
     effect: "archetype selection algorithm changed"
-    migration: "re-run brand"
-  
+    migration: "re-run brand — old snapshots preservan v1 behavior histórico"
+
   - claude_design: "Labs → GA (when released)"
     effect: "PDF format expectations may change"
-    migration: "re-run Handoff Compiler to regenerate PDF in new format"
+    migration: "re-run Handoff Compiler para regenerar PDF en new format"
+
+  - claude_design: "MCP/API released"
+    effect: "auto-upload flag available en Handoff"
+    migration: "opt-in additive, no migration required"
 ```
 
 ## 15.11 Audit log
 
-Cada action graba:
+Cada action graba en `brand/{slug}/audit-log`:
 
 ```
-brand/{slug}/audit-log
-
 Entries:
-  2026-04-20 14:30 — brand:new started (mode: normal, tier: 0)
-  2026-04-20 14:57 — brand:new completed, snapshot v1 created
+  2026-04-20 14:30 — brand:new started (mode: normal)
+  2026-04-20 14:35 — Scope Analysis completed (b2b-smb, confidence 0.84)
+  2026-04-20 14:42 — Strategy completed (archetype: Sage)
+  2026-04-20 14:48 — user confirmed Strategy at Punto 2
+  2026-04-20 14:52 — Verbal naming presented, user picked "Auren" at Punto 3
+  2026-04-20 14:57 — Logo presented, user picked "B2" at Punto 4
+  2026-04-20 15:02 — Coherence gates: 9/9 passed
+  2026-04-20 15:05 — Handoff Compiler completed, snapshot v1 created
   2026-04-21 09:15 — user reported: Claude Design upload successful
-  2026-04-25 10:00 — brand:extend logo started (requesting Tier 1 elevation)
-  2026-04-25 10:05 — user confirmed tier elevation to Tier 1 (+$0.18 estimated)
-  2026-04-25 10:15 — brand:extend logo completed
+  2026-04-25 10:00 — brand:extend logo started
+  2026-04-25 10:15 — brand:extend logo completed (revision 2)
   2026-04-25 10:30 — brand:snapshot (user-forced) — v2 created
 ```
 
 Accesible via `/brand:audit {slug}`.
 
-## 15.12 Reference file a escribir en Sprint 0
+## 15.12 Dónde vive esto en Sprint 0
 
-`skills/brand/references/versioning.md` con:
+Versioning + reproducibility se documentan **dentro de `skills/brand/SKILL.md`** (orchestrator) como sección dedicada:
 - Snapshot schema completo
 - Diff algorithm
-- Rollback procedure
-- Reproducibility guarantees y limitations
+- Rollback procedure (incluye backup step)
+- Reproducibility guarantees y limitations explícitas
 - Storage policies
-- Tier tracking details
+- Audit log format
+- Tool version compatibility matrix
 
 ## 15.13 Testing
 
 Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 
-1. Full run → snapshot v1 creado
-2. `/brand:extend logo` → v1.logo revision++ but NO new snapshot
-3. `/brand:snapshot` → forces v2
+1. Full run → snapshot v1 creado con manifest + hashes + audit
+2. `/brand:extend logo` → v1.logo revision++ pero NO nuevo snapshot
+3. `/brand:snapshot` → fuerza v2
 4. Second full run → snapshot v2 auto-creado
-5. `/brand:diff v1 v2` → muestra diferencias incluyendo tier change
-6. `/brand:rollback v1` → restores correctly
-7. `/brand:show --list` → lista todos
-8. Staleness detection triggered correctly
-9. Cleanup filesystem preserves Engram metadata
-10. Tier 0 snapshot vs Tier 1 snapshot diff reflects cost + generation_method differences
+5. `/brand:diff v1 v2` → muestra diferencias de todos los deptos
+6. `/brand:rollback v1` → restaura correctly, backup del current preservado
+7. `/brand:show --list` → lista todos los snapshots con summary
+8. Staleness detection triggered cuando Validation updated post-snapshot
+9. Cleanup filesystem preserva Engram metadata
+10. `/brand:reproduce v1` → produce output con variance esperable, mismas decisiones estratégicas

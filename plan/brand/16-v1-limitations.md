@@ -7,18 +7,15 @@ Declarar **explícitamente** lo que Brand v1 NO cubre. La transparencia es una f
 
 ## 16.2 Limitaciones del approach
 
-### Dependencia de Claude Design para execution
+### Dependencia de Claude Design (gate de entrada)
 
 **Qué**: Brand v1 produce el brief optimizado, Claude Design produce los artefactos aplicados.
 
-**Implicación**: user necesita Claude Pro/Max/Team/Enterprise subscription para consumir nuestro output al 100%.
+**Implicación**: user **necesita** Claude Pro/Max/Team/Enterprise subscription para correr Brand. El pre-flight del orchestrator bloquea si no hay Claude Pro activo.
 
-**Workaround**:
-- User sin Claude subscription puede usar Brand Design Document PDF como brief para otros tools (Figma, Midjourney, human designer)
-- Brand Tokens folder funciona standalone (puede usarse en cualquier codebase)
-- Reference Assets son usables en cualquier tool
+**Sin workaround para el gate**: Brand no corre sin Claude Pro. Este es un design choice — Brand está optimizado end-to-end para Claude Design downstream.
 
-**Long-term**: cuando Anthropic expanda Claude Design o agregue free tier, esta limitation se reduce.
+**Long-term**: cuando Anthropic expanda Claude Design o agregue free tier, este gate se ajusta.
 
 ### Claude Design handoff es manual en v1
 
@@ -32,16 +29,16 @@ Declarar **explícitamente** lo que Brand v1 NO cubre. La transparencia es una f
 
 **Long-term**: cuando Anthropic ship Claude Design MCP, Handoff Compiler auto-invoca. Feature flag `--auto-setup` disponible.
 
-### Tier 0 degradación para symbolic logos
+### SVG generation para symbolic marks
 
-**Qué**: Claude native SVG generation es excelente para wordmarks pero limitado para symbolic marks abstractos complejos.
+**Qué**: Claude native SVG generation es excelente para wordmarks y marks geométricos simples. Limitada para ilustraciones orgánicas complejas o mascots dibujados.
 
-**Implicación**: si scope requiere `symbolic-first` o `icon-first`, Tier 0 produce quality lower. System auto-eleva a Tier 1 con user confirmation.
+**Implicación**: v1 sesga logo output hacia wordmark / lettermark / geometric marks. Si el scope demanda un mark orgánico fuerte (ilustración expresiva, mascota), el output flagea `organic_mark_requested_geometric_delivered: true` con nota al user.
 
 **Workaround**:
-- Auto-elevation prompt explicit
-- User puede declinar y proceder con Tier 0 acknowledging loss
 - User puede proveer own logo (manual mode)
+- User puede iterar el mark geometric entregado usando Claude Design para variaciones más orgánicas sobre la base
+- Hire illustrator con Brand Document como brief
 
 ### No generamos UI (por diseño, no por limitation)
 
@@ -73,7 +70,7 @@ Declarar **explícitamente** lo que Brand v1 NO cubre. La transparencia es una f
 
 ### Real photography (products, team, locations)
 
-**Out of scope v1**. Mood imagery (si tier ≥ 1) es stylized o curated stock (Unsplash), no photography real.
+**Out of scope v1**. Mood imagery refs (cuando scope los incluye) son curated stock via Unsplash free API (URLs + attribution), no photography real de productos/team/locations del user.
 
 ### Product mockups complejos
 
@@ -125,21 +122,20 @@ Declarar **explícitamente** lo que Brand v1 NO cubre. La transparencia es una f
 ### SVG generation quality
 
 **Limited**:
-- Claude native SVG (Tier 0): great para wordmarks, limited para symbolic abstracts
-- Recraft V4 (Tier 1+): excellent but ocasional artifacts posibles
-- Quality validation built-in pero no perfect
+- Claude native SVG: great para wordmarks y geometric marks, limited para organic abstracts / mascots
+- Quality validation built-in (XML parse, element count, palette compliance, 16px legibility) pero no perfect
+- Regenerate option disponible + manual upload como fallback
 
-**Workaround**: manual mode available + regenerate options
+### Tool dependencies
 
-### Free tier limits
+- **Engram MCP**: mandatory. Sin Engram, Brand no corre (hard halt).
+- **open-websearch MCP**: mandatory para TM screening + sentiment derivation. Graceful degrade si down (flags).
+- **Domain availability MCP**: mandatory para naming verification. Graceful degrade si down.
+- **Unsplash free API**: recommended (para mood refs cuando scope los pide). Graceful skip si down.
+- **PDF skill**: mandatory para Brand Document. Fallback a markdown si falla.
+- **Claude Pro subscription del user**: mandatory. Pre-flight halt si no disponible.
 
-- Stitch: N/A (salió del stack)
-- Huemint: free non-commercial → upgrade para launch comercial
-- Recraft: pay-per-use
-- Domain MCP: free, no limit
-- Claude Design: requires Pro+ subscription
-
-**Implication**: escalar requiere commercial licenses en Huemint + possibly Recraft budget growth.
+Todos los tools son gratuitos (free APIs y MCPs). El único costo recurring es la suscripción Claude Pro del user, no facturada por Hardcore.
 
 ## 16.9 Out-of-scope permanent
 
@@ -232,5 +228,5 @@ Ver [14-testing-strategy.md](./14-testing-strategy.md). Casos:
 3. Package README lista out-of-scope accurately per scope
 4. Brand Document PDF contains "Scope & Limitations" section
 5. User asks for packaging 3D via override → graceful rejection + alternatives
-6. User sin Claude subscription → guidance displayed
-7. Tier 0 symbolic request → auto-elevation prompt + honest about quality
+6. User sin Claude Pro → pre-flight halt con mensaje claro
+7. Scope requiere organic mark complejo → flag + manual-upload suggestion

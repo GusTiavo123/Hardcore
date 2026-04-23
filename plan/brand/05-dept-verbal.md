@@ -316,17 +316,13 @@ se genera via Claude Design usando los prompts del Library.
 ### Copy self-check falla persistently
 - Include con annotation "voice compliance low — review manually"
 
-## 5.10 SKILL.md a escribir en Sprint 0
+## 5.10 Archivos a escribir en Sprint 0
 
-`skills/brand/verbal/SKILL.md` con las 4 fases detalladas + asset list completa + self-check logic.
-
-## 5.11 Reference files a escribir en Sprint 0
-
+Para este depto:
+- `skills/brand/verbal/SKILL.md` — las 4 fases detalladas + asset list completa + self-check logic. **Incluye inline**: verification protocol (Domain MCP + TM screening queries por jurisdicción, parallelization), naming strategies per brand_profile, core copy matrix (qué assets per profile), voice application examples (do/don'ts concretos por archetype)
 - `skills/brand/verbal/references/data-schema.md`
-- `skills/brand/verbal/references/verification-protocol.md` — queries precisas por jurisdicción
-- `skills/brand/verbal/references/naming-strategies-by-profile.md`
-- `skills/brand/verbal/references/core-copy-matrix.md` — qué core assets por brand profile (reduced version)
-- `skills/brand/verbal/references/voice-application-examples.md` — ejemplos do/don'ts
+
+Los ejemplos do/don'ts genéricos per archetype (template-level, no idea-specific) están en `skills/brand/references/archetype-guide.md` a nivel orchestrator.
 
 ## 5.12 Testing
 

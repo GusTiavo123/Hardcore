@@ -47,7 +47,24 @@
       "Bash(__NEW_LINE_a3c1cbdebf8ea907__ echo:*)",
       "Bash(__NEW_LINE_11e698d47911e5ca__ echo:*)",
       "Bash(__NEW_LINE_8592083cdb8dcd1a__ echo:*)",
-      "Bash(head -5 echo \"\" echo \"NEW BizModel SKILL:\" grep \"model_score\\\\|business_model_score\\\\|bizmodel_score\" /c/Users/gus/Desktop/Hardcore/Idea-Validation/skills/hc-bizmodel/SKILL.md)"
+      "Bash(head -5 echo \"\" echo \"NEW BizModel SKILL:\" grep \"model_score\\\\|business_model_score\\\\|bizmodel_score\" /c/Users/gus/Desktop/Hardcore/Idea-Validation/skills/hc-bizmodel/SKILL.md)",
+      "Bash(du -sh /home/gda/hardcore/*)",
+      "Bash(find /home/gda/hardcore -type f -name *engram*)",
+      "Bash(find /home/gda/hardcore -type f \\\\\\(-name *mcp* -o -name *claude*config* -o -name *.engram* \\\\\\))",
+      "Bash(gh api:*)",
+      "Bash(./tools/engram sync:*)",
+      "Bash(./tools/engram export:*)",
+      "Bash(cat /home/gda/hardcore/.engram/chunks/*.gz)",
+      "Bash(zcat)",
+      "Bash(python3 -m json.tool)",
+      "Bash(./tools/engram stats:*)",
+      "Bash(./tools/engram search:*)",
+      "Bash(./tools/engram context:*)",
+      "Bash(gh repo:*)",
+      "Bash(mkdir -p skills/validation)",
+      "Bash(mkdir -p skills/profile)",
+      "mcp__engram__mem_context",
+      "Bash(find /home/gda/hardcore/testing/runs -name \"verdict.yaml\" -exec grep -l \"expected\" {} \\\\;)"
     ]
   },
   "enabledMcpjsonServers": [

@@ -193,8 +193,10 @@ Sub-agentes (no user-invocable directly).
 ### MCP configuration
 
 Nuevos MCPs en `.mcp.json`:
-- `imprvhub/mcp-domain-availability` (required Tier 0)
-- `merlinrabens/image-gen-mcp-server` (required Tier 1+)
+- `imprvhub/mcp-domain-availability` (required)
+
+Env var nueva:
+- `UNSPLASH_ACCESS_KEY` (free API key, gratis en unsplash.com/developers)
 
 User setup necesario — ver [11-tools-stack.md](./11-tools-stack.md).
 
@@ -228,7 +230,7 @@ Prefer separate módulos (`skills/brand-physical/`, etc.) vs extending Brand.
 
 ### Adding new tool
 
-Edit `skills/brand/references/version-compatibility.md` + relevant SKILL.md.
+Edit la sección tool version compatibility dentro de `skills/brand/SKILL.md` + el SKILL.md del dept relevante.
 
 ### Integrating Claude Design MCP (when released)
 

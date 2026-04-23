@@ -1,190 +1,143 @@
-# 11 — Stack de Tools (Tier-based)
+# 11 — Stack de Tools
 
 ## 11.1 Propósito
 
-Documentar cada tool/API/skill que Brand usa, con justificación explícita. Claude Design como downstream, image generation en 3 tiers para cost control.
+Documentar cada tool/API/skill que Brand usa, con justificación explícita. Stack 100% gratis a excepción de la suscripción de Claude Pro del user final (requerida para Claude Design downstream).
 
 **Principio de decisión**: agregar una herramienta cuando existe una operación genuinamente distinta, o un diferencial de calidad grande. No agregar "porque es mejor marginal".
 
-## 11.2 Stack por tier
+## 11.2 Stack completo
 
-### Tier 0 — DEFAULT (zero cost)
+| Capacidad | Tool | Costo | Setup |
+|---|---|---|---|
+| Persistencia + memoria | Engram MCP | Free | Ya instalado |
+| Web search general | open-websearch MCP | Free | Ya instalado |
+| PDF generation | `ms-office-suite:pdf` skill | Free | Ya disponible |
+| Domain availability | `imprvhub/mcp-domain-availability` | Free | `uvx` one-liner |
+| Trademark screening | open-websearch sobre USPTO TESS + WIPO Global Brand Database | Free | — |
+| Mood imagery references | Unsplash free API | Free (commercial-safe con attribution) | API key gratis |
+| Logo SVG generation | Claude native | Incluido en subscription | — |
+| Palette generation | Claude native (color theory reasoning) | Incluido | — |
+| Typography pairing | Claude native + Google Fonts catalog | Free | — |
+| Claude reasoning | Claude Pro/Max/Team/Enterprise | Suscripción user | User account |
+| **Downstream**: UI execution | **Claude Design** (claude.ai/design) | Incluido en Claude Pro+ | Cuenta Pro+ activa |
 
-Para: dogfooding, early stage, vos mismo usando Hardcore.
-
-| Capacidad | Tool | Costo |
-|---|---|---|
-| Persistencia memoria | Engram MCP | Free |
-| Web search (TM screening) | open-websearch MCP | Free |
-| PDF generation | `ms-office-suite:pdf` skill | Free |
-| Domain availability | `imprvhub/mcp-domain-availability` | Free |
-| Logo SVG generation (wordmarks) | Claude native | Free |
-| Palette generation | Claude native (color theory reasoning) | Free |
-| Typography pairing | Claude native + Google Fonts catalog | Free |
-| Mood imagery | **Skipped** (usa description en Brand Document) | Free |
-| Claude reasoning | Claude subscription | Included |
-| **Downstream execution** | **Claude Design** (requires Pro/Max/Team/Enterprise) | Included in subscription |
-
-**Total cost/run: ~$0.00**
-
-### Tier 1 — Leveled up (cuando scope lo requiere o user opta)
-
-Agrega (vs Tier 0):
-
-| Capacidad | Tool | Costo |
-|---|---|---|
-| Symbolic logo generation | **Recraft V4** via `merlinrabens/image-gen-mcp-server` | $0.04/img × 3-5 = $0.12-0.20 |
-| Mood imagery references | **Unsplash API** (free 50req/h demo) | Free |
-| Palette ML | **Huemint API** (free non-commercial) | Free en early stage |
-
-**Total cost/run: ~$0.10-0.20**
-
-**Cuándo se activa**:
-- Auto-elevation: `scope.logo_primary_form: symbolic-first` o `icon-first`
-- User override: `/brand:new --tier=1`
-
-### Tier 2 — Premium
-
-Agrega (vs Tier 1):
-
-| Capacidad | Tool | Costo |
-|---|---|---|
-| Logo completo via Recraft | Recraft V4 para todos los logos + variants + derivations | $0.04 × 10-20 = $0.40-0.80 |
-| Mood imagery generated | Recraft V4 | $0.04 × 6-8 = $0.24-0.32 |
-| Huemint paid tier | Commercial license | ~$10-50/mo estimated |
-
-**Total cost/run: ~$0.40-0.80 + subscription Huemint**
-
-**Cuándo se activa**: user override `/brand:new --tier=2`
+**Costo total del módulo por run: $0.00.** Único costo es la suscripción Claude Pro del user (requerida como gate por ser el downstream obligatorio).
 
 ## 11.3 Tools existentes (ya en Hardcore)
 
 ### Engram MCP
-- **Uso**: persistencia cross-session, retrieval de Validation + Profile
-- **Justificación**: core del ecosystem Hardcore
+- **Uso**: persistencia cross-session, retrieval de Validation + Profile, snapshots pre-run, save de cada dept output
+- **Justificación**: core del ecosystem Hardcore, ya usado por Validation y Profile
 - **Reference**: `skills/_shared/engram-convention.md`
+- **Consumo Brand**: ver `skills/_shared/brand-contract.md` para los topic keys que lee Brand
 
 ### open-websearch MCP
-- **Uso**: trademark screening (Verbal Fase B Paso 4)
-- **Justificación**: existente en el repo, suficiente para screening preliminar
-- **Limitación**: no sustituye trademark search API profesional (disclaimer obligatorio)
+- **Uso**:
+  - Trademark screening (Verbal Fase B): queries sobre USPTO TESS + WIPO Global Brand Database
+  - Sentiment landscape derivation (Strategy, Gate 0): queries sobre sentiment en competitive landscape
+  - Research general cuando Strategy necesita context de mercado adicional
+- **Justificación**: existente, suficiente para screening preliminar y web research
+- **Limitación**: no sustituye trademark search API profesional. Disclaimer obligatorio en la Verbal dept output: "Screening preliminar, no reemplaza asesoría legal".
 
 ### `ms-office-suite:pdf` skill
-- **Uso**: generación del Brand Design Document PDF (Handoff Compiler Paso 2)
-- **Justificación**: skill existente, no hay necesidad de agregar otro tool
+- **Uso**: generación del Brand Design Document PDF (Handoff Compiler)
+- **Justificación**: skill existente, no necesitamos agregar librería
+- **Fallback si falla**: Handoff Compiler entrega `.md` + instrucciones para conversión manual
 
-## 11.4 Tools nuevas — Tier 0
+## 11.4 Tools nuevas
 
-### Claude native SVG generation (logo + mood description)
+### Claude native — SVG, palette, typography
 
-**Uso**: Logo dept (wordmarks y simple combinations), Visual dept (palette reasoning, typography, principles).
+**Uso**:
+- **Logo dept**: wordmarks, lettermarks, simple combinations, abstract marks geométricos — todos via SVG markup generado por Claude
+- **Visual System**: palette derivation (color theory + archetype seeds), typography pairing con Google Fonts catalog, mood principles en texto
+- **Handoff Compiler**: templating del Brand Document, prompts library, tokens
 
 **Justificación**:
-- Claude escribe SVG markup válido directamente
+- Claude escribe SVG markup válido directamente en el output, revisable y editable
 - Zero cost — uses existing Claude subscription
-- Editable output (SVG is text)
-- Sufficient quality para wordmarks y simple geometric marks
+- Resultado es texto (vector) — reproducible, versionable, sin binarios
+- Quality suficiente para wordmarks y marks geométricos razonables
 
-**Limitación**: complex abstract symbols son más difíciles — Tier 1+ usa Recraft para symbolics.
+**Limitación**: abstract symbols orgánicos complejos son más difíciles de lograr con SVG directo. V1 sesga el logo primary form hacia wordmark/lettermark/geometric (ver 07-dept-logo.md). Casos que requieran ilustración compleja quedan fuera de scope v1.
 
-**Implementation**: prompt structure con ejemplos + templates (see `skills/brand/logo/references/claude-svg-templates.md` a escribir en Sprint 0).
+**Implementation**: prompt templates con ejemplos + constraint list en `skills/brand/logo/references/svg-templates.md` (Sprint 0).
 
 ### `imprvhub/mcp-domain-availability`
 
-**Uso**: Verbal Identity Fase B Paso 3 (domain verification).
+**Uso**: Verbal Identity Fase B (domain verification) — chequear availability de 3-5 dominios candidatos por naming shortlist.
 
 **Justificación**:
-- 50+ TLDs
+- 50+ TLDs cubiertos
 - Verificación dual (DNS + WHOIS)
-- Bulk checking (10-12 candidatos simultáneos)
+- Bulk checking (hasta ~12 candidatos simultáneos)
 - Zero-clone install via `uvx`
 - Free, sin API key
 
 **Setup user** (necesario antes de Sprint 1):
 1. `uvx --from imprvhub/mcp-domain-availability domain-mcp`
-2. Configurar MCP en Claude Code settings
+2. Configurar MCP en Claude Code settings (`.mcp.json`)
 
 **Reference**: [imprvhub/mcp-domain-availability](https://github.com/imprvhub/mcp-domain-availability)
 
-## 11.5 Tools Tier 1
+**Fallback si down**: skip verification, flag explícito en output (`"domain_availability_checked": false`), continuar pipeline sin bloquear.
 
-### Recraft V4 via `merlinrabens/image-gen-mcp-server`
+### Unsplash free API — mood imagery references
 
-**Uso** (Tier 1): logos simbólicos solo (cuando scope lo requiere).
-**Uso** (Tier 2): todos los logos + mood imagery.
-
-**Justificación Recraft V4**:
-- **#1 en benchmarks de HuggingFace para logos** en 2026
-- **SVG vector nativo** — crítico para logos editables
-- Logo-specialized training + built-in brand styling tools
-- Costo: $0.04/imagen — mismo rango que DALL-E 3 pero specialized
-
-**Justificación MCP multi-provider**:
-- Permite swap de providers via env vars sin cambiar código
-- Mantiene flexibilidad si en futuro queremos Flux 2 Pro para mood específico
-
-**Setup user** (necesario solo si elevates a Tier 1+):
-1. Crear cuenta en platform.recraft.ai
-2. Obtener API key ($10-20 de crédito inicial alcanza)
-3. Install: `npm install -g @merlinrabens/image-gen-mcp-server` (o similar)
-4. Env: `RECRAFT_API_KEY` + `IMAGE_GEN_PROVIDER=recraft`
-
-**Reference**: [merlinrabens/image-gen-mcp-server](https://github.com/merlinrabens/image-gen-mcp-server)
-
-### Unsplash API
-
-**Uso** (Tier 1): mood imagery references curated.
+**Uso**: Visual System (mood section) — fetch de 3-6 imágenes de referencia que inspiran el mood visual, NO para uso directo en brand assets. El Brand Document y Reference Assets folder citan estas imágenes con Unsplash URL + attribution string.
 
 **Justificación**:
-- 5M+ fotos HD
-- Free tier: 50 req/h demo, 5000 req/h production
-- No API key needed para demo tier (hack: direct public URLs)
-- Attribution fácil de documentar
+- Free API con tier demo usable sin infra
+- Commercial use permitido con attribution (no viola ToS cuando Hardcore monetice)
+- 5M+ fotos HD con curación decente
+- API key gratis en minutos
 
-**Setup user**: no mandatory setup (direct URL fetching funciona). Si scale high, register app.
+**Setup user**: registrar app gratis en unsplash.com/developers, obtener `UNSPLASH_ACCESS_KEY`. Configurar en `.env`.
 
-**Alternativa**: Pexels API (similar, no attribution display required).
+**Uso técnico**: queries construidas por Visual dept basadas en `mood_keywords` derivados del archetype + scope. Ej: "minimal, architectural, monochrome" → Unsplash API → top 3-6 resultados → URLs + attribution strings guardados en Brand outputs.
 
-### Huemint API
+**Limitación**: solo 50 req/h en tier demo (más que suficiente; un run usa 3-6 queries). Tier production (5000 req/h) está a 1 click si alguna vez escala.
 
-**Uso** (Tier 1+): palette ML generation.
+**Fallback si down**: skip mood imagery, Brand Document describe el mood en prosa sin imagery refs. Pipeline no se bloquea.
+
+### Trademark screening — open-websearch sobre USPTO TESS + WIPO Global Brand Database
+
+**Uso**: Verbal Identity Fase B — screening preliminar de conflictos de marca para top 3 naming candidates.
 
 **Justificación**:
-- ML-based (Transformer + Diffusion)
-- Modo "brand-intersection" específico para branding
-- API HTTP simple — no MCP needed
-- Free para uso non-commercial
+- USPTO TESS (Trademark Electronic Search System) es público y web-accesible, no requiere API key
+- WIPO Global Brand Database es público y web-accesible, cubre >65 jurisdicciones
+- open-websearch construye queries structured contra esas URLs y parsea resultados
 
-**Setup user**: no API key para free tier.
+**Implementación**: Verbal dept construye queries estandarizadas (ej. `site:tmsearch.uspto.gov "{name}"` y `site:branddb.wipo.int "{name}"`) y usa open-websearch para ejecutar. Matches se surface con link al registro público + disclaimer de que es screening preliminar.
 
-**Consideración license**: free tier es non-commercial. Para launch comercial requiere upgrade (ver [22-open-decisions.md](./22-open-decisions.md)).
+**Limitación**: screening ≠ clearance legal. Brand output incluye disclaimer permanente: *"Trademark search is a preliminary signal, not legal clearance. Consult a trademark attorney before commercial launch."*
 
-**Reference**: [huemint.com](https://huemint.com/)
+**Fallback si open-websearch down**: skip TM screening, flag `trademark_screened: false`, continuar con warning explícito al user.
 
-## 11.6 Tools Tier 2 (premium)
+## 11.5 Downstream: Claude Design (no es parte del stack técnico, pero es gate)
 
-Mismas que Tier 1 pero con:
-- Huemint paid tier (commercial license)
-- Recraft V4 usado para mood imagery + logos wordmark además de symbolic
-- Mayor budget de image generations
+**Claude Design no es un tool en nuestro stack** — es el downstream layer donde el user ejecuta la identidad visual usando el Brand Design Document como input.
 
-## 11.7 Downstream: Claude Design (no en nuestro stack técnico, pero crítico)
-
-**Claude Design no es un tool en nuestro stack**. Es el downstream layer que consume nuestro output.
-
-**Status en 2026-04**:
-- Web app en `claude.ai/design`
-- Incluido en Pro/Max/Team/Enterprise subscriptions
-- No expone API/MCP actualmente (Anthropic anunció integrations "coming in weeks")
+**Status (2026-04)**:
+- Web app en `claude.ai/design` (lanzada 2026-04-17 por Anthropic Labs)
+- Incluida en Claude Pro, Max, Team y Enterprise (NO disponible en Free)
+- Acepta PDF, PowerPoint, screenshots, logos, codebases como input
+- No expone API/MCP todavía; integrations anunciadas "over coming weeks"
 
 **Nuestra dependencia**:
-- V1: user hace handoff manual (upload PDF, paste prompts)
-- V2 (cuando Anthropic ship API): Handoff Compiler auto-invoca Claude Design
+- V1: user hace handoff manual (upload del PDF Brand Design Document + paste de prompts de la Prompts Library + upload de Reference Assets)
+- V2 (cuando Anthropic ship API/MCP): Handoff Compiler auto-invoca Claude Design sin intervención manual
 
-## 11.8 Stack summary en formato dependency
+**Gate en pre-flight**: el orchestrator verifica que el user tenga Claude Pro+ antes de arrancar. Sin subscription, halt con mensaje:
+
+> *"Brand requires Claude Design access. Claude Design is available on Claude Pro, Max, Team, or Enterprise subscriptions. Upgrade at claude.ai/upgrade and re-run."*
+
+## 11.6 Stack en formato dependency
 
 ```yaml
-# Tier 0 (default) — all that's strictly needed
+# Obligatorias
 engram_mcp:
   required: yes
   already_setup: yes
@@ -198,128 +151,101 @@ pdf_skill:
   already_setup: yes
 
 domain_availability_mcp:
-  required: yes (for naming verification)
+  required: yes
   setup_user: uvx imprvhub/mcp-domain-availability
+  install_time: ~2 min
+
+unsplash_free_api:
+  required: yes
+  setup_user: register app at unsplash.com/developers (free, instant)
+  env_var: UNSPLASH_ACCESS_KEY
 
 claude_subscription:
   required: yes
-  includes: Claude Design access (downstream), reasoning, SVG generation
-
-# Tier 1 — user opts in or scope requires
-recraft_via_image_gen_mcp:
-  required_if: tier >= 1 AND scope requires symbolic logo
-  setup_user: Recraft account + API key + npm MCP install
-
-unsplash_api:
-  required_if: tier >= 1 AND scope requires mood imagery
-  setup_user: none (free tier direct URL access)
-
-huemint_api:
-  required_if: tier >= 1 AND palette ML wanted
-  setup_user: none (non-commercial free)
-
-# Tier 2 — premium
-recraft_full_usage:
-  required_if: tier == 2
-  setup_user: same as Tier 1 + higher credit budget
-
-huemint_paid:
-  required_if: tier == 2 AND commercial launch
-  setup_user: contact Huemint for commercial license
+  tier: Pro | Max | Team | Enterprise
+  includes:
+    - Claude Design access (downstream, mandatory)
+    - Claude reasoning (SVG gen, palette, typography, copy)
 ```
 
-## 11.9 Tool usage per depto
+## 11.7 Tool usage per depto
 
-| Depto | Tier 0 tools | Tier 1 tools (additive) | Tier 2 tools (additive) |
-|---|---|---|---|
-| Orchestrator | Engram | — | — |
-| Scope Analysis (inline) | Engram + Claude native | — | — |
-| Strategy | Engram + Claude native | — | — |
-| Verbal Identity | Engram + domain MCP + open-websearch + Claude native | — | — |
-| Visual System | Engram + Claude native (palette + type) | + Huemint (palette ML) + Unsplash (mood refs) | + Recraft (mood generated) + Huemint paid |
-| Logo & Key Visuals | Engram + Claude native (SVG) | + Recraft (symbolic) | + Recraft everywhere |
-| Handoff Compiler | Engram + pdf skill + Claude native (templating) | — | — |
+| Depto | Tools usados |
+|---|---|
+| Orchestrator | Engram |
+| Scope Analysis (sub-agent) | Engram + Claude native |
+| Strategy | Engram + Claude native + open-websearch (para sentiment derivation cuando competitive data es insuficiente) |
+| Verbal Identity | Engram + Claude native + Domain MCP + open-websearch (para TM screening) |
+| Visual System | Engram + Claude native + Unsplash free API (mood refs) |
+| Logo & Key Visuals | Engram + Claude native (SVG) |
+| Handoff Compiler | Engram + pdf skill + Claude native (templating) |
 
-## 11.10 Total cost per run (resumen)
+## 11.8 Cost summary
 
-Ver [17-cost-and-timing.md](./17-cost-and-timing.md) para breakdown detallado.
+**Por run del módulo Brand: $0.00 en APIs externas.**
 
-Resumen:
-- **Tier 0**: ~$0.00/run
-- **Tier 1**: ~$0.10-0.20/run
-- **Tier 2**: ~$0.40-0.80/run
+El único costo asociado es la suscripción Claude Pro+ del user, que es gate obligatorio (no facturable por Hardcore; es cuenta del user).
 
-## 11.11 Fallbacks si un tool está down
+Ver [17-cost-and-timing.md](./17-cost-and-timing.md) para breakdown por dept + timing estimates.
 
-Ver [13-failure-modes.md](./13-failure-modes.md). Summary:
+## 11.9 Fallbacks si un tool está down
+
+Ver [13-failure-modes.md](./13-failure-modes.md) para protocolo completo. Resumen:
 
 | Tool down | Fallback |
 |---|---|
-| Domain MCP | Skip verification, warn user |
-| open-websearch | Skip TM screening, flag |
-| pdf skill | Deliver package con markdown brand-book.md instead |
-| Recraft (Tier 1+) | Degrade to Claude native (Tier 0 behavior) |
-| Unsplash (Tier 1) | Skip mood imagery, use Brand Document description only |
-| Huemint (Tier 1+) | Fallback to Claude-generated palette |
+| Engram | HALT — dependencia crítica, no hay workaround |
+| Domain MCP | Skip verification, flag `domain_availability_checked: false`, continuar |
+| open-websearch | Skip TM screening y sentiment derivation externa, flag explícito, continuar con heurísticas de Strategy |
+| pdf skill | Entregar Brand Document como `.md`, instrucciones de conversión manual para el user |
+| Unsplash | Skip mood imagery refs, Brand Document describe mood en prosa sin imágenes |
 
-## 11.12 Tool version tracking
+El pipeline nunca se bloquea por tool failure salvo Engram (sin persistencia no podemos continuar). Los fallbacks producen outputs degradados pero funcionales.
 
-Cada run graba en `evidence_trace`:
+## 11.10 Tool version tracking
+
+Cada run graba en el envelope `evidence_trace` la versión de cada tool usada para reproducibilidad:
 
 ```json
 {
   "tool_versions": {
-    "tier_used": 0,
-    "recraft_model": null,
-    "huemint_api": null,
-    "unsplash_api": null,
-    "domain_availability_mcp": "2.1.0",
-    "pdf_skill": "1.2",
+    "engram_mcp": "X.Y.Z",
+    "open_websearch_mcp": "X.Y.Z",
+    "domain_availability_mcp": "X.Y.Z",
+    "unsplash_api_tier": "free-demo | free-production",
+    "pdf_skill": "X.Y",
     "claude_model": "claude-opus-4-7"
   }
 }
 ```
 
-## 11.13 Cambios posibles post-v1
+## 11.11 Cambios posibles post-v1
 
-### Candidatos para v2
-
-**Claude Design MCP** (when Anthropic ship it):
-- Integración automática de Handoff → Claude Design
+### Claude Design MCP/API (cuando Anthropic ship it)
+- Integración automática Handoff → Claude Design
 - Zero user friction
 - Major upgrade del workflow
+- Spec se actualiza en 08-dept-handoff-compiler.md sin romper outputs existentes
 
-**Ideogram 3.0** para wordmarks text-heavy:
-- Solo si detectamos Recraft V4 wordmarks subpar en casos específicos
-- Costo adicional ~$0.04/img
-
-**USPTO TSDR API** para rigor legal:
-- Cuando Hardcore tenga users pagos
+### USPTO TSDR API oficial (si algún día lo valoramos)
 - API key gratis, 60 req/min
+- Más estructurada que screening via open-websearch
+- Opción solo si screening via web search resulta insuficiente en dogfooding
 
-**Módulos futuros con capabilities nuevas**:
+### Módulos futuros con capabilities nuevas
 - Brand-Physical (packaging + print CMYK)
-- Brand-Motion (after-effects templates)
-- Brand-Sonic (Suno/Stable Audio integration)
+- Brand-Motion (animations, video)
+- Brand-Sonic (audio identity)
 
-## 11.14 Acceptance criteria del stack (para Sprint 1)
+Estos son post-v1 y no afectan el stack actual.
 
-### Tier 0 readiness
-- [ ] Domain availability MCP installed + tested
-- [ ] Claude Design account accessible (for testing downstream workflow)
-- [ ] pdf skill functional
-- [ ] open-websearch tested for TM queries
-- [ ] Failure mode tests Tier 0
+## 11.12 Acceptance criteria del stack (para Sprint 1)
 
-### Tier 1 readiness (if user opts in)
-- [ ] Recraft account + API key
-- [ ] Image gen MCP installed
-- [ ] Unsplash API accessible
-- [ ] Huemint API accessible
-- [ ] Failure mode tests Tier 1
-
-### Downstream integration (Claude Design manual v1)
-- [ ] Brand Design Document PDF upload tested en Claude Design onboarding
-- [ ] Prompts Library usable en Claude Design chat
-- [ ] Brand Tokens folder recognized when linked (if user tests codebase linking)
-- [ ] Reference Assets subibles como visual references
+- [ ] Engram ya funcional (compartido con Validation y Profile)
+- [ ] open-websearch ya funcional
+- [ ] pdf skill testeada emitiendo un Brand Document sample
+- [ ] Domain availability MCP instalado y testeado con 3-5 dominios
+- [ ] Unsplash API key configurada en `.env`
+- [ ] Claude Design account accesible (user tiene Pro+ activo) y testeado manualmente subiendo un PDF sample al design system setup
+- [ ] Trademark screening ejecutable via open-websearch (USPTO TESS + WIPO Global Brand Database URLs responden)
+- [ ] Failure mode tests pasando para cada tool (simular each-one-down)
