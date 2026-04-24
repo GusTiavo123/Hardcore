@@ -15,6 +15,24 @@
         "./tools/node_modules/open-websearch/build/index.js"
       ],
       "env": {}
+    },
+    "domain-availability": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "imprvhub/mcp-domain-availability",
+        "domain-mcp"
+      ],
+      "env": {},
+      "description": "Domain availability checker used by Brand Verbal Identity. Install via 'uvx --from imprvhub/mcp-domain-availability domain-mcp'. Free, no API key required. Covers 50+ TLDs. Used for bulk availability checks on naming shortlists."
+    }
+  },
+  "env": {
+    "UNSPLASH_ACCESS_KEY": {
+      "description": "Unsplash free API key (demo tier OK). Used by Brand Visual System for mood imagery refs. Register at unsplash.com/developers. 50 req/h on demo tier (far more than a Brand run needs). Visual gracefully degrades if missing/down — flag mood_imagery_skipped: true.",
+      "required_for": "brand",
+      "optional": true
     }
   }
 }

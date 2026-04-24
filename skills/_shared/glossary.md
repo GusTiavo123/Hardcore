@@ -68,3 +68,39 @@ When counting regulatory frameworks for the Regulatory & Legal sub-dimension:
 | Medical licensing (per jurisdiction) | Barrier (1.0) | Requires jurisdiction-by-jurisdiction legal work |
 
 **Override rule**: If your search finds commercial compliance-as-a-service for a framework listed as "Barrier," reclassify it as Navigable and cite the evidence. Conversely, if a "Navigable" framework has had recent enforcement actions with no compliance tool update, consider reclassifying as Barrier.
+
+## Brand Profile (Brand Module — Classification)
+
+A **brand profile** is a canonical configuration that groups the typical decisions for a type of idea: which outputs are `required`, which to `skip`, which intensity modifiers apply by default, which archetypes work vs. don't. See `skills/brand/references/brand-profiles.md` for the 8 canonical profiles.
+
+Not to be confused with **founder profile** (`skills/profile/SKILL.md`), which is the user's profile.
+
+## Archetype (Brand Module — Strategy)
+
+One of the 12 Jungian brand archetypes (Innocent, Sage, Explorer, Outlaw, Magician, Hero, Lover, Jester, Everyman, Caregiver, Ruler, Creator). Strategy locks one per run with rationale. See `skills/brand/references/archetype-guide.md`.
+
+## Sentiment Landscape (Brand Module — Cross-Module Signal)
+
+A descriptor derived by Strategy from `validation/competitive` + `validation/market` signals. Values: `trust_heavy`, `disruption_ready`, `saturation_neutral`, `low_trust_context`, `mixed`, `insufficient_data`. Used as input to Coherence Gate 0 (archetype ↔ market fit). Not a field written by Validation — it is a Brand-derived projection.
+
+## Intensity Modifiers (Brand Module — Scope)
+
+Fine modulators emitted by Scope Analysis that downstream Brand depts consume for tone/format/volume calibration: `verbal_register`, `copy_depth`, `visual_formality`, `logo_primary_form`, `typography_era`, `social_presence_priority`, `app_asset_criticality`, `print_needs`, `sonic_needs`, `motion_needs`. See `skills/brand/scope-analysis/SKILL.md` for derivation rules.
+
+## Voice Precedence (Brand Module — Arbitration)
+
+When archetype, scope.verbal_register, and founder profile voice preference conflict, the arbitration order is:
+
+1. **Archetype** (primary) — establishes voice baseline
+2. **Scope.verbal_register** (constraint) — modulates within archetype-compatible range
+3. **Profile** (modifier) — annotation only, never overrides 1–2 when in conflict
+
+See `skills/_shared/brand-contract.md` for the full rule.
+
+## Coherence Gates (Brand Module — Quality Enforcement)
+
+9 cross-dept coherence checks (G0–G8) enforced by Handoff Compiler as fail-fast gates before delivery. Criticality varies per brand profile. See `skills/brand/references/coherence-rules.md`.
+
+## Output Manifest (Brand Module — Scope Contract)
+
+Per-scope list of outputs (Brand Document sections, Prompts Library items, Brand Tokens files, Reference Assets) marked as `required | optional_recommended | skip | out_of_scope_declared`. Emitted by Scope Analysis, consumed by all downstream Brand depts and Handoff Compiler.

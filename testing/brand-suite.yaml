@@ -1,0 +1,138 @@
+version: "1.0"
+description: "Brand module test suite — 8 curated ideas, one per canonical brand profile."
+
+brand_test_ideas:
+  - id: "brand-test-b2b-enterprise"
+    text: "Enterprise security platform for Fortune 500 financial institutions, providing real-time compliance monitoring across regulatory frameworks (SOX, GDPR, PCI-DSS)."
+    expected_brand_profile: "b2b-enterprise"
+    expected_archetype_range: ["Sage", "Ruler", "Hero"]
+    required_outputs_include:
+      - "pitch_deck_prompt"
+      - "case_study_prompt"
+      - "security_page_prompt"
+      - "linkedin_post_templates"
+    must_skip:
+      - "tiktok_post"
+      - "app_icon_full_set"
+      - "instagram_post"
+    priority: "medium"
+
+  - id: "brand-test-b2b-smb"
+    text: "Software de facturación y gestión de cobros automatizado para freelancers de tecnología en LATAM, con integración tributaria MX/CO/AR."
+    expected_brand_profile: "b2b-smb"
+    expected_archetype_range: ["Sage", "Everyman", "Creator", "Hero"]
+    required_outputs_include:
+      - "pricing_page_prompt"
+      - "linkedin_company_bio"
+      - "email_welcome_prompt"
+      - "blog_post_template"
+    must_skip:
+      - "tiktok_post"
+      - "pitch_deck_full"
+      - "app_icon_full_set"
+    priority: "high"
+    dogfooding_subset: true
+
+  - id: "brand-test-b2d-devtool"
+    text: "CLI tool that auto-generates interactive API docs from TypeScript codebases, with team collaboration and hosted docs portal."
+    expected_brand_profile: "b2d-devtool"
+    expected_archetype_range: ["Creator", "Magician", "Sage", "Explorer"]
+    required_outputs_include:
+      - "github_readme_prompt"
+      - "docs_landing_prompt"
+      - "code_snippet_styling_prompt"
+      - "cli_help_seed"
+    must_skip:
+      - "pitch_deck_full"
+      - "tiktok_post"
+      - "app_icon_full_set"
+    priority: "medium"
+
+  - id: "brand-test-b2c-consumer-app"
+    text: "Mobile app for habit tracking with gamification, targeted at young professionals who want to build routines."
+    expected_brand_profile: "b2c-consumer-app"
+    expected_archetype_range: ["Jester", "Hero", "Everyman", "Creator"]
+    required_outputs_include:
+      - "app_store_listing_prompt"
+      - "instagram_post_templates"
+      - "tiktok_cover_prompt"
+      - "app_icon_full_set"
+    must_skip:
+      - "pitch_deck_full"
+      - "case_study_prompt"
+      - "whitepaper"
+    priority: "high"
+    dogfooding_subset: true
+
+  - id: "brand-test-b2c-consumer-web"
+    text: "Web platform for curated vintage clothing resale."
+    expected_brand_profile: "b2c-consumer-web"
+    expected_archetype_range: ["Creator", "Lover", "Explorer", "Everyman"]
+    required_outputs_include:
+      - "instagram_post_templates"
+      - "newsletter_template_prompt"
+      - "referral_visuals_prompt"
+    must_skip:
+      - "app_icon_full_set"
+      - "pitch_deck_full"
+      - "case_study_prompt"
+    priority: "medium"
+
+  - id: "brand-test-b2local-service"
+    text: "Barbershop premium en Palermo, Buenos Aires — servicio personalizado + productos de cuidado."
+    expected_brand_profile: "b2local-service"
+    expected_archetype_range: ["Everyman", "Ruler", "Caregiver", "Sage"]
+    required_outputs_include:
+      - "whatsapp_templates"
+      - "google_my_business_copy"
+      - "printable_flyer_prompt"
+      - "business_card_prompt"
+    must_skip:
+      - "pitch_deck_full"
+      - "tiktok_post"
+      - "github_readme_prompt"
+    priority: "high"
+    dogfooding_subset: true
+
+  - id: "brand-test-content-media"
+    text: "Weekly newsletter + podcast sobre product strategy y growth para startup founders LATAM."
+    expected_brand_profile: "content-media"
+    expected_archetype_range: ["Sage", "Creator", "Explorer"]
+    required_outputs_include:
+      - "podcast_cover_prompt"
+      - "newsletter_template_prompt"
+      - "social_post_series_prompt"
+      - "author_bio"
+    must_skip:
+      - "pitch_deck_full"
+      - "pricing_page_formal"
+      - "app_icon_full_set"
+    priority: "medium"
+
+  - id: "brand-test-community-movement"
+    text: "Comunidad online de mujeres founders tech en LATAM — Discord + eventos mensuales + mentoring 1:1."
+    expected_brand_profile: "community-movement"
+    expected_archetype_range: ["Hero", "Caregiver", "Rebel", "Everyman"]
+    required_outputs_include:
+      - "manifesto_opening"
+      - "symbolic_assets_prompt"
+      - "discord_branding_prompt"
+      - "recruiting_copy"
+    must_skip:
+      - "pricing_page_enterprise"
+      - "app_icon_full_set"
+      - "case_study_prompt"
+    priority: "medium"
+
+# Dogfooding subset — first 3 profiles to exercise end-to-end before full coverage
+dogfooding_subset:
+  - "brand-test-b2b-smb"
+  - "brand-test-b2c-consumer-app"
+  - "brand-test-b2local-service"
+
+# Testing approach notes
+notes:
+  - "No numeric quality gate. Shipping criterion is founder approval via qualitative review."
+  - "Coherence gates are binary (pass/fail) — these ARE automated."
+  - "Variance between runs is tracked as data, not as a shipping gate."
+  - "The 5 non-dogfooding profiles are run when real cases appear OR during the full coverage pass."
