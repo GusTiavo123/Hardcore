@@ -587,13 +587,320 @@ Prompts are included per `scope.output_manifest.prompts_library.required + optio
 **Before building**: Propose 4 email template directions.
 ```
 
+#### Welcome email (universal — single email, more granular than sequence above)
+
+```markdown
+### Welcome email template
+
+**Goal**: First email after signup — set relationship tone for {BRAND_NAME}.
+
+**Layout**:
+- Plaintext-first but HTML-supported
+- Short subject line
+- Personal greeting
+- 1-2 paragraphs body
+- Clear single CTA
+- Signature block
+
+**Content**:
+- Subject: short, specific — not clickbait
+- Greeting: "Hola {{first_name}}," or English equivalent
+- Body: welcome + what to expect + next step (use {ABOUT_SHORT} as anchor)
+- CTA: primary action user should take
+- Signature: founder name + title with link to brand
+
+**Audience**: Just-signed-up users in their inbox. Competing with 50 other emails.
+
+**Voice**: {VOICE_ATTRIBUTES}. Human, not corporate. Short sentences.
+
+**Design**: Apply design system. Email-safe HTML. Inline styles. Logo from reference-assets/logo/primary.png.
+
+**Before building**: Propose 4 email directions (each as: tone pattern / CTA prominence / length — one-line rationale), then ask me to pick one.
+```
+
+---
+
+### Newsletter / Recurring Content — `content-media`
+
+#### Newsletter template (weekly edition)
+
+```markdown
+### Email newsletter template (weekly edition)
+
+**Goal**: Branded newsletter template that reads well in Gmail/Outlook on mobile + desktop. Repeatable weekly.
+
+**Layout** (HTML email-safe):
+- Header: {BRAND_NAME} + issue number + date
+- Hero: episode/issue headline
+- Main content block (markdown-renderable)
+- 2-3 secondary sections (e.g., "Reading this week", "Quick thoughts", "Quote of the week")
+- CTA (subscribe / share / reply)
+- Footer: unsubscribe, archive, social links
+
+**Content system**:
+- Template master with `{{placeholders}}` for each weekly section
+- Subject line pattern: "{Issue topic} → {hook}"
+- Preview text pattern: first 50-120 chars complementing subject
+
+**Audience**: Subscribers in their inbox. Mix of desktop/mobile readers. Competing with 50+ other emails.
+
+**Voice**: {VOICE_ATTRIBUTES}. Personal — this is not corporate email. Direct address ("you").
+
+**Design**: Apply design system. Email-safe constraints:
+- Inline CSS (no external stylesheets)
+- Logo as PNG (SVG unreliable in Outlook)
+- Single column primary layout (mobile-first)
+- Web-safe font fallbacks
+- Dark mode considerations
+
+**Before building**: Propose 4 newsletter directions (each as: density pattern / imagery usage / section structure — one-line rationale), then ask me to pick one.
+```
+
+#### Video thumbnails series (YouTube 1280×720)
+
+```markdown
+### YouTube video thumbnail template series
+
+**Goal**: Consistent branded thumbnail system for recurring video content. Each episode customizable but brand-coherent.
+
+**Layout** (1280×720 YouTube standard):
+- Template structure:
+  - Left 60%: dominant element (host face / illustration / text)
+  - Right 40%: episode-specific text (short — 4-6 words)
+  - Brand element (logo or signature color block) in consistent corner
+- Variants for content types (educational, interview, reaction, etc.)
+
+**Content system**:
+- Template master with placeholders: `[HOST PHOTO]` `[EPISODE TITLE]` `[EPISODE NUMBER]`
+- Color variations tied to content category (educational = {PRIMARY_HEX}, interviews = {ACCENT_HEX})
+- Typography treatment consistent across variants
+
+**Audience**: YouTube browsers deciding in <2 seconds whether to click.
+
+**Voice**: N/A (visual + episode-specific text).
+
+**Design**: Apply design system. **CRITICAL**:
+- High contrast (mobile YouTube browsers)
+- Text readable at 120×68 px (mobile thumbnail size)
+- Brand element consistently placed for recognition
+- Face/emotion visible if host-driven
+
+**Before building**: Propose 4 template system directions (each as: host emphasis / text hierarchy / brand element position — one-line rationale), then ask me to pick one.
+```
+
+#### Social post series (Instagram carousel + X thread + LinkedIn post unified)
+
+```markdown
+### Social post series template (Instagram carousel + X thread + LinkedIn post)
+
+**Goal**: Convert one content piece (podcast episode, video, newsletter) into native social posts across 3 platforms consistently.
+
+**Templates**:
+
+**Instagram carousel (10 slides, 1080×1080)**:
+- Slide 1: Hook ("5 things I learned about X")
+- Slides 2-9: Points (1 per slide, large text, branded)
+- Slide 10: CTA (follow / save / share)
+
+**X thread (5-10 tweets)**:
+- Tweet 1: Hook with stakes
+- Tweets 2-8: Points (each standalone)
+- Final tweet: CTA (RT, follow, link)
+
+**LinkedIn post (long-form text)**:
+- Hook (first 3 lines critical — "see more" cutoff)
+- Body (3-5 paragraphs)
+- Closing reflection
+- CTA (comment, share)
+
+**Content system**:
+- All three pulled from same source piece
+- Voice consistent across
+- Brand visual elements on Instagram carousel (logo corner, palette)
+
+**Audience**: Social-scrolling users, varied platforms, varied attention spans.
+
+**Voice**: {VOICE_ATTRIBUTES}. Adjust register per platform:
+- Instagram: emotional + visual + concise
+- X: punchy + opinionated + network-aware
+- LinkedIn: professional + insight-forward
+
+**Design**: Apply design system for Instagram visuals. X/LinkedIn are text-only.
+
+**Before building**: Propose 4 content-to-social directions (each as: angle pattern / visual treatment — one-line rationale), then ask me to pick one.
+```
+
+---
+
+### Community-specific prompts — `community-movement`
+
+#### Discord/Slack server branding
+
+```markdown
+### Discord server branding
+
+**Goal**: Cohesive Discord server identity for {BRAND_NAME} that makes new members feel "this is a real place".
+
+**Layout** (Discord-specific deliverables):
+- Server icon 512×512 (circular crop-ready)
+- Server banner 960×540
+- Role color palette (6-8 colors derived from brand palette)
+- Welcome channel message design
+- Custom emoji direction (5-10 emoji concepts aligned with brand)
+- Channel icon set (for main categories)
+
+**Content**:
+- Server name: {BRAND_NAME}
+- Tagline for banner: "{TAGLINES_ASPIRATIONAL}"
+- Welcome message: based on {RECRUITING_COPY}
+- Emoji themes: aligned with {ARCHETYPE} vocabulary
+
+**Audience**: Existing and prospective members. Users familiar with Discord culture.
+
+**Voice**: {VOICE_ATTRIBUTES}. Discord-native (shorter, warmer, community-forward).
+
+**Design**: Apply design system. **CRITICAL**: server icon must be legible at 32px (Discord sidebar size).
+
+**Before building**: Propose 4 server identity directions (each as: icon treatment / banner composition / role color philosophy — one-line rationale), then ask me to pick one.
+```
+
+#### Member recruiting copy
+
+```markdown
+### Member recruiting copy
+
+**Goal**: Convert a visitor to a member of {BRAND_NAME}. Make them feel "I belong here".
+
+**Layout** (for recruiting landing or post):
+- Hero: emotional hook ("You know that feeling when...")
+- What this community is NOT (subverts expectations)
+- What we believe (3-5 principles in bold statements)
+- Who belongs here (specific — better than "everyone")
+- Who doesn't belong here (filters — feel of exclusivity)
+- CTA to join
+
+**Content**:
+- Based on "{MANIFESTO_OPENING}"
+- Principles drawn from {BRAND_VALUES}
+- Target audience: {TARGET_PRIMARY_DESCRIPTION}
+- CTA: "Join {BRAND_NAME}" or specific phrase matching movement energy
+
+**Audience**: Ideologically-aligned prospects. People who already half-believe what you believe.
+
+**Voice**: {VOICE_ATTRIBUTES}. Expressive-raw typically. You're not selling — you're gathering.
+
+**Design**: Apply design system. Typography drives — imagery supports. Single-column for reading flow.
+
+**Before building**: Propose 4 recruiting directions (each as: emotional register / filter intensity / structure pattern — one-line rationale), then ask me to pick one.
+```
+
+---
+
+### Local-service-specific prompts (additional) — `b2local-service`
+
+#### Printable flyer
+
+```markdown
+### Printable flyer (for local distribution)
+
+**Goal**: Eye-catching flyer for local distribution (mailboxes, local cafes, partnerships) for {BRAND_NAME}.
+
+**Layout** (A5 or quarter-page letter):
+- Large logo + brand name at top
+- Bold headline / offer dominant
+- 3 key benefits (icons + short text)
+- Location + hours + phone/WhatsApp
+- QR code to landing page (optional)
+- Small tagline at bottom
+
+**Content**:
+- Headline: main offer or local-resonant claim ("Vení a conocernos")
+- Benefits: 3 short phrases from {THREE_BULLETS}
+- Address: [user provides]
+- Hours: [user provides]
+
+**Audience**: People who receive the flyer (often while doing something else). 3-second impression.
+
+**Voice**: {VOICE_ATTRIBUTES}. Punchy-only — long-form dies on paper.
+
+**Design**: Apply design system. **PRINT CONSIDERATIONS**:
+- RGB → CMYK disclaimer in output (user converts before press)
+- 3mm bleed around edges (safe area)
+- Typography sizes minimum 8pt body, 14pt headline
+- Flag: "Colors may shift in CMYK conversion — print test before run"
+
+**Before building**: Propose 4 flyer directions (each as: offer emphasis / visual hierarchy / typography dominance — one-line rationale), then ask me to pick one.
+```
+
+#### Phone greeting script
+
+```markdown
+### Phone greeting script
+
+**Goal**: Consistent first impression on phone calls for {BRAND_NAME} — every team member greets the same way.
+
+**Layout** (script + flow):
+
+**Greeting (0-5 seconds)**:
+"Hola, {BRAND_NAME}, habla {Your Name}, ¿en qué te puedo ayudar?"
+
+**Branching**:
+- If booking: → "Dame un segundo que te busco un horario..."
+- If info request: → "Claro, dame un momento..."
+- If existing customer: → "¡Hola! ¿Cómo estás? ¿En qué te ayudo?"
+
+**Closing**:
+"Listo, te confirmo por WhatsApp así lo tenés escrito. ¿Necesitás algo más?"
+
+**Don'ts**:
+- Never put on hold without asking "¿Podés esperar un momento?"
+- Never say "eso no es de mi área" without offering alternative
+
+**Audience**: Customers calling for bookings, info, complaints. Expect immediate human interaction.
+
+**Voice**: {VOICE_ATTRIBUTES}. Warm, professional, efficient. In local dialect.
+
+**Design**: N/A (script for verbal delivery). Provide formatted text with clear branches and don'ts.
+
+**Before building**: Propose 4 script directions (each as: formality level / structure / phrase patterns — one-line rationale), then ask me to pick one.
+```
+
 ---
 
 ## Per-Scope Inclusion Matrix
 
-See `skills/brand/references/brand-profiles.md` §Cross-Profile Output Matrix for which prompts are required/optional/skipped per brand profile.
+See `skills/brand/references/brand-profiles.md` §Cross-Profile Output Matrix for the canonical matrix per brand profile. Handoff Compiler includes only prompts marked `required` or `optional_recommended` in `scope.output_manifest.prompts_library` — do not emit prompts marked `skip`.
 
-Handoff Compiler includes only prompts marked `required` or `optional_recommended` in `scope.output_manifest.prompts_library` — do not emit prompts marked `skip`.
+Authoritative prompt-level matrix (✓ required, ○ optional_recommended, — skip):
+
+| Prompt | ent | smb | dev | c-app | c-web | local | media | comm |
+|---|---|---|---|---|---|---|---|---|
+| Landing hero | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Landing page (full) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ○ |
+| About page | ✓ | ✓ | ○ | ○ | ✓ | ○ | ○ | ○ |
+| Pricing page | ✓ | ✓ | ○ | ✓ | ✓ | — | ○ | ○ |
+| Pitch deck (10 slides) | ✓ | — | — | — | — | — | — | — |
+| Case study | ✓ | ○ | ○ | — | — | — | — | — |
+| LinkedIn post templates | ✓ | ✓ | ○ | — | — | — | ○ | ○ |
+| App store listing | — | — | — | ✓ | — | — | — | — |
+| Instagram post templates | — | ○ | — | ✓ | ✓ | ✓ | ✓ | ○ |
+| TikTok cover | — | — | — | ✓ | ○ | — | ✓ | ○ |
+| GitHub README | — | — | ✓ | — | — | — | — | — |
+| Code snippet styling | — | — | ✓ | — | — | — | — | — |
+| Docs-style landing | — | — | ✓ | — | — | — | — | — |
+| Local landing | — | — | — | — | — | ✓ | — | — |
+| WhatsApp templates | — | — | — | — | — | ✓ | — | — |
+| Printable flyer | — | — | — | — | — | ✓ | — | — |
+| Phone greeting script | — | — | — | — | — | ✓ | — | — |
+| Manifesto document | — | — | — | — | — | — | — | ✓ |
+| Discord server branding | — | — | — | — | — | — | — | ✓ |
+| Member recruiting copy | — | — | — | — | — | — | — | ✓ |
+| Podcast cover | — | — | — | — | ○ | — | ✓ | — |
+| Video thumbnails series | — | — | — | — | — | — | ✓ | — |
+| Newsletter template | — | — | — | — | ○ | — | ✓ | — |
+| Social post series | — | — | — | — | — | — | ✓ | ○ |
+| Welcome email | ✓ | ✓ | ✓ | ✓ | ✓ | — | ○ | ○ |
+| Email welcome sequence | ✓ | ✓ | ○ | ○ | ✓ | — | ○ | ○ |
 
 ---
 

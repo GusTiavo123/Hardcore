@@ -293,6 +293,127 @@ Scope extras go after Copy Samples and before Scope & Limitations.
 
 ---
 
+## Embedded Machine-Readable Design Tokens
+
+The PDF embeds machine-readable design tokens that Claude Design can extract reliably. Without these, Claude Design may infer colors approximately but won't get exact HEX values.
+
+### Color tokens (Page 4 — Palette)
+
+Each swatch displays:
+- HEX code prominently (e.g., `#0B1F3A`)
+- Machine-readable line: `color-primary: #0B1F3A`
+- Semantic usage tag: `usage: backgrounds, auth, headers`
+- The swatch itself rendered in that exact color
+
+Example layout per swatch:
+```
+[ Large rectangle filled with #0B1F3A, ~120×120 px ]
+─────────────────────────────────
+NAVY
+color-primary: #0B1F3A
+HSL: hsl(216, 68%, 14%)
+usage: backgrounds, auth, headers
+```
+
+### Typography tokens (Page 5 — Typography)
+
+Each font specimen displays:
+- Family name in actual font: `Fraunces`
+- Weights available: `400 / 600 / 700`
+- Sizes applied at real proportions (48px / 32px / 24px specimens)
+- Google Fonts import URL in small text near specimen:
+  `import: https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&display=swap`
+
+Specimen at multiple weights is critical — Claude Design infers weight scale from what it sees.
+
+### Spacing tokens (Page 8 — Visual Principles)
+
+Visual grid showing the spacing scale (4 / 8 / 16 / 24 / 32 / 48 / 64 / 96 px) **applied to actual layout spacing in the PDF itself**. The page IS an example of the scale.
+
+Add a small reference: `spacing-scale: 4 / 8 / 16 / 24 / 32 / 48 / 64 / 96`.
+
+### Component tokens (Page 9 — Copy Library Samples)
+
+Applied component examples ARE the tokens — no abstraction layer. Render:
+- Button at exact properties (color = accent, radius = 8px, padding = sm/md, font = body 500, size = body)
+- Card at exact properties (radius = 12px, shadow = sm, padding = lg)
+- These render with the same values as `tokens.css` / `tokens.json` produces
+
+Add small annotation: `button: bg=accent, radius=md, padding=sm md, font=body 500`.
+
+---
+
+## Format & Production
+
+### Tool
+
+Use `ms-office-suite:pdf` skill. Generation path:
+1. Handoff Compiler compiles markdown content per page with inline styling for visual elements
+2. Markdown → PDF via skill (with embedded styling)
+3. Embed Google Fonts (imported in PDF generation context)
+4. Embed logo SVGs
+5. Embed mood image refs (links + attribution, NOT downloaded binaries)
+
+### Filename
+
+`brand-design-document.pdf` — always canonical. Do not version in filename (versioning lives in `brand/{slug}/snapshot/v{N}` Engram metadata).
+
+### File size targets
+
+- Typical: **2-8 MB**
+- Maximum acceptable: **~15 MB** (heavier when scope includes more imagery embeds, e.g., `content-media` or `b2c-consumer-app` with screenshot previews)
+- If PDF exceeds 15 MB: regenerate with image compression. Flag if persistent after retry.
+
+### PDF compatibility
+
+- **PDF/A compliance** preferred (archivability) when the skill supports it.
+- Fonts embedded — no CDN dependency post-download.
+- Logo SVGs embedded as vector when supported, raster fallback otherwise.
+- Tested in standard viewers: Preview (macOS), Adobe Reader, Firefox, Chrome.
+
+---
+
+## Claude Design Compatibility Testing (manual)
+
+Verify the PDF is Claude Design-friendly. Required for at least 1 run per brand profile during Sprint 1 dogfooding.
+
+**Test procedure**:
+1. User uploads `brand-design-document.pdf` to Claude Design "Set up your design system".
+2. Wait for extraction (~30s-2min).
+3. Verify extracted design system:
+   - **Colors**: primary, background, accent — match the swatches in Page 4? (HEX exact)
+   - **Typography**: heading + body — match Page 5 specimens? (family + weights)
+   - **Components**: buttons, cards — reflect Page 9 applied examples? (visual fidelity)
+   - **Voice**: copy that Claude Design generates next — matches voice attributes from Page 3?
+4. Create a test project in Claude Design.
+5. Prompt: *"Create a simple 1-page site for {Brand Name} using my brand"*.
+6. Compare: does the output feel like our brand (palette, typography, voice all coherent)?
+
+**If mismatches**:
+- Investigate which page failed to convey the value (color HEX visible? typography rendered in actual font?)
+- Iterate the template (this file) and regenerate.
+- Track in §Iteration Changelog below.
+
+---
+
+## Iteration Changelog
+
+This section accumulates learnings from Claude Design dogfooding. Append entries; do not delete history (it's the signal).
+
+```
+## v1.0 (2026-04 — initial spec)
+- Base structure as documented above
+
+## v1.1 (TBD — after first dogfood run)
+- {what was learned}
+- {what changed in the template}
+- {Claude Design behavior observation}
+```
+
+This file is a **living spec**. As Sprint 1 produces real Claude Design uploads, edit this section with concrete observations and version-bump as breaking changes accumulate.
+
+---
+
 ## Fallback (markdown if PDF skill fails)
 
 If `ms-office-suite:pdf` fails after retries, emit `brand-design-document.md` with:
@@ -312,3 +433,6 @@ Flag `pdf_conversion_failed: true` in Handoff envelope.
 4. **Every page has a focus.** One main concept per page.
 5. **Typography must be embedded.** Use Google Fonts import in the PDF generation context so rendered typography matches brand.
 6. **Page count stays in range** per brand profile. Do not exceed.
+7. **Machine-readable tokens always present.** Each color swatch, font specimen, and component example carries the literal token line that Claude Design can parse (e.g., `color-primary: #0B1F3A`).
+8. **File size ≤ 15 MB.** Compress images on regeneration if exceeded.
+9. **Test against Claude Design at least once per profile** during dogfooding. Record results in §Iteration Changelog.

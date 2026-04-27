@@ -427,7 +427,7 @@ Invocation: `brandea esta idea` / `/brand:new`.
 - 4 interaction points mid-run: post-Scope (conditional), post-Strategy, post-Verbal naming, post-Logo.
 - 1 obligatory pre-delivery review.
 - Progressive reveal after each dept.
-- Typical runtime: 15-25 min.
+- Typical compute runtime: 15-25 min (varies by profile — see table below).
 
 ### Fast mode
 
@@ -436,7 +436,37 @@ Invocation: `/brand:fast` / `brandea rápido`.
 - Skips mid-run interactions (auto-picks top-ranked at each decision).
 - **Keeps the pre-delivery review** — non-negotiable safety net. User can `/brand:extend {dept}` if anything doesn't convince.
 - Compressed reveals during execution.
-- Typical runtime: 12-20 min.
+- Typical compute runtime: 12-20 min (varies by profile — see table below).
+
+### Timing per Brand Profile
+
+Compute-only baselines (excludes user interaction wait time, which is 3-10 min additional in Normal mode). Calibrated in Sprint 1 from real runs; treat these as starting estimates.
+
+| Brand profile | Normal mode | Fast mode | Notes |
+|---|---|---|---|
+| `b2local-service` | 10-15 min | 8-12 min | Compact scope: no pitch deck, no TikTok, no enterprise sections |
+| `b2b-smb` | 15-20 min | 12-16 min | Baseline |
+| `b2b-enterprise` | 20-25 min | 15-20 min | Pitch deck + case study + security/compliance copy adds ~5 min to Verbal |
+| `b2d-devtool` | 15-20 min | 12-16 min | Extra in GitHub README + CLI aesthetic, compensated by less social |
+| `b2c-consumer-app` | 18-22 min | 14-18 min | App icon set + app store templates + onboarding adds to Handoff Compiler |
+| `b2c-consumer-web` | 15-20 min | 12-16 min | Baseline |
+| `content-media` | 18-24 min | 14-18 min | Podcast cover + video thumbnails + newsletter + merch direction adds to Handoff |
+| `community-movement` | 22-30 min | 18-24 min | Manifesto is long-form (Verbal ~10 min vs 5-7); symbolic assets + Discord branding |
+
+**Per-step baseline** (Normal mode, b2b-smb baseline):
+- Setup + Engram retrieval + pre-flight: 30-60s
+- Scope Analysis sub-agent: 1-2 min
+- Strategy: 2-3 min
+- Verbal Identity (parallel with Visual): 5-7 min
+- Visual System (parallel with Verbal): 2-3 min
+- Logo & Key Visuals: 3-4 min
+- Handoff Compiler: 3-5 min
+
+Parallelism (Verbal ∥ Visual) keeps the total at ~15-20 min for the baseline. Without parallelism it would be ~22-28 min.
+
+**Timing alerts during run**:
+- If a step exceeds expected +50%: surface to user — *"⚠ This step is taking longer than expected (estimated ~3 min, actual ~5 min). Wait or cancel?"*
+- If total exceeds 60 min: alert + offer `/brand:resume` to retake later instead of aborting.
 
 ### Extend mode
 
@@ -583,26 +613,125 @@ When a run reaches the end with soft failures:
 
 ## Edge Cases
 
-### Override conflict with scope
+### Input edge cases
+
+#### Override conflict with scope
 `archetype=Outlaw` + `brand_profile=b2b-enterprise` → block with options: adjust override, change brand_profile, or abort.
 
-### Scope classification ambiguous (primary + secondary within 1 point)
+#### Scope classification ambiguous (primary + secondary within 1 point)
 Force user confirmation at Interaction Point 1 even if total confidence ≥ 0.7.
 
-### All candidate names taken (TM red or domain taken)
-Present raw candidates + conflicts matrix. User decides: adopt a flagged candidate with explicit tension-accepted flag, or regenerate with explicit constraints (alternate TLDs, prefixes/suffixes).
+#### Multiple Validations on the same idea
+Default: latest validation snapshot. User can disambiguate with `/brand:new --validation-version=v1`.
 
-### Session crashes mid-flow
+#### Re-run on idea that already has a Brand run
+Confirm with user. Options: new run (creates v{N+1}), `/brand:extend {dept}` (partial), `/brand:show v{N}` (display existing), or cancel.
+
+#### Inputs modified since last Brand run
+Detect via input hashes (`input_hashes.validation_hash` / `profile_hash` / `idea_text_hash`). Inform user: "Validation/Profile changed since v{N}. Continue with new inputs (v{N+1}), or use frozen snapshot (`/brand:reproduce v{N}`)?"
+
+#### Idea hybrid (multiple brand profiles match)
+`primary + secondary` with composition_weights. Union of required outputs, intersection of skip, weighted modifiers (see `brand-profiles.md` §Hybrid).
+
+#### Idea matches no profile well
+`primary_confidence < 0.5` → fallback `b2b-smb` with flag `low_confidence_classification: true`. Force user confirmation with the 8 profiles + "other (describe manually)".
+
+### Execution edge cases
+
+#### User cancels mid-flow
+Persist partial state (`status: "partial"` in `brand/{slug}/handoff`). Offer `/brand:resume`.
+
+#### Session crashes mid-flow
 Engram preserves state. `/brand:resume {slug}` rehydrates from the last completed phase (or from the pending gate if it was a halt-without-decision).
 
-### Profile updated after Brand run
+#### Timeout in user interaction
+- 10 minutes without response → pause (notify, preserve state).
+- 24 hours without response → cancel run, flag `incomplete_user_timeout`. `/brand:resume` to retake.
+
+This differs from per-dept compute timeout (15 min) and orchestrator total (60 min) — those are compute-bound, not user-bound.
+
+#### Partial run completes (some soft failures)
+Deliver package with what's available + flags. README declares partial. `/brand:extend {failed_dept}` to retry the failed parts. Full pattern in §Failure Modes →Partial output policy.
+
+### Output edge cases
+
+#### Package path conflict (re-run over existing output)
+Default: backup current `output/{slug}/brand/` to `output/{slug}/brand-vN-backup/` → overwrite with new run. Snapshot files preserved in backup.
+
+#### Disk space insufficient
+Clean up partial files (any in-progress writes). Surface clear error to user. Suggest `/brand:cleanup --keep-last N` to free space from older snapshots.
+
+#### Filesystem permissions denied
+Clear error message. State preserved in Engram. User fixes permissions and runs `/brand:resume`.
+
+### User input edge cases
+
+#### Invalid override (key not in allowlist)
+Reject with explicit list of allowlist keys + which key was rejected.
+
+#### Override values outside enum
+Reject with explicit list of valid values for that key.
+
+#### User requests an asset out of scope v1
+Examples: packaging 3D, motion design, sonic branding, real photography, complex organic illustrations. Explicit rejection + alternatives:
+- Brand Document PDF as brief for a human designer
+- Future Hardcore modules (Brand-Physical, Brand-Motion, Brand-Sonic)
+- Iterate via Claude Design downstream
+
+### Tool edge cases
+
+#### Multiple tools down simultaneously
+Handle each independently per §Failure Modes (retries, fallbacks per tool). If multiple critical tools are down (Engram + open-websearch + Domain MCP all fail): surface to user with options to (a) cancel and retry later, (b) continue with severe degradation accepting the flags. Engram down is always hard halt regardless.
+
+#### Tool returns unexpected format
+Flag in internal logs. Retry with format emphasis (max 2). Fallback if persistent. Never silently accept unparseable output.
+
+#### Palette generation produces invalid colors (out-of-gamut OR all-pair WCAG fails)
+Auto-adjust to bring within gamut. Re-run palette generation with more distant seeds if WCAG keeps failing. After 2 regeneration cycles unresolved: surface 3 alternate palettes to user for manual choice.
+
+### Data consistency edge cases
+
+#### Engram inconsistency (topic keys conflict)
+E.g., `brand/{slug}/strategy` present but `brand/{slug}/visual` missing despite handoff implying both done. Warn + offer options: re-run the missing dept (`/brand:extend {dept}`), full re-run (`/brand:new`), or inspect Engram manually.
+
+#### Filesystem ↔ Engram divergence
+Detection: snapshot manifest references files that don't exist on disk, OR files exist that aren't in the manifest. Warn + options: regenerate missing files (`/brand:extend handoff` regenerates the package), restore from a `brand-vN-backup/` directory if present, or continue partial with explicit flag.
+
+### Concurrency edge cases
+
+#### Two Brand runs simultaneously on the same idea
+Block the second invocation. Options: cancel the ongoing run, wait for it to complete, or `/brand:resume` if the first was a halt-pending-user-decision.
+
+#### Brand runs on different ideas simultaneously
+Allowed — no conflict. Different `{slug}` namespaces in Engram.
+
+### Claude Design edge cases
+
+#### User reports Claude Design rejected/failed PDF upload
+Possible causes + responses:
+- PDF too large → regenerate with compression flag in Handoff Compiler retry
+- Claude Design changed format expectations → update `brand-document-template.md`, regenerate
+- Specific page corrupt → regenerate that section only
+
+#### Claude Design extracts design system incorrectly
+Detection: user reports colors/fonts don't match after upload + extract. Investigation:
+- Was our PDF incomplete? → fix Handoff Compiler template, regenerate
+- Was Claude Design parsing buggy? → document workaround (manual color/font entry in Claude Design)
+
+#### Claude Design changes behavior breaking our PDF
+Anthropic updates Claude Design and parsing changes. Response:
+- Update `brand-document-template.md`
+- Re-test all 8 brand profiles
+- Bump `brand_module_version`
+- Notify existing users to regenerate (snapshot diff helps)
+
+#### Anthropic releases Claude Design MCP/API
+Update Handoff Compiler with `--auto-setup` flag (additive — not breaking). Maintain manual upload path as fallback. Bump version.
+
+### Profile-related edge cases
+
+#### Profile updated after Brand run
 Does NOT invalidate Brand retroactively. When a future consumer module reads Brand: flag staleness ("brand may be outdated — upstream changed"). User can `/brand:new` to regenerate (creates v{N+1}).
-
-### Claude Design changes PDF format expectations
-Update `brand-document-template.md` in handoff-compiler references. Re-test all brand profiles. Bump `brand_module_version`. Notify existing users to regenerate.
-
-### User cancels mid-flow
-Persist partial state (`status: "partial"` in `brand/{slug}/handoff`). Offer `/brand:resume`.
 
 ---
 
