@@ -904,11 +904,93 @@ Authoritative prompt-level matrix (✓ required, ○ optional_recommended, — s
 
 ---
 
+## Variable Source Mapping
+
+When customizing templates at runtime, substitute every `{VAR}` with values from upstream artifacts. Categorize variables into three groups:
+
+### Group 1 — From upstream depts (substituted by Handoff Compiler)
+
+| Variable | Source field |
+|---|---|
+| `{BRAND_NAME}` | `verbal.naming_artifact.chosen` |
+| `{ARCHETYPE}` | `strategy.archetype.chosen` |
+| `{VOICE_ATTRIBUTES}` | `strategy.voice_attributes[]` (rendered as joined attribute names) |
+| `{VOICE_ATTRIBUTES_JOINED}` | `strategy.voice_attributes[]` (rendered as comma-separated string) |
+| `{DO_EXAMPLE}` | `strategy.voice_attributes[0].do_examples[0]` |
+| `{DONT_EXAMPLE}` | `strategy.voice_attributes[0].dont_examples[0]` |
+| `{BRAND_VALUES}` | `strategy.brand_values[]` (rendered as comma-separated names) |
+| `{BRAND_VALUES_LIST}` | `strategy.brand_values[]` (rendered as bullet list with definitions) |
+| `{TARGET_AUDIENCE}` | `strategy.target_audience_refined.primary.description` |
+| `{TARGET_PRIMARY_DESCRIPTION}` | `strategy.target_audience_refined.primary.description` |
+| `{HERO_HEADLINE}` | `verbal.core_copy_artifact.hero.primary.headline` |
+| `{HERO_SUBHEADLINE}` | `verbal.core_copy_artifact.hero.primary.subheadline` |
+| `{CTA_PRIMARY}` | `verbal.core_copy_artifact.cta.primary` |
+| `{CTA_SECONDARY}` | `verbal.core_copy_artifact.cta.secondary` |
+| `{TAGLINES_SHORT}` | `verbal.core_copy_artifact.taglines[length=short].text` |
+| `{TAGLINES_ASPIRATIONAL}` | `verbal.core_copy_artifact.taglines[length=aspirational].text` |
+| `{ABOUT_SHORT}` | `verbal.core_copy_artifact.about.short` |
+| `{ABOUT_MEDIUM}` | `verbal.core_copy_artifact.about.medium` |
+| `{VALUE_PROP_ONE_LINE}` | `verbal.core_copy_artifact.value_props.one_line` |
+| `{THREE_BULLETS}` | `verbal.core_copy_artifact.value_props.three_bullets[]` (rendered as bullet list) |
+| `{APP_STORE_SHORT}` | `verbal.core_copy_artifact.specialized_by_scope.app_store_short` (b2c-consumer-app only) |
+| `{APP_STORE_LONG}` | `verbal.core_copy_artifact.specialized_by_scope.app_store_long` (b2c-consumer-app only) |
+| `{MANIFESTO_OPENING}` | `verbal.core_copy_artifact.specialized_by_scope.manifesto_opening` (community-movement only) |
+| `{RECRUITING_COPY}` | `verbal.core_copy_artifact.specialized_by_scope.recruiting_copy` (community-movement only) |
+| `{WHATSAPP_GREETING_SEED}` | `verbal.core_copy_artifact.communications_core.whatsapp_greeting_seed` (b2local-service only) |
+| `{PRIMARY_HEX}` | `visual.palette.primary_palette.colors.primary.hex` |
+| `{BG_HEX}` | `visual.palette.primary_palette.colors.background.hex` |
+| `{ACCENT_HEX}` | `visual.palette.primary_palette.colors.accent.hex` |
+| `{HEADING_FONT}` | `visual.typography.heading.family` |
+| `{BODY_FONT}` | `visual.typography.body.family` |
+| `{VISUAL_PRINCIPLES_SUMMARY}` | `visual.visual_principles` (1-line summary derived from whitespace + shape_language + density) |
+| `{FORMALITY}` | `scope.intensity_modifiers.visual_formality` |
+| `{LANGUAGE}` | `scope.cultural_scope` mapped to language code (regional-LATAM → es; regional-US → en; etc.) — overridable via `user_overrides.language` |
+| `{DATE}` | run timestamp (ISO date) |
+
+### Group 2 — Pricing / metric placeholders (Handoff fills if available, else marks as user-filled)
+
+| Variable | Source / fallback |
+|---|---|
+| `{PRICING_TIERS_COUNT}` | `validation.bizmodel.pricing_suggestion.tiers.length` if present, else `3` (default) |
+| `{PRICING_STRUCTURE}` | derived from `validation.bizmodel.pricing_suggestion` (one-line summary), else placeholder text |
+
+### Group 3 — User-filled placeholders (Handoff leaves verbatim — user fills in Claude Design)
+
+These appear literally in the emitted prompts because Brand can't infer them from validation/profile. Document in the README that the user replaces these:
+
+- `{ADDRESS_PLACEHOLDER}` — local service address (b2local-service)
+- `{HOURS_PLACEHOLDER}` — opening hours (b2local-service)
+- `{PHONE_PLACEHOLDER}` — phone number (b2local-service)
+- `{CONTACT_PLACEHOLDER}` — contact email/form (universal, optional)
+- `{SERVICES_LIST_PLACEHOLDER}` — list of services offered (b2local-service)
+- `{INSTALL_COMMAND_PLACEHOLDER}` — install command (b2d-devtool)
+- `{CUSTOMER}` — customer name in case study (b2b)
+- `{METRIC}` — outcome metric in case study (b2b)
+- `{TIMEFRAME}` — period for metric (b2b)
+- `{FEATURE_LIST_5}` — 5 feature names for app store screenshots (b2c-consumer-app)
+
+### Substitution Rules
+
+1. **Group 1 variables**: substitute at Handoff Compiler emission time. If the source field is empty/null AND the variable is required for the prompt's scope, that's a manifest-completeness failure — Handoff regenerates the upstream dept output with explicit instruction to populate the field, max 2 retries. If still empty, flag `prompt_variable_missing: {var}` and mark the prompt with a `⚠ TODO` annotation in the output.
+2. **Group 2 variables**: substitute if available; else replace with descriptive placeholder text the user can fill (e.g., `{PRICING_STRUCTURE}` → `[describe your pricing model]`).
+3. **Group 3 variables**: leave verbatim with the `{...}` braces. Handoff appends a "User Fills" section to the README listing every Group 3 variable used in the emitted Prompts Library.
+
+### Validation post-substitution
+
+After emission, scan the file:
+- No Group 1 variable should remain unsubstituted (search regex: `\{[A-Z_]+\}` minus Group 3 allowlist)
+- All Group 3 variables present should appear in the README "User Fills" section
+- `{DO_EXAMPLE}` / `{DONT_EXAMPLE}` per prompt should NOT all reference the same voice attribute — rotate through `strategy.voice_attributes[]` so different prompts surface different attributes
+
+---
+
 ## Critical Rules
 
-1. **All variables substituted.** No `{BRAND_NAME}` placeholders remaining in output.
-2. **Voice attributes from Strategy are used verbatim.** Do not paraphrase.
-3. **Do/Don'ts pulled from brand book.** Each prompt references the archetype's concrete examples.
-4. **"Before building" move on every prompt.** Forces Claude Design to propose options.
-5. **Scope manifest is authoritative.** If a prompt is marked skip in scope, don't emit it even if the user might want it.
-6. **HEX codes from Visual's palette.** Do not guess colors — reference the palette.
+1. **All Group 1 variables substituted.** No `{BRAND_NAME}` or similar placeholders remaining in output (check via post-substitution scan).
+2. **Group 3 placeholders documented in README.** Every user-filled variable listed in package README with explanation.
+3. **Voice attributes from Strategy are used verbatim.** Do not paraphrase.
+4. **Do/Don'ts pulled from brand book.** Each prompt references the archetype's concrete examples; rotate across attributes.
+5. **"Before building" move on every prompt.** Forces Claude Design to propose options.
+6. **Scope manifest is authoritative.** If a prompt is marked skip in scope, don't emit it even if the user might want it.
+7. **HEX codes from Visual's palette.** Do not guess colors — reference the palette.
+8. **Manifest completeness check.** If a required Group 1 variable is empty, regenerate upstream dept (max 2 retries) before flagging.
