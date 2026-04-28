@@ -21,8 +21,8 @@
       "command": "uvx",
       "args": [
         "--from",
-        "imprvhub/mcp-domain-availability",
-        "domain-mcp"
+        "git+https://github.com/imprvhub/mcp-domain-availability",
+        "mcp-domain-availability"
       ],
       "env": {}
     }
