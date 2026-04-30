@@ -123,14 +123,39 @@ Emit Google Fonts import URL (complete CSS2 query with weights) for inclusion in
 
 Execute only if `scope.output_manifest.reference_assets.optional_recommended` includes `mood_imagery_refs`.
 
-**Via Unsplash free API** (`GET /search/photos`):
+**API key loading** (mandatory pre-step):
+
+The `UNSPLASH_ACCESS_KEY` lives in the project-local `.env` file (gitignored — never committed). Bash sub-shell invocations don't auto-load shell rc files, so load explicitly:
+
+```bash
+# Read key without echoing it
+export $(grep -v '^#' .env | xargs)
+# OR equivalently:
+set -a && source .env && set +a
+```
+
+If `.env` does not exist OR `UNSPLASH_ACCESS_KEY` is empty: skip Unsplash entirely, emit `mood_imagery_skipped: true` flag with reason `unsplash_key_missing`. Do NOT prompt the user — the orchestrator's pre-flight should have validated this.
+
+**Via Unsplash free API** (`GET https://api.unsplash.com/search/photos`):
+
+```bash
+curl -s -H "Authorization: Client-ID $UNSPLASH_ACCESS_KEY" \
+  "https://api.unsplash.com/search/photos?query=<URL_ENCODED_QUERY>&per_page=3"
+```
 
 1. Derive `mood_keywords` from archetype + brand_values + voice attributes + target psychographics.
 2. Build 3-6 queries (one per mood axis: energy, texture, composition, light, focus, motion).
-3. Execute queries against Unsplash.
+3. Execute queries against Unsplash. Free demo tier rate limit: 50 req/h (we use 3-6 per run, far below).
 4. Select top 1 per query (or top 6 overall).
 5. Output: array of refs with URL, photographer, photo_id, attribution string, mood axis, description.
 6. These refs go into Reference Assets folder as **markdown files with metadata** (URL + attribution + mood description) — do NOT download binaries.
+
+**Required attribution format** per Unsplash ToS:
+```
+Photo by [Photographer Name](https://unsplash.com/@username) on [Unsplash](https://unsplash.com/photos/{photo_id})
+```
+
+**Never log or persist the API key** — only used in `Authorization: Client-ID` header. If you need to test/debug, reference it as `$UNSPLASH_ACCESS_KEY`, never echo its value.
 
 **Unsplash query templates per archetype × mood axis**:
 
